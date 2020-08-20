@@ -2,14 +2,14 @@
 /.pnp
 .pnp.js
 
+.env
+
 ormconfig.json
 
 */secrets
 /coverage
 
 /build
-
-.env
 
 .DS_Store
 .env.local
