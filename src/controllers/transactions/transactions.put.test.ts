@@ -1,12 +1,12 @@
 import { TestClient } from "../../tests/TestClient";
-import { mockTransactionConstructable } from "../../tests/testUtils";
+import { mockTransaction } from "../../tests/testUtils";
 import { v4 as uuid } from "uuid";
 
 const ids = [uuid(), uuid(), uuid()];
 
 const existingResources = (uid?: string) =>
   ids.map((id, index) => {
-    return mockTransactionConstructable({
+    return mockTransaction({
       integerAmount: index + 1,
       comment: `resource ${index + 1}`,
       category: "existing",
@@ -29,7 +29,7 @@ describe("/api/transactions > PUT", () => {
   it("blocks unauthorized requests", async (done) => {
     const client = new TestClient();
     const id = uuid();
-    const constructable = mockTransactionConstructable();
+    const constructable = mockTransaction();
     const response = await client.transactions().put(id, constructable);
     expect(response.status).toBe(401);
     done();
@@ -171,7 +171,7 @@ describe("/api/transactions > PUT", () => {
     await client.authenticate();
     const uid = client.authenticatedUid;
     const id = uuid();
-    const post = mockTransactionConstructable({
+    const post = mockTransaction({
       id,
       uid,
       comment: "original",

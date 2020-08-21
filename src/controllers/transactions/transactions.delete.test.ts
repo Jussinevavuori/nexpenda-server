@@ -1,5 +1,5 @@
 import { TestClient } from "../../tests/TestClient";
-import { mockTransactionConstructable } from "../../tests/testUtils";
+import { mockTransaction } from "../../tests/testUtils";
 import { v4 as uuid } from "uuid";
 
 describe("/api/transactions > DELETE", () => {
@@ -24,9 +24,7 @@ describe("/api/transactions > DELETE", () => {
     const uid = client.authenticatedUid;
     const ids = [uuid(), uuid(), uuid()];
     await Promise.all(
-      ids.map((id) =>
-        client.transactions().post(mockTransactionConstructable({ id, uid }))
-      )
+      ids.map((id) => client.transactions().post(mockTransaction({ id, uid })))
     );
     const before = await (await client.transactions().get()).json();
     expect(before).toHaveLength(3);
@@ -51,9 +49,7 @@ describe("/api/transactions > DELETE", () => {
     await client2.authenticate();
     const uid = client1.authenticatedUid;
     const id = uuid();
-    await client1
-      .transactions()
-      .post(mockTransactionConstructable({ id, uid }));
+    await client1.transactions().post(mockTransaction({ id, uid }));
     const response1 = await (await client1.transactions().get()).json();
     expect(response1).toHaveLength(1);
 

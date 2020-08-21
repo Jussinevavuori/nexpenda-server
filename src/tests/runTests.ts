@@ -1,5 +1,5 @@
 import * as jest from "jest-cli";
-import { startServer, connection } from "../server";
+import { startServer, prisma } from "../server";
 
 async function initialize() {
   await startServer();
@@ -30,9 +30,7 @@ async function runTests(options?: {
 }
 
 async function teardown() {
-  if (connection) {
-    await connection.close();
-  }
+  await prisma.$disconnect();
 }
 
 async function run() {
@@ -41,7 +39,7 @@ async function run() {
     runInBand: true,
     detectOpenHandles: true,
     forceExit: true,
-    testNamePattern: "transactions",
+    // testNamePattern: "post",
   });
   await teardown();
 }

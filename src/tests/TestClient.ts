@@ -161,6 +161,9 @@ export class TestClient {
       logout() {
         return that.get("/auth/logout");
       },
+      profile() {
+        return that.get("/auth/profile");
+      },
       refreshToken() {
         return that.get("/auth/refresh_token").then(async (response) => {
           try {

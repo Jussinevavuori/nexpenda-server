@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource postgresql {
+  provider = "postgresql"
+  url = "***"
+}
+
+model Transaction {
+  id            String  @id @default(uuid())
+  uid           String
+  user          User    @relation(fields: [uid], references: [id])
+  integerAmount Int     @map("integer_amount")
+  category      String
+  date          Int
+  comment       String?
+
+  @@map(name: "transactions")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String?       @unique
+  displayName  String?       @map("display_name")
+  password     String?
+  googleId     String?       @unique @map("google_id")
+  photoUrl     String?       @map("photo_url")
+  transactions Transaction[]
+
+  @@map(name: "users")
+}

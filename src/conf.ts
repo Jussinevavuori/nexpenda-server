@@ -1,4 +1,5 @@
-import "dotenv/config";
+import * as dotenv from "dotenv";
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 export const conf = {
   google: {
@@ -24,9 +25,9 @@ export const conf = {
     },
   },
 
-  port: ENV_NUM_WITH_NODE_ENV("PORT"),
+  port: ENV_NUM("PORT"),
 
-  clientHost: ENV_WITH_NODE_ENV("CLIENT_HOST"),
+  clientHost: ENV("CLIENT_HOST"),
 };
 
 /**
@@ -38,16 +39,4 @@ function ENV_NUM(variable: string) {
 
 function ENV(variable: string) {
   return process.env[variable] || "";
-}
-
-function ENV_NUM_WITH_NODE_ENV(variable: string) {
-  return Number(ENV_WITH_NODE_ENV(variable));
-}
-
-function ENV_WITH_NODE_ENV(variable: string) {
-  const suffixMap: Record<string, string> = {
-    test: "_TEST",
-    development: "_DEV",
-  };
-  return ENV(`${variable}${suffixMap[process.env.NODE_ENV || ""] || ""}`);
 }

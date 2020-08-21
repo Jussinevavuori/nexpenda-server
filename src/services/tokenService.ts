@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { User } from "../entity/user.entity";
 import * as jwt from "jsonwebtoken";
 import { conf } from "../conf";
+import { User } from "@prisma/client";
 
 /**
  * Extracting the access token from any request's authorization bearer header

@@ -1,6 +1,6 @@
 import { TestClient } from "../../tests/TestClient";
 import { v4 as uuid } from "uuid";
-import { mockTransactionConstructable } from "../../tests/testUtils";
+import { mockTransaction } from "../../tests/testUtils";
 
 describe("/api/transactions > GET", () => {
   it("blocks unauthenticated requests", async (done) => {
@@ -25,7 +25,7 @@ describe("/api/transactions > GET", () => {
     ];
 
     const constructables = options.map((opt) =>
-      mockTransactionConstructable({ ...opt, uid })
+      mockTransaction({ ...opt, uid })
     );
 
     await Promise.all(
@@ -63,10 +63,10 @@ describe("/api/transactions > GET", () => {
     const ids2 = [uuid(), uuid(), uuid(), uuid()];
 
     const constructables1 = ids1.map((id) =>
-      mockTransactionConstructable({ id, uid: uid1 })
+      mockTransaction({ id, uid: uid1 })
     );
     const constructables2 = ids2.map((id) =>
-      mockTransactionConstructable({ id, uid: uid2 })
+      mockTransaction({ id, uid: uid2 })
     );
 
     await Promise.all([

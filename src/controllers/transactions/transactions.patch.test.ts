@@ -1,12 +1,12 @@
 import { TestClient } from "../../tests/TestClient";
 import { v4 as uuid } from "uuid";
-import { mockTransactionConstructable } from "../../tests/testUtils";
+import { mockTransaction } from "../../tests/testUtils";
 
 describe("/api/transactions > PATCH", () => {
   it("blocks unauthorized requests", async (done) => {
     const client = new TestClient();
     const id = uuid();
-    const constructable = mockTransactionConstructable();
+    const constructable = mockTransaction();
     const response = await client.transactions().patch(id, constructable);
     expect(response.status).toBe(401);
     done();
@@ -17,7 +17,7 @@ describe("/api/transactions > PATCH", () => {
     await client.authenticate();
     const uid = client.authenticatedUid;
     const id = uuid();
-    const constructable = mockTransactionConstructable({ id, uid });
+    const constructable = mockTransaction({ id, uid });
     await client.transactions().patch(id, constructable);
     done();
   });
@@ -27,12 +27,12 @@ describe("/api/transactions > PATCH", () => {
     await client.authenticate();
     const uid = client.authenticatedUid;
     const id = uuid();
-    const constructable1 = mockTransactionConstructable({
+    const constructable1 = mockTransaction({
       id,
       uid,
       integerAmount: 1,
     });
-    const constructable2 = mockTransactionConstructable({
+    const constructable2 = mockTransaction({
       id,
       uid,
       integerAmount: 2,
