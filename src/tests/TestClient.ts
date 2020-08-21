@@ -90,7 +90,7 @@ export class TestClient {
    */
   async put(path: string, id: string, body?: any) {
     const response = await fetch(this.endpoint(path, id), {
-      headers: this.getHeaders(),
+      headers: this.getHeaders({ body }),
       timeout: this.defaultTimeout,
       method: "PUT",
       body: body ? JSON.stringify(body) : undefined,
@@ -191,7 +191,7 @@ export class TestClient {
         return that.post("/transactions", data);
       },
       put(id: any, data: any) {
-        return that.put("/transaction", id, data);
+        return that.put("/transactions", id, data);
       },
       patch(id: any, data: any) {
         return that.patch("/transactions", id);

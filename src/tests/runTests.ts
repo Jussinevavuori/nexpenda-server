@@ -41,7 +41,7 @@ async function run() {
     runInBand: true,
     detectOpenHandles: true,
     forceExit: true,
-    // testNamePattern: "transaction",
+    testNamePattern: "transactions",
   });
   await teardown();
 }

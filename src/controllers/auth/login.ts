@@ -4,11 +4,11 @@ import { UserNotFoundError } from "../../errors/UserNotFoundError";
 import { tokenService } from "../../services/tokenService";
 import { InvalidCredentialsError } from "../../errors/InvalidCredentialsError";
 import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
-import { schemas } from "../bodySchemas";
+import { authSchema } from "../schemas/auth.schema";
 
 authRouter.post("/login", async (req, res, next) => {
   try {
-    const form = await getValidatedRequestBody(req, schemas.authSchema);
+    const form = await getValidatedRequestBody(req, authSchema);
 
     const user = await User.findOne({ where: { email: form.email } });
 

@@ -19,13 +19,6 @@ export const io = socketIO(http);
 export let connection: undefined | Connection;
 export let server: undefined | Server;
 
-process.on("uncaughtException", function (exception) {
-  console.log("Uncaught exception in process:", exception);
-});
-process.on("unhandledRejection", function (rejection) {
-  console.log("Unhandled rejection in process", rejection);
-});
-
 export function startServer() {
   return new Promise(async (resolve, reject) => {
     try {

@@ -4,12 +4,12 @@ import { InvalidRequestDataError } from "../../errors/InvalidRequestDataError";
 import { tokenService } from "../../services/tokenService";
 import { UserAlreadyExistsError } from "../../errors/UserAlreadyExistsError";
 import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
-import { schemas } from "../bodySchemas";
 import { redirect } from "../../utils/redirect";
+import { authSchema } from "../schemas/auth.schema";
 
 authRouter.post("/register", async (request, response, next) => {
   try {
-    const form = await getValidatedRequestBody(request, schemas.authSchema);
+    const form = await getValidatedRequestBody(request, authSchema);
 
     const existingUser = await User.findOne({ where: { email: form.email } });
 

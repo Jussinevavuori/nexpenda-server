@@ -27,7 +27,7 @@ export async function getValidatedRequestBody<T extends object>(
     return validatedBody;
   } catch (error) {
     if (error instanceof yup.ValidationError) {
-      throw new InvalidRequestDataError(error.message);
+      throw new InvalidRequestDataError(error.errors.join("; "));
     } else {
       throw new InvalidRequestDataError();
     }
