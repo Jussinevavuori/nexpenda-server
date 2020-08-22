@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import * as express from "express";
 import { createServer, Server } from "http";
 import * as socketIO from "socket.io";
