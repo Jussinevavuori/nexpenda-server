@@ -6,7 +6,7 @@ describe("/api/auth/logout", () => {
   it("does nothing on unauthenticated request", async (done) => {
     const client = new TestClient();
     const response = await client.auth().logout();
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(302);
     done();
   });
   it("sends clear cookie header", async (done) => {

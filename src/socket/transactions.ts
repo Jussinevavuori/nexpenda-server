@@ -1,16 +1,12 @@
 import { io } from "../server";
 
-function log(...args: any[]) {
-  console.log("/transactions:", ...args);
-}
-
 const nsp = io.of("/transactions");
 
 nsp.on("connection", (socket) => {
-  log("User connected");
+  // ("User connected");
 
   socket.on("disconnect", () => {
-    log("User disconnected");
+    // ("User disconnected");
   });
 });
 

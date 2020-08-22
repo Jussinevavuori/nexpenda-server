@@ -35,7 +35,12 @@ export function startServer() {
       app.use(cookieParser());
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
-      app.use(cors());
+      app.use(
+        cors({
+          credentials: true,
+          origin: ["http://localhost:3000", "https://expenceapp.herokuapp.com"],
+        })
+      );
       app.use(initializeRequestData());
       app.use(extractAuthentication());
 

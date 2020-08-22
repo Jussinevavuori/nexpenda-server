@@ -26,6 +26,7 @@ model User {
   password     String?
   googleId     String?       @unique @map("google_id")
   photoUrl     String?       @map("photo_url")
+  tokenVersion Int           @default(1) @map("token_version")
   transactions Transaction[]
 
   @@map(name: "users")

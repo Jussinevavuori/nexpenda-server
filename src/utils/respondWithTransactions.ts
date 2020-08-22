@@ -13,8 +13,11 @@ export function respondWithTransactions(
   response: Response,
   transactions: Transaction[]
 ) {
+  console.log("Responding with", transactions.length, "transactions");
   response.send(
-    transactions.map(mapTransactionToResponse).sort((a, b) => a.time - b.time)
+    transactions
+      .map((transaction) => mapTransactionToResponse(transaction))
+      .sort((a, b) => a.time - b.time)
   );
 }
 

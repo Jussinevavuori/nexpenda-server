@@ -5,8 +5,13 @@ authRouter.get(
   "/profile",
   protectedRoute((user, req, res, next) => {
     try {
-      const { password, ...profile } = user;
-      res.json(profile);
+      res.json({
+        id: user.id,
+        displayName: user.displayName ?? undefined,
+        photoUrl: user.photoUrl ?? undefined,
+        email: user.email ?? undefined,
+        googleId: user.googleId ?? undefined,
+      });
     } catch (error) {
       next(error);
     }

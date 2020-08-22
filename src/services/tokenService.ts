@@ -7,7 +7,10 @@ import { User } from "@prisma/client";
  * Extracting the access token from any request's authorization bearer header
  */
 export function extractAccessTokenFromRequest(request: Request) {
-  return request.headers.authorization;
+  const authorizationHeader = request.headers.authorization;
+  if (!authorizationHeader) return;
+  if (!authorizationHeader.toLowerCase().startsWith("bearer ")) return;
+  return authorizationHeader.split(" ")[1];
 }
 
 /**
@@ -46,7 +49,8 @@ export function generateAndSendRefreshTokenAsCookie(
   try {
     const refreshToken = generateRefreshToken(user);
     return response.cookie(conf.token.refreshToken.name, refreshToken, {
-      maxAge: conf.token.refreshToken.expiresInSeconds,
+      maxAge: conf.token.refreshToken.expiresInSeconds * 1000,
+      httpOnly: true,
     });
   } catch (error) {
     return response;

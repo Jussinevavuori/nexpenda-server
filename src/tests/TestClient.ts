@@ -33,7 +33,7 @@ export class TestClient {
   getHeaders(options?: { body?: any }) {
     let headers: Record<string, string> = {};
     if (this.accessToken) {
-      headers["Authorization"] = this.accessToken;
+      headers["Authorization"] = `bearer ${this.accessToken}`;
     }
     if (this.refreshToken) {
       const value = `${conf.token.refreshToken.name}=${this.refreshToken};`;
