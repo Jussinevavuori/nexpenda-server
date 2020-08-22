@@ -8,8 +8,7 @@
     "start": "cross-env NODE_ENV=development ts-node --files ./src/index.ts",
     "production": "cross-env NODE_ENV=production ts-node --files ./src/index.ts",
     "dev": "nodemon -e ts -w ./src -x npm run start",
-    "test": "cross-env NODE_ENV=test ts-node --files ./src/tests/runTests.ts",
-    "script": "cross-env NODE_ENV=development ts-node --files ./src/script.ts"
+    "test": "cross-env NODE_ENV=test ts-node --files ./src/tests/runTests.ts"
   },
   "author": "",
   "license": "ISC",

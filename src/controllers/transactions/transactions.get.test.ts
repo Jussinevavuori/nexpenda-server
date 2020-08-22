@@ -16,12 +16,12 @@ describe("/api/transactions > GET", () => {
     const uid = client.authenticatedUid;
 
     const options = [
-      { id: uuid(), date: 2 },
-      { id: uuid(), date: 1 },
-      { id: uuid(), date: 6 },
-      { id: uuid(), date: 3 },
-      { id: uuid(), date: 5 },
-      { id: uuid(), date: 8 },
+      { id: uuid(), time: 2 },
+      { id: uuid(), time: 1 },
+      { id: uuid(), time: 6 },
+      { id: uuid(), time: 3 },
+      { id: uuid(), time: 5 },
+      { id: uuid(), time: 8 },
     ];
 
     const constructables = options.map((opt) =>
@@ -39,7 +39,7 @@ describe("/api/transactions > GET", () => {
     expect(Array.isArray(body)).toBeTruthy();
     expect(body).toHaveLength(6);
 
-    const sorted = options.sort((a, b) => a.date - b.date);
+    const sorted = options.sort((a, b) => a.time - b.time);
 
     expect(body[0].id).toBe(sorted[0].id);
     expect(body[1].id).toBe(sorted[1].id);

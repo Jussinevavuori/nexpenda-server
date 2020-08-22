@@ -3,6 +3,13 @@ import { startServer, prisma } from "../server";
 
 async function initialize() {
   await startServer();
+
+  await prisma.transaction.deleteMany({
+    where: { id: { not: { equals: "" } } },
+  });
+  await prisma.user.deleteMany({
+    where: { id: { not: { equals: "" } } },
+  });
 }
 
 async function runTests(options?: {
@@ -39,9 +46,16 @@ async function run() {
     runInBand: true,
     detectOpenHandles: true,
     forceExit: true,
-    // testNamePattern: "post",
+    testNamePattern: getTestNamePattern(),
   });
   await teardown();
+}
+
+function getTestNamePattern() {
+  const testNamePatternArg = process.argv.find((arg) => arg.startsWith("-t="));
+  if (testNamePatternArg) {
+    return testNamePatternArg.substring(3);
+  }
 }
 
 run();

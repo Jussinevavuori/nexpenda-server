@@ -37,6 +37,8 @@ describe("/api/transactions > POST", () => {
     await client.authenticate();
     const transaction = mockTransaction();
     expect(transaction.uid).toBeDefined();
+    expect(transaction.uid).not.toBe(client.authenticatedUid);
+    expect(transaction.uid).toBeDefined();
     const response = await client.transactions().post(transaction);
     expect(response.status).toBe(400);
     done();
@@ -130,7 +132,7 @@ describe("/api/transactions > POST", () => {
     expect(created.integerAmount).toBe(transaction.integerAmount);
     expect(created.category).toBe(transaction.category);
     expect(created.comment).toBe(transaction.comment);
-    expect(created.date).toBe(transaction.date);
+    expect(created.time).toBe(transaction.time);
 
     done();
   });

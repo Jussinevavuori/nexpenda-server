@@ -197,7 +197,7 @@ export class TestClient {
         return that.put("/transactions", id, data);
       },
       patch(id: any, data: any) {
-        return that.patch("/transactions", id);
+        return that.patch("/transactions", id, data);
       },
       delete(id: any) {
         return that.delete("/transactions", id);

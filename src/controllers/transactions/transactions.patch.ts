@@ -26,6 +26,14 @@ transactionsRouter.patch(
       }
       const updated = await prisma.transaction.update({
         where: { id: transaction.id },
+        select: {
+          id: true,
+          uid: true,
+          integerAmount: true,
+          category: true,
+          comment: true,
+          time: true,
+        },
         data: {
           category: form.category,
           comment: form.comment,

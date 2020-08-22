@@ -37,7 +37,7 @@ describe("/api/transactions > GET by ID", () => {
     expect(result.integerAmount).toBe(constructable.integerAmount);
     expect(result.comment).toBe(constructable.comment);
     expect(result.category).toBe(constructable.category);
-    expect(result.date).toBe(constructable.date);
+    expect(result.time).toBe(constructable.time);
     done();
   });
 

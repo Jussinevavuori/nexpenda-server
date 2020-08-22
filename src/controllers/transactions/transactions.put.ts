@@ -1,6 +1,5 @@
 import { transactionsRouter } from "..";
 import { protectedRoute } from "../../middleware/protectedRoute";
-import { UnimplementedError } from "../../errors/UnimplementedError";
 import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
 import { TransactionNotFoundError } from "../../errors/TransactionNotFoundError";
 import { putTransactionSchema } from "../../schemas/transaction.schema";
@@ -17,20 +16,17 @@ transactionsRouter.put(
       const id = req.params.id;
       const transaction = await getProtectedTransaction(user, id);
       const form = await getValidatedRequestBody(req, putTransactionSchema);
-      if (!transaction) {
-        throw new TransactionNotFoundError();
-      }
-      if (form.id && form.id !== transaction.id) {
+      if (form.id && form.id !== id) {
         throw new InvalidRequestDataError("Cannot update transaction ID");
       }
-      if (form.uid && form.uid !== transaction.uid) {
+      if (form.uid && form.uid !== user.id) {
         throw new InvalidRequestDataError("Cannot update transaction user");
       }
       const upserted = await prisma.transaction.upsert({
-        where: { id: transaction.id },
+        where: { id },
         create: {
+          id,
           user: { connect: { id: user.id } },
-          id: form.id || uuid(),
           integerAmount: form.integerAmount,
           category: form.category,
           comment: form.comment,

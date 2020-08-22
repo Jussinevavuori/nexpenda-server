@@ -1,6 +1,7 @@
 import { Response } from "node-fetch";
 import { v4 as uuid } from "uuid";
 import * as faker from "faker";
+import { TestClient } from "./TestClient";
 
 export const testUtils = {
   parseCookieFromResponse(response: Response, cookieName: string) {
@@ -20,6 +21,25 @@ export function fakeInteger(): number {
   return Math.round(min + Math.random() * (max - min));
 }
 
+export async function createTestClientWithTransactions() {
+  const client = new TestClient();
+  await client.authenticate();
+  const uid = client.authenticatedUid;
+  const ids = [uuid(), uuid(), uuid(), uuid(), uuid()] as const;
+  const posts = ids.map((id, index) => {
+    return mockTransaction({
+      integerAmount: index + 1,
+      comment: `resource ${index + 1}`,
+      category: "existing",
+      time: index + 1,
+      id,
+      uid,
+    });
+  });
+  await Promise.all(posts.map((post) => client.transactions().post(post)));
+  return { client, uid, ids, posts };
+}
+
 export function mockTransaction(
   defaults?: Partial<
     {
@@ -28,7 +48,7 @@ export function mockTransaction(
       integerAmount: any;
       category: any;
       comment: any;
-      date: any;
+      time: any;
     } & Record<string, any>
   >,
   remove?: Partial<{
@@ -37,7 +57,7 @@ export function mockTransaction(
     integerAmount: boolean;
     category: boolean;
     comment: boolean;
-    date: boolean;
+    time: boolean;
   }>
 ) {
   const object = {
@@ -46,7 +66,7 @@ export function mockTransaction(
     integerAmount: fakeInteger(),
     category: faker.commerce.product(),
     comment: faker.lorem.words(5),
-    date: faker.date.past(2).getTime(),
+    time: faker.date.past(2).getTime(),
   };
 
   if (remove) {
@@ -65,8 +85,8 @@ export function mockTransaction(
     if (remove.comment) {
       delete object.comment;
     }
-    if (remove.date) {
-      delete object.date;
+    if (remove.time) {
+      delete object.time;
     }
   }
 
