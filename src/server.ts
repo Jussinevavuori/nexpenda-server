@@ -10,6 +10,7 @@ import { conf } from "./conf";
 import { handleApplicationError } from "./middleware/handleApplicationError";
 import { extractAuthentication } from "./middleware/extractAuthentication";
 import { PrismaClient } from "@prisma/client";
+import { initializeRequestData } from "./middleware/initializeData";
 
 export const app: express.Application = express();
 export const http = createServer(app);
@@ -35,6 +36,7 @@ export function startServer() {
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use(cors());
+      app.use(initializeRequestData());
       app.use(extractAuthentication());
 
       // Api endpoints

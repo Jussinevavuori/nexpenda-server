@@ -12,7 +12,7 @@ export function extractAuthentication() {
      * Mark user as null initially to signal that this middleware
      * has taken place and no user was found (unless one is found)
      */
-    request.user = null;
+    request.data.user = null;
 
     /**
      * Verify access token from request
@@ -56,7 +56,7 @@ export function extractAuthentication() {
      * Apply found user to request and continue
      */
 
-    request.user = user;
+    request.data.user = user;
     next();
   };
 }

@@ -6,10 +6,10 @@ export function protectedRoute(
   resolver: (user: User, req: Request, res: Response, next: NextFunction) => any
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) {
+    if (!req.data.user) {
       next(new UnauthenticatedError());
     } else {
-      resolver(req.user, req, res, next);
+      resolver(req.data.user, req, res, next);
     }
   };
 }

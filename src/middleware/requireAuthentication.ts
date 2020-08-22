@@ -7,7 +7,7 @@ export function requireAuthentication() {
     res: Response,
     next: NextFunction
   ) {
-    if (!req.user) {
+    if (!req.data.user) {
       return next(new UnauthenticatedError());
     } else {
       return next();
