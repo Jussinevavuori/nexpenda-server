@@ -1,35 +1,15 @@
 import { TestClient } from "../../tests/TestClient";
-import { mockTransactionConstructable } from "../../tests/testUtils";
+import {
+  mockTransaction,
+  createTestClientWithTransactions,
+} from "../../tests/testUtils";
 import { v4 as uuid } from "uuid";
-
-const ids = [uuid(), uuid(), uuid()];
-
-const existingResources = (uid?: string) =>
-  ids.map((id, index) => {
-    return mockTransactionConstructable({
-      integerAmount: index + 1,
-      comment: `resource ${index + 1}`,
-      category: "existing",
-      date: index + 1,
-      id,
-      uid,
-    });
-  });
-
-const setup = async (client: TestClient) => {
-  if (!client.authenticatedUid) {
-    await client.authenticate();
-  }
-  const posts = existingResources(client.authenticatedUid);
-  await Promise.all(posts.map((post) => client.transactions().post(post)));
-  return client;
-};
 
 describe("/api/transactions > PUT", () => {
   it("blocks unauthorized requests", async (done) => {
     const client = new TestClient();
     const id = uuid();
-    const constructable = mockTransactionConstructable();
+    const constructable = mockTransaction();
     const response = await client.transactions().put(id, constructable);
     expect(response.status).toBe(401);
     done();
@@ -42,28 +22,30 @@ describe("/api/transactions > PUT", () => {
     const id = uuid();
     const put = {
       integerAmount: 2,
-      date: 2,
+      time: 2,
       comment: "update",
       category: "update",
     };
-    await client.transactions().put(id, put);
+    const response = await client.transactions().put(id, put);
+    expect(response.status).toBe(200);
+    const created = await response.json();
+    expect(created.id).toBe(id);
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
     expect(result.uid).toBe(uid);
     expect(result.integerAmount).toBe(2);
-    expect(result.date).toBe(2);
+    expect(result.time).toBe(2);
     expect(result.comment).toBe("update");
     expect(result.category).toBe("update");
     done();
   });
 
   it("can fully update existing resouce", async (done) => {
-    const client = await setup(new TestClient());
-    const uid = client.authenticatedUid;
+    const { client, uid, ids } = await createTestClientWithTransactions();
     const id = ids[0];
     const put = {
       integerAmount: 99,
-      date: 99,
+      time: 99,
       comment: "update",
       category: "update",
     };
@@ -72,17 +54,17 @@ describe("/api/transactions > PUT", () => {
     expect(result.id).toBe(id);
     expect(result.uid).toBe(uid);
     expect(result.integerAmount).toBe(99);
-    expect(result.date).toBe(99);
+    expect(result.time).toBe(99);
     expect(result.comment).toBe("update");
     expect(result.category).toBe("update");
     done();
   });
 
   it("only updates targeted resource", async (done) => {
-    const client = await setup(new TestClient());
+    const { client, uid, ids } = await createTestClientWithTransactions();
     const put = {
       integerAmount: 99,
-      date: 99,
+      time: 99,
       comment: "update",
       category: "update",
     };
@@ -97,14 +79,13 @@ describe("/api/transactions > PUT", () => {
   });
 
   it("works with ID and UID in request body", async (done) => {
-    const client = await setup(new TestClient());
-    const uid = client.authenticatedUid;
+    const { client, uid, ids } = await createTestClientWithTransactions();
     const id = ids[0];
     const put = {
       uid,
       id,
       integerAmount: 99,
-      date: 99,
+      time: 99,
       comment: "update",
       category: "update",
     };
@@ -117,14 +98,13 @@ describe("/api/transactions > PUT", () => {
   });
 
   it("blocks conflicting ID and UID in request body", async (done) => {
-    const client = await setup(new TestClient());
-    const uid = client.authenticatedUid;
+    const { client, uid, ids } = await createTestClientWithTransactions();
     const id = ids[0];
     const put1 = {
       uid: uuid(),
       id,
       integerAmount: 99,
-      date: 99,
+      time: 99,
       comment: "update",
       category: "update",
     };
@@ -132,7 +112,7 @@ describe("/api/transactions > PUT", () => {
       uid,
       id: uuid(),
       integerAmount: 99,
-      date: 99,
+      time: 99,
       comment: "update",
       category: "update",
     };
@@ -147,15 +127,20 @@ describe("/api/transactions > PUT", () => {
     done();
   });
 
-  it.only("can null unrequired fields", async (done) => {
-    const client = await setup(new TestClient());
-    const uid = client.authenticatedUid;
+  it("can null unrequired fields", async (done) => {
+    const {
+      client,
+      uid,
+      ids,
+      posts,
+    } = await createTestClientWithTransactions();
     const id = ids[0];
     const put = {
-      ...existingResources(uid)[0],
+      ...posts[0],
       category: "update",
     };
     delete put.comment;
+    expect(put.comment).toBeUndefined();
     const response = await client.transactions().put(id, put);
     expect(response.status).toBe(200);
     const result = await (await client.transactions().get(id)).json();
@@ -171,12 +156,12 @@ describe("/api/transactions > PUT", () => {
     await client.authenticate();
     const uid = client.authenticatedUid;
     const id = uuid();
-    const post = mockTransactionConstructable({
+    const post = mockTransaction({
       id,
       uid,
       comment: "original",
       category: "c",
-      date: 1,
+      time: 1,
       integerAmount: 10,
     });
     await client.transactions().post(post);
@@ -185,9 +170,9 @@ describe("/api/transactions > PUT", () => {
     const invalidPut2 = { ...post, integerAmount: "string" };
     const invalidPut3 = { ...post, integerAmount: true };
     const invalidPut4 = { ...post, integerAmount: { value: 3 } };
-    const invalidPut5 = { ...post, date: "string" };
-    const invalidPut6 = { ...post, date: -1 };
-    const invalidPut7 = { ...post, date: true };
+    const invalidPut5 = { ...post, time: "string" };
+    const invalidPut6 = { ...post, time: -1 };
+    const invalidPut7 = { ...post, time: true };
     const invalidPut8 = { ...post, comment: 4 };
     const invalidPut9 = { ...post, category: 3 };
 
@@ -197,7 +182,7 @@ describe("/api/transactions > PUT", () => {
 
     delete partialPut1.integerAmount;
     delete partialPut2.category;
-    delete partialPut3.date;
+    delete partialPut3.time;
 
     const responseInvalid1 = await client.transactions().put(id, invalidPut1);
     const responseInvalid2 = await client.transactions().put(id, invalidPut2);
@@ -234,16 +219,19 @@ describe("/api/transactions > PUT", () => {
   });
 
   it("cannot modify another user's data", async (done) => {
-    const client1 = await setup(new TestClient());
+    const {
+      ["client"]: client1,
+      ["uid"]: uid1,
+      ids,
+    } = await createTestClientWithTransactions();
     const client2 = new TestClient();
-    const uid1 = client1.authenticatedUid;
     const uid2 = client2.authenticatedUid;
     const id = ids[0];
     const put = {
       comment: "update",
       category: "update",
       integerAmount: 99,
-      date: 99,
+      time: 99,
     };
     const response = await client2.transactions().put(id, put);
     expect(response.status).toBeGreaterThanOrEqual(400);

@@ -6,17 +6,16 @@ import * as passport from "passport";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
 import * as cookieParser from "cookie-parser";
-// import * as path from "path";
-import { createConnection, getConnectionOptions, Connection } from "typeorm";
 import { pingRouter, authRouter, transactionsRouter } from "./controllers";
 import { conf } from "./conf";
 import { handleApplicationError } from "./middleware/handleApplicationError";
 import { extractAuthentication } from "./middleware/extractAuthentication";
+import { PrismaClient } from "@prisma/client";
 
 export const app: express.Application = express();
 export const http = createServer(app);
 export const io = socketIO(http);
-export let connection: undefined | Connection;
+export let prisma = new PrismaClient();
 export let server: undefined | Server;
 
 export function startServer() {
@@ -28,14 +27,8 @@ export function startServer() {
       await require("./socket/socket");
       await require("./passport");
 
-      // Connect with TypeORM to PSQL database
-      const connectionOptions = await getConnectionOptions(
-        process.env.NODE_ENV
-      );
-      connection = await createConnection({
-        ...connectionOptions,
-        name: "default",
-      });
+      // Connect to DB
+      await prisma.$connect();
 
       // Middleware
       app.use(passport.initialize());

@@ -1,6 +1,6 @@
 import { tokenService } from "../services/tokenService";
-import { User } from "../entity/user.entity";
 import { Request, Response, NextFunction } from "express";
+import { prisma } from "../server";
 
 export function extractAuthentication() {
   return async function extractAuthenticationMiddleware(
@@ -47,7 +47,7 @@ export function extractAuthentication() {
     /**
      * Get the user by the access token UID and ensure they exist
      */
-    const user = await User.findOne(accessToken.uid);
+    const user = await prisma.user.findOne({ where: { id: accessToken.uid } });
     if (!user) {
       return next();
     }

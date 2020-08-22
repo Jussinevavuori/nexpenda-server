@@ -1,7 +1,7 @@
 import { Response } from "node-fetch";
-import { TransactionConstructable } from "../entity/transaction.entity";
 import { v4 as uuid } from "uuid";
 import * as faker from "faker";
+import { TestClient } from "./TestClient";
 
 export const testUtils = {
   parseCookieFromResponse(response: Response, cookieName: string) {
@@ -21,16 +21,74 @@ export function fakeInteger(): number {
   return Math.round(min + Math.random() * (max - min));
 }
 
-export function mockTransactionConstructable(
-  defaults?: Partial<TransactionConstructable>
-): TransactionConstructable {
-  return {
+export async function createTestClientWithTransactions() {
+  const client = new TestClient();
+  await client.authenticate();
+  const uid = client.authenticatedUid;
+  const ids = [uuid(), uuid(), uuid(), uuid(), uuid()] as const;
+  const posts = ids.map((id, index) => {
+    return mockTransaction({
+      integerAmount: index + 1,
+      comment: `resource ${index + 1}`,
+      category: "existing",
+      time: index + 1,
+      id,
+      uid,
+    });
+  });
+  await Promise.all(posts.map((post) => client.transactions().post(post)));
+  return { client, uid, ids, posts };
+}
+
+export function mockTransaction(
+  defaults?: Partial<
+    {
+      id: any;
+      uid: any;
+      integerAmount: any;
+      category: any;
+      comment: any;
+      time: any;
+    } & Record<string, any>
+  >,
+  remove?: Partial<{
+    id: boolean;
+    uid: boolean;
+    integerAmount: boolean;
+    category: boolean;
+    comment: boolean;
+    time: boolean;
+  }>
+) {
+  const object = {
     id: uuid(),
     uid: uuid(),
     integerAmount: fakeInteger(),
     category: faker.commerce.product(),
     comment: faker.lorem.words(5),
-    date: faker.date.past(2).getTime(),
-    ...defaults,
+    time: faker.date.past(2).getTime(),
   };
+
+  if (remove) {
+    if (remove.id) {
+      delete object.id;
+    }
+    if (remove.uid) {
+      delete object.uid;
+    }
+    if (remove.integerAmount) {
+      delete object.integerAmount;
+    }
+    if (remove.category) {
+      delete object.category;
+    }
+    if (remove.comment) {
+      delete object.comment;
+    }
+    if (remove.time) {
+      delete object.time;
+    }
+  }
+
+  return { ...object, ...defaults };
 }

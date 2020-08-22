@@ -1,5 +1,5 @@
 declare namespace Express {
   export interface Request {
-    user?: import("../../entity/user.entity").User | null | undefined;
+    user?: import("@prisma/client").User | null | undefined;
   }
 }

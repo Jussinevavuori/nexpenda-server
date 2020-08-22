@@ -11,5 +11,11 @@ import "./auth/login";
 import "./auth/logout";
 import "./auth/refresh_token";
 import "./auth/register";
+import "./auth/profile";
 
-import "./transactions/transactions";
+import "./transactions/transactions.get";
+import "./transactions/transactions.getbyid";
+import "./transactions/transactions.post";
+import "./transactions/transactions.put";
+import "./transactions/transactions.patch";
+import "./transactions/transactions.delete";

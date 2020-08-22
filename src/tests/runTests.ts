@@ -1,8 +1,15 @@
 import * as jest from "jest-cli";
-import { startServer, connection } from "../server";
+import { startServer, prisma } from "../server";
 
 async function initialize() {
   await startServer();
+
+  await prisma.transaction.deleteMany({
+    where: { id: { not: { equals: "" } } },
+  });
+  await prisma.user.deleteMany({
+    where: { id: { not: { equals: "" } } },
+  });
 }
 
 async function runTests(options?: {
@@ -30,9 +37,7 @@ async function runTests(options?: {
 }
 
 async function teardown() {
-  if (connection) {
-    await connection.close();
-  }
+  await prisma.$disconnect();
 }
 
 async function run() {
@@ -41,9 +46,16 @@ async function run() {
     runInBand: true,
     detectOpenHandles: true,
     forceExit: true,
-    testNamePattern: "transactions",
+    testNamePattern: getTestNamePattern(),
   });
   await teardown();
+}
+
+function getTestNamePattern() {
+  const testNamePatternArg = process.argv.find((arg) => arg.startsWith("-t="));
+  if (testNamePatternArg) {
+    return testNamePatternArg.substring(3);
+  }
 }
 
 run();

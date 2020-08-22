@@ -1,6 +1,6 @@
 import { TestClient } from "../../tests/TestClient";
 import { v4 as uuid } from "uuid";
-import { mockTransactionConstructable } from "../../tests/testUtils";
+import { mockTransaction } from "../../tests/testUtils";
 import { TransactionNotFoundError } from "../../errors/TransactionNotFoundError";
 import { UnauthorizedError } from "../../errors/UnauthorizedError";
 
@@ -25,7 +25,7 @@ describe("/api/transactions > GET by ID", () => {
   it("correctly finds created resource", async (done) => {
     const client = new TestClient();
     await client.authenticate();
-    const constructable = mockTransactionConstructable({
+    const constructable = mockTransaction({
       uid: client.authenticatedUid,
     });
     await client.transactions().post(constructable);
@@ -37,7 +37,7 @@ describe("/api/transactions > GET by ID", () => {
     expect(result.integerAmount).toBe(constructable.integerAmount);
     expect(result.comment).toBe(constructable.comment);
     expect(result.category).toBe(constructable.category);
-    expect(result.date).toBe(constructable.date);
+    expect(result.time).toBe(constructable.time);
     done();
   });
 
@@ -47,7 +47,7 @@ describe("/api/transactions > GET by ID", () => {
     await client1.authenticate();
     await client2.authenticate();
 
-    const constructable = mockTransactionConstructable({
+    const constructable = mockTransaction({
       uid: client1.authenticatedUid,
     });
     await client1.transactions().post(constructable);

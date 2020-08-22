@@ -1,6 +1,6 @@
 import { TestClient } from "../../tests/TestClient";
 import { v4 as uuid } from "uuid";
-import { mockTransactionConstructable } from "../../tests/testUtils";
+import { mockTransaction } from "../../tests/testUtils";
 
 describe("/api/transactions > GET", () => {
   it("blocks unauthenticated requests", async (done) => {
@@ -16,16 +16,16 @@ describe("/api/transactions > GET", () => {
     const uid = client.authenticatedUid;
 
     const options = [
-      { id: uuid(), date: 2 },
-      { id: uuid(), date: 1 },
-      { id: uuid(), date: 6 },
-      { id: uuid(), date: 3 },
-      { id: uuid(), date: 5 },
-      { id: uuid(), date: 8 },
+      { id: uuid(), time: 2 },
+      { id: uuid(), time: 1 },
+      { id: uuid(), time: 6 },
+      { id: uuid(), time: 3 },
+      { id: uuid(), time: 5 },
+      { id: uuid(), time: 8 },
     ];
 
     const constructables = options.map((opt) =>
-      mockTransactionConstructable({ ...opt, uid })
+      mockTransaction({ ...opt, uid })
     );
 
     await Promise.all(
@@ -39,7 +39,7 @@ describe("/api/transactions > GET", () => {
     expect(Array.isArray(body)).toBeTruthy();
     expect(body).toHaveLength(6);
 
-    const sorted = options.sort((a, b) => a.date - b.date);
+    const sorted = options.sort((a, b) => a.time - b.time);
 
     expect(body[0].id).toBe(sorted[0].id);
     expect(body[1].id).toBe(sorted[1].id);
@@ -63,10 +63,10 @@ describe("/api/transactions > GET", () => {
     const ids2 = [uuid(), uuid(), uuid(), uuid()];
 
     const constructables1 = ids1.map((id) =>
-      mockTransactionConstructable({ id, uid: uid1 })
+      mockTransaction({ id, uid: uid1 })
     );
     const constructables2 = ids2.map((id) =>
-      mockTransactionConstructable({ id, uid: uid2 })
+      mockTransaction({ id, uid: uid2 })
     );
 
     await Promise.all([

@@ -29,7 +29,9 @@ export async function getValidatedRequestBody<T extends object>(
     if (error instanceof yup.ValidationError) {
       throw new InvalidRequestDataError(error.errors.join("; "));
     } else {
-      throw new InvalidRequestDataError();
+      throw new InvalidRequestDataError(
+        "Unknown request body validation error"
+      );
     }
   }
 }
