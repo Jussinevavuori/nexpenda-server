@@ -4,6 +4,7 @@ import * as socketIO from "socket.io";
 import * as passport from "passport";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
+import * as path from "path";
 import * as cookieParser from "cookie-parser";
 import { pingRouter, authRouter, transactionsRouter } from "./controllers";
 import { conf } from "./conf";
@@ -49,12 +50,13 @@ export function startServer() {
       app.use("/api/auth", authRouter);
       app.use("/api/transactions", transactionsRouter);
 
-      // Serve latest React app build at all unmatching endpoints
-      // app.use("/", (req, res) => {
-      //   res.sendFile("index.html", {
-      //     root: path.join(__dirname, "..", "..", "client", "build"),
-      //   });
-      // });
+      app.use(express.static(path.join(__dirname, "..", "build")));
+
+      app.use((req, res) => {
+        res.sendFile("index.html", {
+          root: path.join(__dirname, "..", "build"),
+        });
+      });
 
       // Error handler middlewares
       app.use(handleApplicationError);

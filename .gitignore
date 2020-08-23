@@ -10,7 +10,7 @@ ormconfig.json
 */secrets
 /coverage
 
-/build
+
 /dist
 
 .DS_Store
