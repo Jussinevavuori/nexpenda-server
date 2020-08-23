@@ -13,7 +13,6 @@ export function respondWithTransactions(
   response: Response,
   transactions: Transaction[]
 ) {
-  console.log("Responding with", transactions.length, "transactions");
   response.send(
     transactions
       .map((transaction) => mapTransactionToResponse(transaction))
