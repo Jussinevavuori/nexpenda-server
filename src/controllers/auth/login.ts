@@ -6,10 +6,11 @@ import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
 import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
 import { validatePassword } from "../../services/passwordService";
+import { redirect } from "../../utils/redirect";
 
-authRouter.post("/login", async (req, res, next) => {
+authRouter.post("/login", async (request, response, next) => {
   try {
-    const form = await getValidatedRequestBody(req, authSchema);
+    const form = await getValidatedRequestBody(request, authSchema);
 
     const user = await prisma.user.findOne({ where: { email: form.email } });
 
@@ -27,7 +28,9 @@ authRouter.post("/login", async (req, res, next) => {
       throw new InvalidCredentialsError("Wrong password");
     }
 
-    tokenService.generateAndSendRefreshTokenAsCookie(user, res).end();
+    return tokenService
+      .generateAndSendRefreshTokenAsCookie(user, response)
+      .end();
   } catch (e) {
     return next(e);
   }

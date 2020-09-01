@@ -30,9 +30,9 @@ authRouter.post("/register", async (request, response, next) => {
       },
     });
 
-    tokenService.generateAndSendRefreshTokenAsCookie(user, response);
-
-    redirect(response).toFrontend("/app");
+    return tokenService
+      .generateAndSendRefreshTokenAsCookie(user, response)
+      .end();
   } catch (error) {
     return next(new InvalidRequestDataError("Invalid register form data"));
   }
