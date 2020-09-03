@@ -8,7 +8,7 @@ export function redirect(response: Response) {
         return response.status(302).end();
       }
 
-      return response.redirect(`${conf.clientHost}${path}`);
+      return response.redirect(`${conf.hosts.client}${path}`);
     },
   };
 }

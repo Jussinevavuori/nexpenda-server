@@ -49,7 +49,10 @@ export const conf = {
 
   port: ENV_NUM("PORT"),
 
-  clientHost: ENV("CLIENT_HOST"),
+  hosts: {
+    client: ENV("HOSTS_CLIENT"),
+    server: ENV("HOSTS_SERVER"),
+  },
 };
 
 /**

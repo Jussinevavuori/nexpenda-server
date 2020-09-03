@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-export const pagesRouter = Router();
+export const viewsRouter = Router();
 export const pingRouter = Router();
 export const authRouter = Router();
 export const transactionsRouter = Router();
@@ -22,4 +22,4 @@ import "./transactions/transactions.put";
 import "./transactions/transactions.patch";
 import "./transactions/transactions.delete";
 
-import "./pages/forgot_password";
+import "./views/forgot_password";

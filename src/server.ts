@@ -10,8 +10,9 @@ import {
   pingRouter,
   authRouter,
   transactionsRouter,
-  pagesRouter,
+  viewsRouter,
 } from "./controllers";
+import * as ejs from "ejs";
 import { conf } from "./conf";
 import { handleApplicationError } from "./middleware/handleApplicationError";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -50,15 +51,21 @@ export function startServer() {
       app.use(initializeRequestData());
       app.use(extractAuthentication());
 
+      app.set("views", path.join(__dirname, "views"));
+      app.engine("html", ejs.renderFile);
+      app.set("view engine", "ejs");
+
       // Api endpoints
-      app.use("/", pagesRouter);
+      app.use("/", viewsRouter);
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
       app.use("/api/transactions", transactionsRouter);
 
       app.use(express.static(path.join(__dirname, "..", "build")));
+      app.use(express.static(path.join(__dirname, "views")));
 
       app.use((req, res) => {
+        console.log("Serving React app");
         res.sendFile("index.html", {
           root: path.join(__dirname, "..", "build"),
         });

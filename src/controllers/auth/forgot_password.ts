@@ -9,11 +9,11 @@ import { ForgotPasswordTemplate } from "../../mailTemplates/ForgotPasswordTempla
 import { ForgotPasswordToken } from "../../services/ForgotPasswordToken";
 import { UserNotFoundError } from "../../errors/UserNotFoundError";
 import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
-import { forgotPasswordSchema } from "../../schemas/forgotPassword.schema";
+import { emailOnlyAuthSchema } from "../../schemas/auth.schema";
 
 authRouter.post("/forgot_password", async (request, response, next) => {
   try {
-    const form = await getValidatedRequestBody(request, forgotPasswordSchema);
+    const form = await getValidatedRequestBody(request, emailOnlyAuthSchema);
 
     const user = await prisma.user.findOne({ where: { email: form.email } });
 
