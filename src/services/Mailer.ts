@@ -1,11 +1,11 @@
 import * as nodemailer from "nodemailer";
 import { conf } from "../conf";
+import { AbstractTemplate } from "../mailTemplates/AbstractTemplate";
 
 export class Mailer {
   transporter: nodemailer.Transporter;
 
   constructor() {
-    console.log(conf.email);
     this.transporter = nodemailer.createTransport({
       host: conf.email.host,
       port: conf.email.port,
@@ -15,6 +15,16 @@ export class Mailer {
         user: conf.email.auth.user,
         pass: conf.email.auth.pass,
       },
+    });
+  }
+
+  sendTemplate<T extends AbstractTemplate>(to: string, template: T) {
+    return this.transporter.sendMail({
+      from: conf.email.defaultSender,
+      to,
+      subject: template.subject,
+      text: template.text,
+      html: template.html,
     });
   }
 

@@ -6,7 +6,12 @@ import * as bodyParser from "body-parser";
 import * as cors from "cors";
 import * as path from "path";
 import * as cookieParser from "cookie-parser";
-import { pingRouter, authRouter, transactionsRouter } from "./controllers";
+import {
+  pingRouter,
+  authRouter,
+  transactionsRouter,
+  pagesRouter,
+} from "./controllers";
 import { conf } from "./conf";
 import { handleApplicationError } from "./middleware/handleApplicationError";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -46,6 +51,7 @@ export function startServer() {
       app.use(extractAuthentication());
 
       // Api endpoints
+      app.use("/", pagesRouter);
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
       app.use("/api/transactions", transactionsRouter);

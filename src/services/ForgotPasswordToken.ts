@@ -1,11 +1,12 @@
 import * as yup from "yup";
-import * as jwt from "jsonwebtoken";
 import { conf } from "../conf";
 import { User } from "@prisma/client";
 import { AbstractToken } from "./AbstractToken";
+import { prisma } from "../server";
 
 type IForgotPasswordToken = {
   uid: string;
+  vrs: number;
 };
 
 export class ForgotPasswordToken
@@ -17,19 +18,47 @@ export class ForgotPasswordToken
   readonly uid: string;
 
   /**
+   * User token version: token only works if user's token
+   * version is identical to the token's version. Upon token
+   * being used, the user's token version will be incremented
+   */
+  readonly vrs: number;
+
+  /**
    * Read raw JWT token to generate new auth link token
    */
-  constructor(user: User) {
+  constructor(arg: User | string) {
     super(
-      { uid: user.id },
+      typeof arg === "string" ? arg : { uid: arg.id, vrs: arg.tokenVersion },
       {
         schema: ForgotPasswordToken.schema,
         tkt: "forgot_password",
         secret: conf.token.forgotPasswordToken.secret,
         expiresIn: conf.token.forgotPasswordToken.expiresIn,
+        verify: async (payload) => {
+          const user = await prisma.user.findOne({
+            where: { id: payload.uid },
+          });
+          if (!user) return false;
+          return user.tokenVersion === payload.vrs;
+        },
       }
     );
     this.uid = this.payload.uid;
+    this.vrs = this.payload.vrs;
+  }
+
+  /**
+   * Generate a URL for resetting the password
+   */
+  generateURL() {
+    return [
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:4000"
+        : "http://expenceapp.herokuapp.com",
+      "forgot_password",
+      this.jwt,
+    ].join("/");
   }
 
   /**
@@ -38,6 +67,7 @@ export class ForgotPasswordToken
   static schema: yup.ObjectSchema<IForgotPasswordToken> = yup
     .object({
       uid: yup.string().required(),
+      vrs: yup.number().required().integer(),
     })
     .required();
 }

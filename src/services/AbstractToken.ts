@@ -1,6 +1,7 @@
 import * as jwt from "jsonwebtoken";
 import * as yup from "yup";
 import { conf } from "../conf";
+import { TokenConstructionError } from "../errors/TokenConstructionError";
 
 export type IAbstractToken = {
   iat: number;
@@ -78,45 +79,49 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
       verify?(payload: TokenPayload<T>): Promise<boolean>;
     }
   ) {
-    /**
-     * Merge metadata and specific data schemas
-     */
-    this.mergedSchema = options.schema.concat(AbstractToken.metadataSchema);
+    try {
+      /**
+       * Merge metadata and specific data schemas
+       */
+      this.mergedSchema = options.schema.concat(AbstractToken.metadataSchema);
 
-    /**
-     * Store secret and intended token type
-     */
-    this.secret = options.secret;
-    this.intendedTokenType = options.tkt;
+      /**
+       * Store secret and intended token type
+       */
+      this.secret = options.secret;
+      this.intendedTokenType = options.tkt;
 
-    /**
-     * Get verification extender function if any
-     */
-    this.verificationExtender = options.verify;
+      /**
+       * Get verification extender function if any
+       */
+      this.verificationExtender = options.verify;
 
-    /**
-     * Use provided token or generate token from provided data
-     */
-    if (typeof token === "string") {
-      this.jwt = token;
-    } else {
-      this.jwt = jwt.sign(token, options.secret, {
-        issuer: conf.token.issuer,
-        audience: conf.token.audience,
-        expiresIn: options.expiresIn,
-      });
+      /**
+       * Use provided token or generate token from provided data
+       */
+      if (typeof token === "string") {
+        this.jwt = token;
+      } else {
+        this.jwt = jwt.sign({ ...token, tkt: options.tkt }, options.secret, {
+          issuer: conf.token.issuer,
+          audience: conf.token.audience,
+          expiresIn: options.expiresIn,
+        });
+      }
+
+      /**
+       * Parse and verify resulting token and store information
+       */
+      const decoded = jwt.decode(this.jwt);
+      this.payload = this.mergedSchema.validateSync(decoded);
+      this.iat = this.payload.iat;
+      this.exp = this.payload.exp;
+      this.aud = this.payload.aud;
+      this.iss = this.payload.iss;
+      this.tkt = this.payload.tkt;
+    } catch (error) {
+      throw new TokenConstructionError(`Could not create ${options.tkt} token`);
     }
-
-    /**
-     * Parse and verify resulting token and store information
-     */
-    const decoded = jwt.decode(this.jwt);
-    this.payload = this.mergedSchema.validateSync(decoded);
-    this.iat = this.payload.iat;
-    this.exp = this.payload.exp;
-    this.aud = this.payload.aud;
-    this.iss = this.payload.iss;
-    this.tkt = this.payload.tkt;
   }
 
   /**

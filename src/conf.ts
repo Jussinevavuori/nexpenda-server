@@ -44,6 +44,7 @@ export const conf = {
       user: ENV("EMAIL_AUTH_USER"),
       pass: ENV("EMAIL_AUTH_PASS"),
     },
+    defaultSender: ENV("EMAIL_DEFAULT_SENDER"),
   },
 
   port: ENV_NUM("PORT"),

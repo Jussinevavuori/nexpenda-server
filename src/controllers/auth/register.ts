@@ -6,6 +6,7 @@ import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
 import { RefreshToken } from "../../services/RefreshToken";
 import { Password } from "../../services/Password";
+import { GenericApplicationError } from "../../errors/GenericApplicationError";
 
 authRouter.post("/register", async (request, response, next) => {
   try {
@@ -31,6 +32,9 @@ authRouter.post("/register", async (request, response, next) => {
 
     new RefreshToken(user).send(response).end();
   } catch (error) {
+    if (error instanceof GenericApplicationError) {
+      return next(error);
+    }
     return next(new InvalidRequestDataError("Invalid register form data"));
   }
 });
