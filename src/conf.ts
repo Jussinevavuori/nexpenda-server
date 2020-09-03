@@ -23,6 +23,27 @@ export const conf = {
       expiresIn: ENV("TOKEN_REFRESHTOKEN_EXPIRESIN"),
       expiresInSeconds: ENV_NUM("TOKEN_REFRESHTOKEN_EXPIRESINSECONDS"),
     },
+
+    forgotPasswordToken: {
+      secret: ENV("TOKEN_FORGOTPASSWORDTOKEN_SECRET"),
+      expiresIn: ENV("TOKEN_FORGOTPASSWORDTOKEN_EXPIRESIN"),
+      expiresInSeconds: ENV_NUM("TOKEN_FORGOTPASSWORDTOKEN_EXPIRESINSECONDS"),
+    },
+
+    confirmEmailToken: {
+      secret: ENV("TOKEN_CONFIRMEMAILTOKEN_SECRET"),
+      expiresIn: ENV("TOKEN_CONFIRMEMAILTOKEN_EXPIRESIN"),
+      expiresInSeconds: ENV_NUM("TOKEN_CONFIRMEMAILTOKEN_EXPIRESINSECONDS"),
+    },
+  },
+
+  email: {
+    host: ENV("EMAIL_HOST"),
+    port: ENV_NUM("EMAIL_PORT"),
+    auth: {
+      user: ENV("EMAIL_AUTH_USER"),
+      pass: ENV("EMAIL_AUTH_PASS"),
+    },
   },
 
   port: ENV_NUM("PORT"),

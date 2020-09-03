@@ -1,8 +1,8 @@
 import { authRouter } from "..";
-import { tokenService } from "../../services/tokenService";
 import { redirect } from "../../utils/redirect";
+import { RefreshToken } from "../../services/RefreshToken";
 
 authRouter.get("/logout", async (request, response) => {
-  tokenService.clearRefreshTokenCookie(response);
+  RefreshToken.clearCookie(response);
   redirect(response).toFrontend("/login");
 });

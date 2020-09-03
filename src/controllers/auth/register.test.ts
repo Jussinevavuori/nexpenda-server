@@ -82,13 +82,13 @@ describe("/api/auth/register", () => {
     done();
   });
 
-  it("succeeds and redirects on proper data", async (done) => {
+  it("succeeds on proper data", async (done) => {
     const client = new TestClient();
     const response = await client.auth().register({
       email: faker.internet.email(),
       password: faker.internet.password(),
     });
-    expect(response.status).toBe(302);
+    expect(response.status).toBe(200);
     done();
   });
 
@@ -126,7 +126,7 @@ describe("/api/auth/register", () => {
       email,
       password: faker.internet.password(),
     });
-    expect(response1.status).toBe(302);
+    expect(response1.status).toBe(200);
     expect(response2.status).toBe(400);
     expect(client1.refreshToken).toBeDefined();
     expect(client2.refreshToken).not.toBeDefined();

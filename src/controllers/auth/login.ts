@@ -1,12 +1,11 @@
 import { authRouter } from "..";
 import { UserNotFoundError } from "../../errors/UserNotFoundError";
-import { tokenService } from "../../services/tokenService";
 import { InvalidCredentialsError } from "../../errors/InvalidCredentialsError";
 import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
 import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
-import { validatePassword } from "../../services/passwordService";
-import { redirect } from "../../utils/redirect";
+import { RefreshToken } from "../../services/RefreshToken";
+import { Password } from "../../services/Password";
 
 authRouter.post("/login", async (request, response, next) => {
   try {
@@ -22,15 +21,13 @@ authRouter.post("/login", async (request, response, next) => {
       throw new InvalidCredentialsError("User does not have a password");
     }
 
-    const passwordValid = await validatePassword(form.password, user.password);
+    const passwordValid = await Password.validate(form.password, user.password);
 
     if (!passwordValid) {
       throw new InvalidCredentialsError("Wrong password");
     }
 
-    return tokenService
-      .generateAndSendRefreshTokenAsCookie(user, response)
-      .end();
+    new RefreshToken(user).send(response).end();
   } catch (e) {
     return next(e);
   }

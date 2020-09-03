@@ -1,12 +1,11 @@
 import { authRouter } from "..";
 import { InvalidRequestDataError } from "../../errors/InvalidRequestDataError";
-import { tokenService } from "../../services/tokenService";
 import { UserAlreadyExistsError } from "../../errors/UserAlreadyExistsError";
 import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
-import { redirect } from "../../utils/redirect";
 import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
-import { hashPassword } from "../../services/passwordService";
+import { RefreshToken } from "../../services/RefreshToken";
+import { Password } from "../../services/Password";
 
 authRouter.post("/register", async (request, response, next) => {
   try {
@@ -20,7 +19,7 @@ authRouter.post("/register", async (request, response, next) => {
       return next(new UserAlreadyExistsError());
     }
 
-    const hashedPassword = await hashPassword(form.password);
+    const hashedPassword = await Password.hash(form.password);
 
     const user = await prisma.user.create({
       data: {
@@ -30,9 +29,7 @@ authRouter.post("/register", async (request, response, next) => {
       },
     });
 
-    return tokenService
-      .generateAndSendRefreshTokenAsCookie(user, response)
-      .end();
+    new RefreshToken(user).send(response).end();
   } catch (error) {
     return next(new InvalidRequestDataError("Invalid register form data"));
   }

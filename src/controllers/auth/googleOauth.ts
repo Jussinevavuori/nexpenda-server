@@ -1,8 +1,8 @@
 import { authRouter } from "..";
 import * as passport from "passport";
 import { redirect } from "../../utils/redirect";
-import { generateAndSendRefreshTokenAsCookie } from "../../services/tokenService";
 import { prisma } from "../../server";
+import { RefreshToken } from "../../services/RefreshToken";
 
 authRouter.get(
   "/google",
@@ -25,7 +25,7 @@ authRouter.get(
       if (id && googleId) {
         const user = await prisma.user.findOne({ where: { id } });
         if (user && googleId === user.googleId) {
-          generateAndSendRefreshTokenAsCookie(user, response);
+          new RefreshToken(user).send(response);
           return redirect(response).toFrontend("/app");
         }
       }

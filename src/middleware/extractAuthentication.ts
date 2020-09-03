@@ -1,6 +1,7 @@
-import { tokenService } from "../services/tokenService";
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../server";
+import { AccessToken } from "../services/AccessToken";
+import { RefreshToken } from "../services/RefreshToken";
 
 export function extractAuthentication() {
   return async function extractAuthenticationMiddleware(
@@ -12,42 +13,39 @@ export function extractAuthentication() {
      * Mark user as null initially to signal that this middleware
      * has taken place and no user was found (unless one is found)
      */
+
     request.data.user = null;
 
     /**
-     * Verify access token from request
+     * Get both tokens from request
      */
-    if (!tokenService.verifyAccessTokenFromRequest(request)) {
+
+    const accessToken = await AccessToken.fromRequest(request);
+
+    const refreshToken = await RefreshToken.fromRequest(request);
+
+    if (!accessToken || !refreshToken) {
       return next();
     }
 
     /**
-     * Verify refresh token from request
+     * Check both tokens are verified
      */
-    if (!tokenService.verifyRefreshTokenFromRequest(request)) {
-      return next();
-    }
 
-    /**
-     * Get access token from request if all tokens are verified
-     */
-    const rawAccessToken = tokenService.extractAccessTokenFromRequest(request);
-    if (!rawAccessToken) {
-      return next();
-    }
+    const accessTokenVerified = await accessToken.verify();
 
-    /**
-     * Parse access token from request and ensure it contains and UID
-     */
-    const accessToken = tokenService.parseAccessToken(rawAccessToken);
-    if (!accessToken || !accessToken.uid) {
+    const refreshTokenVerified = await refreshToken.verify();
+
+    if (!accessTokenVerified || !refreshTokenVerified) {
       return next();
     }
 
     /**
      * Get the user by the access token UID and ensure they exist
      */
+
     const user = await prisma.user.findOne({ where: { id: accessToken.uid } });
+
     if (!user) {
       return next();
     }
@@ -57,6 +55,11 @@ export function extractAuthentication() {
      */
 
     request.data.user = user;
+
+    request.data.accessToken = accessToken;
+
+    request.data.refreshToken = refreshToken;
+
     next();
   };
 }
