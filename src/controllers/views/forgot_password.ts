@@ -47,9 +47,7 @@ viewsRouter.get("/forgot_password/:token", async (request, response, next) => {
 
     // response.send({ message: "Your password has been reset to " + unhashed });
   } catch (e) {
-    console.log(e);
-
-    return fail(response, "Error occured during password reset");
+    response.status(404).end();
   }
 });
 
