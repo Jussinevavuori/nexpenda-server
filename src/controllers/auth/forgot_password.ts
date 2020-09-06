@@ -36,6 +36,15 @@ new Route(authRouter, "/forgot_password").post(async (req, res) => {
   const token = new ForgotPasswordToken(user);
 
   /**
+   * Verify token
+   */
+  const tokenVerified = await token.verify();
+
+  if (!tokenVerified) {
+    return new Failure(Errors.Token.Invalid());
+  }
+
+  /**
    * Send token as mail to user
    */
   const mailer = new Mailer();

@@ -41,6 +41,19 @@ export const Errors = {
         message
       );
     },
+    /**
+     * Invalid token
+     */
+    Invalid(message?: string) {
+      return new ApplicationError(
+        {
+          code: "token/invalid",
+          status: 400,
+          message: "Token invalid",
+        },
+        message
+      );
+    },
   },
 
   /**

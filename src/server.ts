@@ -53,6 +53,9 @@ export function startServer() {
       app.use(initializeRequestData());
       app.use(extractAuthentication());
 
+      app.use(express.static(path.join(__dirname, "..", "build")));
+      app.use(express.static(path.join(__dirname, "views")));
+
       app.set("views", path.join(__dirname, "views"));
       app.engine("html", ejs.renderFile);
       app.set("view engine", "ejs");
@@ -62,9 +65,6 @@ export function startServer() {
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
       app.use("/api/transactions", transactionsRouter);
-
-      app.use(express.static(path.join(__dirname, "..", "build")));
-      app.use(express.static(path.join(__dirname, "views")));
 
       app.use((req, res) => {
         res.sendFile("index.html", {

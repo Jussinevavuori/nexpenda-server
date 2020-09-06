@@ -22,6 +22,6 @@ export class ForgotPasswordView extends AbstractView<
    * If neither is given, invalid or expired token screen is rendered
    */
   constructor(variables: ForgotPasswordViewVariables) {
-    super("forgot_password", variables);
+    super("./forgot_password.ejs", variables);
   }
 }
