@@ -18,6 +18,8 @@ import { handleApplicationError } from "./middleware/handleApplicationError";
 import { extractAuthentication } from "./middleware/extractAuthentication";
 import { PrismaClient } from "@prisma/client";
 import { initializeRequestData } from "./middleware/initializeData";
+import { handleFailure } from "./middleware/handleFailure";
+import { handleErrors } from "./middleware/handleErrors";
 
 export const app: express.Application = express();
 export const http = createServer(app);
@@ -65,13 +67,14 @@ export function startServer() {
       app.use(express.static(path.join(__dirname, "views")));
 
       app.use((req, res) => {
-        console.log("Serving React app");
         res.sendFile("index.html", {
           root: path.join(__dirname, "..", "build"),
         });
       });
 
       // Error handler middlewares
+      app.use(handleErrors);
+      app.use(handleFailure);
       app.use(handleApplicationError);
 
       // Start server

@@ -1,3 +1,5 @@
+declare type EjsTemplateName = "forgot_password";
+
 declare namespace Express {
   export interface Request {
     data: {

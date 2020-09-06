@@ -1,13 +1,10 @@
 import { pingRouter } from "..";
-import { protectedRoute } from "../../middleware/protectedRoute";
+import { Route } from "../../utils/Route";
 
-pingRouter.get("/", (_request, response) => {
-  return response.send("pong");
+new Route(pingRouter, "/").get((_, res) => {
+  res.send("pong");
 });
 
-pingRouter.get(
-  "/protected",
-  protectedRoute((user, _request, response) => {
-    return response.send(`pong ${user.id}`);
-  })
-);
+new Route(pingRouter, "/protected").protected.get((user, __, res) => {
+  res.send("pong " + user.id);
+});

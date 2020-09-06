@@ -14,7 +14,7 @@ describe("/api/transactions > DELETE", () => {
     const client = new TestClient();
     await client.authenticate();
     const response = await client.transactions().delete("id");
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(404);
     done();
   });
 

@@ -174,7 +174,7 @@ describe("/api/transactions > PATCH", () => {
     const id = ids[0];
     const patch = { category: "unauthorized" };
     const response = await client2.transactions().patch(id, patch);
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(404);
     const result = await (await client1.transactions().get(id)).json();
     expect(result.category).not.toBe("unauthorized");
     done();

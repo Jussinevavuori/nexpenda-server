@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { UnauthenticatedError } from "../errors/UnauthenticatedError";
+import { Errors } from "../errors/Errors";
+import { Failure } from "../utils/Result";
 
 export function requireAuthentication() {
   return async function requireAuthenticationMiddleware(
@@ -8,7 +9,7 @@ export function requireAuthentication() {
     next: NextFunction
   ) {
     if (!req.data.user) {
-      return next(new UnauthenticatedError());
+      return next(new Failure(Errors.Auth.Unauthenticated));
     } else {
       return next();
     }

@@ -41,7 +41,7 @@ describe("/api/auth/login", () => {
     const password = faker.internet.password();
     const response = await client.auth().login({ email, password });
     const body = await response.json();
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(404);
     expect(body.code).toBe("auth/user-not-found");
     done();
   });

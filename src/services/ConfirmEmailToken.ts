@@ -27,6 +27,7 @@ export class ConfirmEmailToken
         tkt: "confirm_email",
         secret: conf.token.confirmEmailToken.secret,
         expiresIn: conf.token.confirmEmailToken.expiresIn,
+        defaultUponError: { uid: "" },
       }
     );
     this.uid = this.payload.uid;

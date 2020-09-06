@@ -4,14 +4,11 @@ import { Result, Failure, Success } from "./Result";
 import { Errors } from "../errors/Errors";
 
 /**
- * Helper function to fetch a transaction for user. Only allows accessing
- * own resources
+ * Helper function to fetch a transaction for user.
  *
- * @param user Requesting user
  * @param id   Id of requested transaction
  */
-export async function getProtectedTransaction(
-  user: User,
+export async function getUnprotectedTransaction(
   id?: string
 ): Promise<Result<Transaction>> {
   /**
@@ -33,7 +30,7 @@ export async function getProtectedTransaction(
   /**
    * Ensure transaction exists and is user's
    */
-  if (!transaction || transaction.uid !== user.id) {
+  if (!transaction) {
     return new Failure(Errors.Transaction.NotFound());
   }
 

@@ -33,6 +33,7 @@ export class AccessToken
       tkt: "access",
       secret: conf.token.accessToken.secret,
       expiresIn: conf.token.accessToken.expiresIn,
+      defaultUponError: { uid: "", vrs: -1 },
       verify: async (payload) => {
         const user = await prisma.user.findOne({
           where: { id: payload.uid },

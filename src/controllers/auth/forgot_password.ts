@@ -1,39 +1,51 @@
 import { authRouter } from "..";
 import { prisma } from "../../server";
-import { protectedRoute } from "../../middleware/protectedRoute";
-import { v4 as uuid } from "uuid";
-import { conf } from "../../conf";
-import { addHours } from "date-fns";
 import { Mailer } from "../../services/Mailer";
 import { ForgotPasswordTemplate } from "../../mailTemplates/ForgotPasswordTemplate";
 import { ForgotPasswordToken } from "../../services/ForgotPasswordToken";
-import { UserNotFoundError } from "../../errors/UserNotFoundError";
-import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
+import { validateRequestBody } from "../../utils/validateRequestBody";
 import { emailOnlyAuthSchema } from "../../schemas/auth.schema";
+import { Route } from "../../utils/Route";
+import { Failure } from "../../utils/Result";
+import { Errors } from "../../errors/Errors";
 
-authRouter.post("/forgot_password", async (request, response, next) => {
-  try {
-    const form = await getValidatedRequestBody(request, emailOnlyAuthSchema);
+new Route(authRouter, "/forgot_password").post(async (req, res) => {
+  /**
+   * Validate body
+   */
+  const body = await validateRequestBody(req, emailOnlyAuthSchema);
 
-    const user = await prisma.user.findOne({ where: { email: form.email } });
-
-    if (!user || !user.email) {
-      throw new UserNotFoundError();
-    }
-
-    const mailer = new Mailer();
-
-    const token = new ForgotPasswordToken(user);
-
-    const template = new ForgotPasswordTemplate({
-      email: user.email,
-      url: token.generateURL(),
-    });
-
-    await mailer.sendTemplate(user.email, template);
-
-    response.end();
-  } catch (e) {
-    return next(e);
+  if (body.isFailure()) {
+    return body;
   }
+
+  /**
+   * Find user by email
+   */
+  const user = await prisma.user.findOne({
+    where: { email: body.value.email },
+  });
+
+  if (!user || !user.email) {
+    return new Failure(Errors.Auth.UserNotFound());
+  }
+
+  /**
+   * Create forgot password token for user
+   */
+  const token = new ForgotPasswordToken(user);
+
+  /**
+   * Send token as mail to user
+   */
+  const mailer = new Mailer();
+
+  const template = new ForgotPasswordTemplate({
+    email: user.email,
+    url: token.generateURL(),
+  });
+
+  await mailer.sendTemplate(user.email, template);
+
+  res.end();
 });

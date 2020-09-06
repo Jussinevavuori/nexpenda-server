@@ -5,8 +5,8 @@ import { testUtils } from "../../tests/testUtils";
 describe("/api/auth/logout", () => {
   it("does nothing on unauthenticated request", async (done) => {
     const client = new TestClient();
-		const response = await client.auth().logout();
-		
+    const response = await client.auth().logout();
+
     expect(response.status).toBe(302);
     done();
   });

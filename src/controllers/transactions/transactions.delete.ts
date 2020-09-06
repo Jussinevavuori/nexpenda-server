@@ -1,28 +1,32 @@
 import { transactionsRouter } from "..";
-import { protectedRoute } from "../../middleware/protectedRoute";
-import { TransactionNotFoundError } from "../../errors/TransactionNotFoundError";
 import { getProtectedTransaction } from "../../utils/getProtectedTransaction";
 import { prisma } from "../../server";
+import { Route } from "../../utils/Route";
 
-transactionsRouter.delete(
-  "/:id",
-  protectedRoute(async (user, req, res, next) => {
-    try {
-      const id = req.params.id;
+new Route(transactionsRouter, "/:id").protected.delete(
+  async (user, req, res) => {
+    /**
+     * Get ID from request params
+     */
+    const id = req.params.id;
 
-      const transaction = await getProtectedTransaction(user, id);
+    /**
+     * Find user's transaction with given ID
+     */
+    const transaction = await getProtectedTransaction(user, id);
 
-      if (!transaction) {
-        throw new TransactionNotFoundError();
-      }
-
-      await prisma.transaction.delete({ where: { id: transaction.id } });
-
-      return res.status(204).end();
-    } catch (error) {
-      next(error);
+    if (transaction.isFailure()) {
+      return transaction;
     }
-  })
-);
 
-export default transactionsRouter;
+    /**
+     * Delete transaction
+     */
+    await prisma.transaction.delete({ where: { id: transaction.value.id } });
+
+    /**
+     * Respond with 204
+     */
+    res.status(204).end();
+  }
+);

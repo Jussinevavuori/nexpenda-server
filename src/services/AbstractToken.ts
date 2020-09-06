@@ -1,7 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import * as yup from "yup";
 import { conf } from "../conf";
-import { TokenConstructionError } from "../errors/TokenConstructionError";
 
 export type IAbstractToken = {
   iat: number;
@@ -60,6 +59,12 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
   private secret: string;
 
   /**
+   * Token is considered valid if no error was thrown during the constructor
+   * phase.
+   */
+  readonly valid: boolean;
+
+  /**
    * Verification extender function for extra verification steps
    */
   private verificationExtender?(payload: TokenPayload<T>): Promise<boolean>;
@@ -76,52 +81,69 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
       secret: string;
       tkt: string;
       expiresIn: string;
+      defaultUponError: T;
       verify?(payload: TokenPayload<T>): Promise<boolean>;
     }
   ) {
+    /**
+     * Merge metadata and specific data schemas
+     */
+    this.mergedSchema = options.schema.concat(AbstractToken.metadataSchema);
+
+    /**
+     * Store secret and intended token type
+     */
+    this.secret = options.secret;
+    this.intendedTokenType = options.tkt;
+
+    /**
+     * Get verification extender function if any
+     */
+    this.verificationExtender = options.verify;
+
+    /**
+     * Use provided token or generate token from provided data
+     */
+    if (typeof token === "string") {
+      this.jwt = token;
+    } else {
+      this.jwt = jwt.sign({ ...token, tkt: options.tkt }, options.secret, {
+        issuer: conf.token.issuer,
+        audience: conf.token.audience,
+        expiresIn: options.expiresIn,
+      });
+    }
+
+    /**
+     * Parse and verify resulting token and store information
+     */
+    const decoded = jwt.decode(this.jwt);
     try {
       /**
-       * Merge metadata and specific data schemas
+       * If validation succeeds, use validated values and register as valid
        */
-      this.mergedSchema = options.schema.concat(AbstractToken.metadataSchema);
-
-      /**
-       * Store secret and intended token type
-       */
-      this.secret = options.secret;
-      this.intendedTokenType = options.tkt;
-
-      /**
-       * Get verification extender function if any
-       */
-      this.verificationExtender = options.verify;
-
-      /**
-       * Use provided token or generate token from provided data
-       */
-      if (typeof token === "string") {
-        this.jwt = token;
-      } else {
-        this.jwt = jwt.sign({ ...token, tkt: options.tkt }, options.secret, {
-          issuer: conf.token.issuer,
-          audience: conf.token.audience,
-          expiresIn: options.expiresIn,
-        });
-      }
-
-      /**
-       * Parse and verify resulting token and store information
-       */
-      const decoded = jwt.decode(this.jwt);
       this.payload = this.mergedSchema.validateSync(decoded);
-      this.iat = this.payload.iat;
-      this.exp = this.payload.exp;
-      this.aud = this.payload.aud;
-      this.iss = this.payload.iss;
-      this.tkt = this.payload.tkt;
-    } catch (error) {
-      throw new TokenConstructionError(`Could not create ${options.tkt} token`);
+      this.valid = true;
+    } catch (e) {
+      /**
+       * If validation fails, fallback to default values and register
+       * as invalid
+       */
+      this.payload = {
+        aud: "",
+        iss: "",
+        iat: -1,
+        exp: -1,
+        tkt: "invalid",
+        ...options.defaultUponError,
+      };
+      this.valid = false;
     }
+    this.iat = this.payload.iat;
+    this.exp = this.payload.exp;
+    this.aud = this.payload.aud;
+    this.iss = this.payload.iss;
+    this.tkt = this.payload.tkt;
   }
 
   /**
@@ -173,6 +195,13 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
   async verify(): Promise<boolean> {
     try {
       /**
+       * If token was invalid during construction, automatically return false
+       */
+      if (!this.valid) {
+        return false;
+      }
+
+      /**
        * Verify token. If token verification fails, an error is thrown and the
        * function automatically returns false
        */
@@ -185,7 +214,7 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
        * Verify the payload of the verified token. If verification fails, an
        * error is thrown and the function automatically returns false
        */
-      const payload = this.mergedSchema.validateSync(decoded);
+      this.mergedSchema.validateSync(decoded);
 
       /**
        * Run extra verification steps if specified

@@ -35,6 +35,7 @@ export class ForgotPasswordToken
         tkt: "forgot_password",
         secret: conf.token.forgotPasswordToken.secret,
         expiresIn: conf.token.forgotPasswordToken.expiresIn,
+        defaultUponError: { uid: "", vrs: -1 },
         verify: async (payload) => {
           const user = await prisma.user.findOne({
             where: { id: payload.uid },

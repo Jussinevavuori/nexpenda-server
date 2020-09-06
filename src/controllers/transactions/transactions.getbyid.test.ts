@@ -1,8 +1,6 @@
 import { TestClient } from "../../tests/TestClient";
 import { v4 as uuid } from "uuid";
 import { mockTransaction } from "../../tests/testUtils";
-import { TransactionNotFoundError } from "../../errors/TransactionNotFoundError";
-import { UnauthorizedError } from "../../errors/UnauthorizedError";
 
 describe("/api/transactions > GET by ID", () => {
   it("blocks unauthenticated requests", async (done) => {
@@ -16,9 +14,9 @@ describe("/api/transactions > GET by ID", () => {
     const client = new TestClient();
     await client.authenticate();
     const response = await client.transactions().get(uuid());
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(404);
     const error = await response.json();
-    expect(error.code).toBe(TransactionNotFoundError.code);
+    expect(error.code).toBe("transaction/not-found");
     done();
   });
 
@@ -58,9 +56,9 @@ describe("/api/transactions > GET by ID", () => {
     expect(body.integerAmount).toBe(constructable.integerAmount);
 
     const response2 = await client2.transactions().get(constructable.id!);
-    expect(response2.status).toBe(UnauthorizedError.status);
+    expect(response2.status).toBe(404);
     const error = await response2.json();
-    expect(error.code).toBe(UnauthorizedError.code);
+    expect(error.code).toBe("transaction/not-found");
 
     done();
   });

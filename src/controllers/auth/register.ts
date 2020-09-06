@@ -1,40 +1,52 @@
 import { authRouter } from "..";
-import { InvalidRequestDataError } from "../../errors/InvalidRequestDataError";
-import { UserAlreadyExistsError } from "../../errors/UserAlreadyExistsError";
-import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
+import { validateRequestBody } from "../../utils/validateRequestBody";
 import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
 import { RefreshToken } from "../../services/RefreshToken";
 import { Password } from "../../services/Password";
-import { GenericApplicationError } from "../../errors/GenericApplicationError";
+import { Route } from "../../utils/Route";
+import { Errors } from "../../errors/Errors";
+import { Failure } from "../../utils/Result";
 
-authRouter.post("/register", async (request, response, next) => {
-  try {
-    const form = await getValidatedRequestBody(request, authSchema);
+new Route(authRouter, "/register").post(async (request, response) => {
+  /**
+   * Validate request body
+   */
+  const body = await validateRequestBody(request, authSchema);
 
-    const existingUser = await prisma.user.findOne({
-      where: { email: form.email },
-    });
-
-    if (existingUser) {
-      return next(new UserAlreadyExistsError());
-    }
-
-    const hashedPassword = await Password.hash(form.password);
-
-    const user = await prisma.user.create({
-      data: {
-        displayName: form.email,
-        email: form.email,
-        password: hashedPassword,
-      },
-    });
-
-    new RefreshToken(user).send(response).end();
-  } catch (error) {
-    if (error instanceof GenericApplicationError) {
-      return next(error);
-    }
-    return next(new InvalidRequestDataError("Invalid register form data"));
+  if (body.isFailure()) {
+    return body;
   }
+
+  /**
+   * Check for existing users with given email
+   */
+  const existingUser = await prisma.user.findOne({
+    where: { email: body.value.email },
+  });
+
+  if (existingUser) {
+    return new Failure(Errors.Auth.UserAlreadyExists());
+  }
+
+  /**
+   * Hash given password
+   */
+  const hashedPassword = await Password.hash(body.value.password);
+
+  /**
+   * Create user
+   */
+  const user = await prisma.user.create({
+    data: {
+      displayName: body.value.email,
+      email: body.value.email,
+      password: hashedPassword,
+    },
+  });
+
+  /**
+   * Create refresh token for user and send in response
+   */
+  new RefreshToken(user).send(response).end();
 });

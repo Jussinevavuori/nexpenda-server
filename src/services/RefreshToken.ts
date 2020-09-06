@@ -35,6 +35,7 @@ export class RefreshToken
         tkt: "refresh",
         secret: conf.token.refreshToken.secret,
         expiresIn: conf.token.refreshToken.expiresIn,
+        defaultUponError: { uid: "", vrs: -1 },
         verify: async (payload) => {
           const user = await prisma.user.findOne({
             where: { id: payload.uid },

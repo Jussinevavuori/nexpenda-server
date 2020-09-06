@@ -58,7 +58,7 @@ describe("/api/auth/register", () => {
     done();
   });
 
-  it("blocks requests with extra or invalid data", async (done) => {
+  it("xxx blocks requests with extra or invalid data", async (done) => {
     const client = new TestClient();
     const responses = await Promise.all([
       client.auth().register(null),

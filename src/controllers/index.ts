@@ -22,4 +22,4 @@ import "./transactions/transactions.put";
 import "./transactions/transactions.patch";
 import "./transactions/transactions.delete";
 
-import "./views/forgot_password";
+import "./views/forgot_password.get";

@@ -1,50 +1,66 @@
 import { transactionsRouter } from "..";
-import { protectedRoute } from "../../middleware/protectedRoute";
-import { getValidatedRequestBody } from "../../utils/getValidatedRequestBody";
+import { validateRequestBody } from "../../utils/validateRequestBody";
 import { postTransactionSchema } from "../../schemas/transaction.schema";
 import { prisma } from "../../server";
 import { v4 as uuid } from "uuid";
 import { respondWithTransaction } from "../../utils/respondWithTransactions";
-import { TransactionAlreadyExistsError } from "../../errors/TransactionAlreadyExistsError";
-import { InvalidRequestDataError } from "../../errors/InvalidRequestDataError";
+import { Route } from "../../utils/Route";
+import { Errors } from "../../errors/Errors";
+import { Failure } from "../../utils/Result";
 
-transactionsRouter.post(
-  "/",
-  protectedRoute(async (user, req, res, next) => {
-    try {
-      const form = await getValidatedRequestBody(req, postTransactionSchema);
+new Route(transactionsRouter, "/").protected.post(async (user, req, res) => {
+  /**
+   * Validate request body
+   */
+  const body = await validateRequestBody(req, postTransactionSchema);
 
-      if (form.uid && form.uid !== user.id) {
-        throw new InvalidRequestDataError(
-          "Cannot create transaction for another user id"
-        );
-      }
+  if (body.isFailure()) {
+    return body;
+  }
 
-      const id = form.id || uuid();
+  /**
+   * Ensure UID is same as authenticated user's if it exists
+   */
+  if (body.value.uid && body.value.uid !== user.id) {
+    return new Failure(
+      Errors.Data.InvalidRequestData({
+        uid: "Cannot create transaction for another user id",
+      })
+    );
+  }
 
-      const existing = await prisma.transaction.findOne({
-        where: { id: id },
-      });
+  /**
+   * Generate ID or use provided ID
+   */
+  const id = body.value.id || uuid();
 
-      if (existing) {
-        throw new TransactionAlreadyExistsError();
-      }
+  /**
+   * Check no transaction already exists with given ID
+   */
+  const existing = await prisma.transaction.findOne({
+    where: { id: id },
+  });
 
-      // Create new id from form
-      const created = await prisma.transaction.create({
-        data: {
-          id,
-          user: { connect: { id: user.id } },
-          integerAmount: form.integerAmount,
-          category: form.category,
-          comment: form.comment,
-          time: new Date(form.time),
-        },
-      });
+  if (existing) {
+    return new Failure(Errors.Transaction.AlreadyExists());
+  }
 
-      respondWithTransaction(res.status(201), created);
-    } catch (error) {
-      next(error);
-    }
-  })
-);
+  /**
+   * Create new transaction from body
+   */
+  const created = await prisma.transaction.create({
+    data: {
+      id,
+      user: { connect: { id: user.id } },
+      integerAmount: body.value.integerAmount,
+      category: body.value.category,
+      comment: body.value.comment,
+      time: new Date(body.value.time),
+    },
+  });
+
+  /**
+   * Send created transaction to user
+   */
+  respondWithTransaction(res.status(201), created);
+});
