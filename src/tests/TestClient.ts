@@ -47,22 +47,37 @@ export class TestClient {
 
   /**
    * Endpoint generator
+   * if (partials includes __omitapi then "/api" is left out fom URL
    */
-  endpoint(path: string, ...partials: string[]) {
+  endpoint(...partials: string[]) {
     const fix = (s: string) => (s.startsWith("/") ? s.substring(1) : s);
-    return [
-      this.url,
-      "api",
-      fix(path),
-      ...partials.filter((_) => typeof _ === "string").map(fix),
-    ].join("/");
+
+    let url = this.url;
+
+    if (partials.includes("__omitapi")) {
+      url += "/";
+    } else {
+      url += "/api/";
+    }
+
+    for (const partial of partials) {
+      if (partial && typeof partial === "string" && partial !== "__omitapi") {
+        url += `${fix(partial)}/`;
+      }
+    }
+
+    return url;
   }
 
   /**
    * Fetch GET wrapper with automatic auth header and cookies
    */
-  async get(path: string) {
-    const response = await fetch(this.endpoint(path), {
+  async get(path: string, options?: { omitApiInEndpoint?: boolean }) {
+    const endpoint = this.endpoint(
+      path,
+      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+    );
+    const response = await fetch(endpoint, {
       headers: this.getHeaders(),
       timeout: this.defaultTimeout,
       method: "GET",
@@ -74,8 +89,16 @@ export class TestClient {
   /**
    * Fetch POST wrapper with automatic body, auth header and cookies
    */
-  async post(path: string, body?: any) {
-    const response = await fetch(this.endpoint(path), {
+  async post(
+    path: string,
+    body?: any,
+    options?: { omitApiInEndpoint?: boolean }
+  ) {
+    const endpoint = this.endpoint(
+      path,
+      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+    );
+    const response = await fetch(endpoint, {
       headers: this.getHeaders({ body }),
       timeout: this.defaultTimeout,
       method: "POST",
@@ -88,8 +111,19 @@ export class TestClient {
   /**
    * Fetch PUT wrapper with automatic body, auth header and cookies
    */
-  async put(path: string, id: string, body?: any) {
-    const response = await fetch(this.endpoint(path, id), {
+  async put(
+    path: string,
+    id: string,
+    body?: any,
+    options?: { omitApiInEndpoint?: boolean }
+  ) {
+    const endpoint = this.endpoint(
+      path,
+      id,
+      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+    );
+
+    const response = await fetch(endpoint, {
       headers: this.getHeaders({ body }),
       timeout: this.defaultTimeout,
       method: "PUT",
@@ -102,8 +136,18 @@ export class TestClient {
   /**
    * Fetch PATCH wrapper with automatic body, auth header and cookies
    */
-  async patch(path: string, id: string, body?: any) {
-    const response = await fetch(this.endpoint(path, id), {
+  async patch(
+    path: string,
+    id: string,
+    body?: any,
+    options?: { omitApiInEndpoint?: boolean }
+  ) {
+    const endpoint = this.endpoint(
+      path,
+      id,
+      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+    );
+    const response = await fetch(endpoint, {
       headers: this.getHeaders({ body }),
       timeout: this.defaultTimeout,
       method: "PATCH",
@@ -116,8 +160,17 @@ export class TestClient {
   /**
    * Fetch DELETE wrapper with automatic auth header and cookies
    */
-  async delete(path: string, id: string) {
-    const response = await fetch(this.endpoint(path, id), {
+  async delete(
+    path: string,
+    id: string,
+    options?: { omitApiInEndpoint?: boolean }
+  ) {
+    const endpoint = this.endpoint(
+      path,
+      id,
+      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+    );
+    const response = await fetch(endpoint, {
       headers: this.getHeaders(),
       timeout: this.defaultTimeout,
       method: "DELETE",
