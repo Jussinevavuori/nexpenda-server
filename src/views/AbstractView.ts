@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { conf } from "../conf";
+import * as path from "path";
 
 type DefaultVariables = {
   hosts: {
@@ -19,7 +20,7 @@ export class AbstractView<T extends object = {}> {
    * @param variables Variables to assign by default for view
    */
   constructor(name: string, variables: T) {
-    this.name = name;
+    this.name = path.join(__dirname, "..", "..", "src", "views", `${name}`);
 
     /**
      * Assign also default values from config
