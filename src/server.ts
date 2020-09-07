@@ -47,7 +47,11 @@ export function startServer() {
       app.use(
         cors({
           credentials: true,
-          origin: ["http://localhost:3000", "https://expenceapp.herokuapp.com"],
+          origin: [
+            "http://localhost:3000",
+            "http://localhost:4000",
+            "https://expenceapp.herokuapp.com",
+          ],
         })
       );
       app.use(initializeRequestData());
