@@ -1,5 +1,4 @@
 import * as yup from "yup";
-import * as jwt from "jsonwebtoken";
 import { conf } from "../conf";
 import { User } from "@prisma/client";
 import { AbstractToken } from "./AbstractToken";
@@ -19,17 +18,14 @@ export class ConfirmEmailToken
   /**
    * Read raw JWT token to generate new auth link token
    */
-  constructor(user: User) {
-    super(
-      { uid: user.id },
-      {
-        schema: ConfirmEmailToken.schema,
-        tkt: "confirm_email",
-        secret: conf.token.confirmEmailToken.secret,
-        expiresIn: conf.token.confirmEmailToken.expiresIn,
-        defaultUponError: { uid: "" },
-      }
-    );
+  constructor(arg: string | User) {
+    super(typeof arg === "string" ? arg : { uid: arg.id }, {
+      schema: ConfirmEmailToken.schema,
+      tkt: "confirm_email",
+      secret: conf.token.confirmEmailToken.secret,
+      expiresIn: conf.token.confirmEmailToken.expiresIn,
+      defaultUponError: { uid: "" },
+    });
     this.uid = this.payload.uid;
   }
 

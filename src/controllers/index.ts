@@ -24,3 +24,4 @@ import "./transactions/transactions.delete";
 
 import "./views/forgot_password.get";
 import "./views/forgot_password.post";
+import "./views/confirm_email";
