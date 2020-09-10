@@ -4,8 +4,15 @@ import {
   mockTransaction,
   createTestClientWithTransactions,
 } from "../../tests/testUtils";
+import { PrismaClient } from "@prisma/client";
 
 describe("/api/transactions > PATCH", () => {
+  const prisma = new PrismaClient();
+  console.log("Prisma client: ", prisma);
+
+  beforeAll((done) => prisma.$connect().then(() => done()));
+  afterAll((done) => prisma.$disconnect().then(() => done()));
+
   it("blocks unauthorized requests", async (done) => {
     const client = new TestClient();
     const id = uuid();
@@ -17,7 +24,7 @@ describe("/api/transactions > PATCH", () => {
 
   it("cannot patch when no transaction is found", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const uid = client.authenticatedUid;
     const id = uuid();
     const patch = mockTransaction({ id, uid });
@@ -29,7 +36,7 @@ describe("/api/transactions > PATCH", () => {
   });
 
   it("can fully update existing resouce", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const id = ids[0];
     const patch = {
       id,
@@ -51,7 +58,7 @@ describe("/api/transactions > PATCH", () => {
   });
 
   it("can patch with missing ID or UID", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const id = ids[0];
     const patch = {
       integerAmount: 99,
@@ -79,7 +86,7 @@ describe("/api/transactions > PATCH", () => {
   });
 
   it("cannot patch with invalid ID or UID", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const id = ids[0];
     const patch1 = {
       id: uuid(),
@@ -112,7 +119,7 @@ describe("/api/transactions > PATCH", () => {
   });
 
   it("can partially update fields", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const id = ids[0];
     const patch1 = { integerAmount: 99 };
     const patch2 = { time: 99 };
@@ -148,7 +155,7 @@ describe("/api/transactions > PATCH", () => {
   });
 
   it("can partially null fields", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const id = ids[0];
     const patch = { comment: null };
     const response = await client.transactions().patch(id, patch);
@@ -165,12 +172,11 @@ describe("/api/transactions > PATCH", () => {
   });
 
   it("cannot modify another user's data", async (done) => {
-    const {
-      ["client"]: client1,
-      ids,
-    } = await createTestClientWithTransactions();
+    const { ["client"]: client1, ids } = await createTestClientWithTransactions(
+      prisma
+    );
     const client2 = new TestClient();
-    await client2.authenticate();
+    await client2.authenticate(prisma);
     const id = ids[0];
     const patch = { category: "unauthorized" };
     const response = await client2.transactions().patch(id, patch);

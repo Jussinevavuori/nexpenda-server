@@ -2,8 +2,14 @@ import { TestClient } from "../../tests/TestClient";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { conf } from "../../conf";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 describe("/api/auth/login", () => {
+  beforeAll((done) => prisma.$connect().then(() => done()));
+  afterAll((done) => prisma.$disconnect().then(() => done()));
+
   it("blocks requests without data", async (done) => {
     const client = new TestClient();
     const response = await client.auth().login(undefined);
@@ -35,6 +41,18 @@ describe("/api/auth/login", () => {
     done();
   });
 
+  it("fails when user email not confirmed", async (done) => {
+    const client = new TestClient();
+    const email = faker.internet.email();
+    const password = faker.internet.password();
+    await client.auth().register({ email, password });
+    const response = await client.auth().login({ email, password });
+    const body = await response.json();
+    expect(response.status).toBe(400);
+    expect(body.code).toBe("auth/email-not-confirmed");
+    done();
+  });
+
   it("fails when user does not exist", async (done) => {
     const client = new TestClient();
     const email = faker.internet.email();
@@ -47,37 +65,45 @@ describe("/api/auth/login", () => {
   });
 
   it("fails with wrong password", async (done) => {
-    const client1 = new TestClient();
-    const client2 = new TestClient();
+    const client = new TestClient();
     const email = faker.internet.email();
-    await client1
+    await client
       .auth()
       .register({ email, password: faker.internet.password() });
-    const response = await client2
+    const userInDb = await prisma.user.findOne({ where: { email } });
+    const token = client.fabricateConfirmEmailToken(userInDb!.id);
+    await client.auth().confirmEmail(token);
+    const response = await client
       .auth()
       .login({ email, password: faker.internet.password() });
+    const body = await response.json();
     expect(response.status).toBe(400);
+    expect(body.code).toBe("auth/invalid-credentials");
     done();
   });
 
   it("succeeds on correct credentials", async (done) => {
-    const client1 = new TestClient();
-    const client2 = new TestClient();
+    const client = new TestClient();
     const email = faker.internet.email();
     const password = faker.internet.password();
-    await client1.auth().register({ email, password });
-    const response = await client2.auth().login({ email, password });
+    await client.auth().register({ email, password });
+    const userInDb = await prisma.user.findOne({ where: { email } });
+    const token = client.fabricateConfirmEmailToken(userInDb!.id);
+    await client.auth().confirmEmail(token);
+    const response = await client.auth().login({ email, password });
     expect(response.status).toBe(200);
     done();
   });
 
   it("succeeds and sends refresh token as cookie", async (done) => {
-    const client1 = new TestClient();
-    const client2 = new TestClient();
+    const client = new TestClient();
     const email = faker.internet.email();
     const password = faker.internet.password();
-    await client1.auth().register({ email, password });
-    const response = await client2.auth().login({ email, password });
+    await client.auth().register({ email, password });
+    const userInDb = await prisma.user.findOne({ where: { email } });
+    const token = client.fabricateConfirmEmailToken(userInDb!.id);
+    await client.auth().confirmEmail(token);
+    const response = await client.auth().login({ email, password });
     expect(response.status).toBe(200);
     expect(
       response.headers
@@ -86,8 +112,8 @@ describe("/api/auth/login", () => {
           _.startsWith(`${conf.token.refreshToken.name}=`)
         )
     ).toBeDefined();
-    expect(client2.refreshToken).toBeDefined();
-    const decoded = jwt.decode(client2.refreshToken!) as any;
+    expect(client.refreshToken).toBeDefined();
+    const decoded = jwt.decode(client.refreshToken!) as any;
     expect(decoded).not.toBeNull();
     expect(decoded).toBeDefined();
     expect(decoded.uid).toBeDefined();

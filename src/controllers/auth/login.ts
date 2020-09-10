@@ -33,6 +33,10 @@ new Route(authRouter, "/login").post(async (req, res) => {
     );
   }
 
+  if (!user.emailVerified) {
+    return new Failure(Errors.Auth.EmailNotConfirmed());
+  }
+
   if (!user.password) {
     return new Failure(
       Errors.Auth.InvalidCredentials("User does not have a password")

@@ -7,6 +7,9 @@ import { Password } from "../../services/Password";
 import { Route } from "../../utils/Route";
 import { Errors } from "../../errors/Errors";
 import { Failure } from "../../utils/Result";
+import { Mailer } from "../../services/Mailer";
+import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
+import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
 
 new Route(authRouter, "/register").post(async (request, response) => {
   /**
@@ -46,7 +49,23 @@ new Route(authRouter, "/register").post(async (request, response) => {
   });
 
   /**
-   * Create refresh token for user and send in response
+   * Generate confirm email token for user
    */
-  new RefreshToken(user).send(response).end();
+  const token = new ConfirmEmailToken(user);
+
+  if (user.email) {
+    /**
+     * Send confirm email to user
+     */
+    const mailer = new Mailer();
+
+    const template = new ConfirmEmailTemplate({
+      email: user.email,
+      url: token.generateURL(),
+    });
+
+    await mailer.sendTemplate(user.email, template);
+  }
+
+  response.end();
 });

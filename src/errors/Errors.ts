@@ -144,6 +144,18 @@ export const Errors = {
         message
       );
     },
+
+    EmailNotConfirmed(message?: string) {
+      return new ApplicationError(
+        {
+          code: "auth/email-not-confirmed",
+          status: 400,
+          message: "Email not confirmed",
+        },
+        message
+      );
+    },
+
     /**
      * User not found
      */

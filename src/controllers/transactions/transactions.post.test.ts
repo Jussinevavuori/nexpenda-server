@@ -1,7 +1,13 @@
 import { TestClient } from "../../tests/TestClient";
 import { mockTransaction } from "../../tests/testUtils";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 describe("/api/transactions > POST", () => {
+  beforeAll((done) => prisma.$connect().then(() => done()));
+  afterAll((done) => prisma.$disconnect().then(() => done()));
+
   it("blocks unauthenticated requests", async (done) => {
     const client = new TestClient();
     const response = await client.transactions().post(undefined);
@@ -11,7 +17,7 @@ describe("/api/transactions > POST", () => {
 
   it("blocks request with invalid data", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
 
     const response1 = await client.transactions().post(null);
     const response2 = await client.transactions().post(undefined);
@@ -34,7 +40,7 @@ describe("/api/transactions > POST", () => {
 
   it("blocks requests with invalid UID", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const transaction = mockTransaction();
     expect(transaction.uid).toBeDefined();
     expect(transaction.uid).not.toBe(client.authenticatedUid);
@@ -46,7 +52,7 @@ describe("/api/transactions > POST", () => {
 
   it("blocks requests with missing or invalid integeramount", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const uid = client.authenticatedUid;
 
     const transaction1 = mockTransaction({ uid }) as any;
@@ -82,7 +88,7 @@ describe("/api/transactions > POST", () => {
 
   it("blocks requests with missing or invalid category", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const uid = client.authenticatedUid;
 
     const transaction1 = mockTransaction({ uid }) as any;
@@ -118,7 +124,7 @@ describe("/api/transactions > POST", () => {
 
   it("succeeds and creates resource with proper data", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const transaction = mockTransaction({
       uid: client.authenticatedUid,
     });
@@ -139,7 +145,7 @@ describe("/api/transactions > POST", () => {
 
   it("generates UUID and ID for transaction without ID and UID", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const transaction = mockTransaction();
     delete transaction.id;
     delete transaction.uid;

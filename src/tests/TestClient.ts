@@ -3,6 +3,8 @@ import { conf } from "../conf";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { testUtils } from "./testUtils";
+import { ConfirmEmailToken } from "../services/ConfirmEmailToken";
+import { User, PrismaClient } from "@prisma/client";
 
 export class TestClient {
   /**
@@ -180,13 +182,23 @@ export class TestClient {
   }
 
   /**
+   * Fabricates a confirm email token
+   */
+  fabricateConfirmEmailToken(id: string) {
+    return new ConfirmEmailToken({ id } as User).jwt;
+  }
+
+  /**
    * Authentication function: automatically authenticates the client
    * and stores access token, refresh token and authenticated UID data
    */
-  async authenticate() {
+  async authenticate(prisma: PrismaClient) {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await this.auth().register({ email, password });
+    const record = await prisma.user.findOne({ where: { email } });
+    await this.auth().confirmEmail(this.fabricateConfirmEmailToken(record!.id));
+    await this.auth().login({ email, password });
     await this.auth().refreshToken();
     return email;
   }
@@ -212,10 +224,16 @@ export class TestClient {
         return that.post("/auth/register", data);
       },
       logout() {
-        return that.get("/auth/logout");
+        return that.post("/auth/logout");
       },
       profile() {
         return that.get("/auth/profile");
+      },
+      forgotPassword() {
+        return that.post("/auth/forgot_password");
+      },
+      confirmEmail(token: string) {
+        return that.get(`/auth/confirm_email/${token}`);
       },
       refreshToken() {
         return that.get("/auth/refresh_token").then(async (response) => {

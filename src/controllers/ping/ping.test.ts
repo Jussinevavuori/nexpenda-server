@@ -1,6 +1,12 @@
 import { TestClient } from "../../tests/TestClient";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 describe("/api/ping", () => {
+  beforeAll((done) => prisma.$connect().then(() => done()));
+  afterAll((done) => prisma.$disconnect().then(() => done()));
+
   it("pongs", async (done) => {
     const client = new TestClient();
     const response = await client.ping();
@@ -20,7 +26,7 @@ describe("/api/ping/protected", () => {
 
   it("pongs on authenticated", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const response = await client.ping({ protected: true });
     const text = await response.text();
     expect(text.substring(0, 4)).toBe(`pong`);
@@ -29,7 +35,7 @@ describe("/api/ping/protected", () => {
 
   it("pongs on authenticated with correct UID", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const response = await client.ping({ protected: true });
     const text = await response.text();
     expect(text).toBe(`pong ${client.authenticatedUid}`);

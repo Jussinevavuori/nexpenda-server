@@ -1,19 +1,21 @@
 import { Router } from "express";
 
-export const viewsRouter = Router();
 export const pingRouter = Router();
 export const authRouter = Router();
 export const transactionsRouter = Router();
 
 import "./ping/ping";
 
-import "./auth/googleOauth";
 import "./auth/login";
 import "./auth/logout";
 import "./auth/refresh_token";
 import "./auth/register";
 import "./auth/profile";
 import "./auth/forgot_password";
+import "./auth/change_password.get";
+import "./auth/change_password.post";
+import "./auth/confirm_email";
+import "./auth/googleOauth";
 
 import "./transactions/transactions.get";
 import "./transactions/transactions.getbyid";
@@ -21,7 +23,3 @@ import "./transactions/transactions.post";
 import "./transactions/transactions.put";
 import "./transactions/transactions.patch";
 import "./transactions/transactions.delete";
-
-import "./views/forgot_password.get";
-import "./views/forgot_password.post";
-import "./views/confirm_email";

@@ -2,6 +2,7 @@ import { Response } from "node-fetch";
 import { v4 as uuid } from "uuid";
 import * as faker from "faker";
 import { TestClient } from "./TestClient";
+import { PrismaClient } from "@prisma/client";
 
 export const testUtils = {
   parseCookieFromResponse(response: Response, cookieName: string) {
@@ -21,9 +22,9 @@ export function fakeInteger(): number {
   return Math.round(min + Math.random() * (max - min));
 }
 
-export async function createTestClientWithTransactions() {
+export async function createTestClientWithTransactions(prisma: PrismaClient) {
   const client = new TestClient();
-  await client.authenticate();
+  await client.authenticate(prisma);
   const uid = client.authenticatedUid;
   const ids = [uuid(), uuid(), uuid(), uuid(), uuid()] as const;
   const posts = ids.map((id, index) => {

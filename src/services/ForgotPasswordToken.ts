@@ -55,9 +55,9 @@ export class ForgotPasswordToken
   generateURL() {
     return [
       process.env.NODE_ENV === "development"
-        ? "http://localhost:4000"
+        ? "http://localhost:3000"
         : "http://expenceapp.herokuapp.com",
-      "forgot_password",
+      "changePassword",
       this.jwt,
     ].join("/");
   }

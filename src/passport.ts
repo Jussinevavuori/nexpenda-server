@@ -27,7 +27,7 @@ passport.use(
     {
       clientID: conf.google.clientId,
       clientSecret: conf.google.clientSecret,
-      callbackURL: "http://localhost:4000/api/auth/google/callback",
+      callbackURL: `${conf.hosts.server}/api/auth/google/callback`,
     },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
@@ -54,6 +54,7 @@ passport.use(
               googleId: profile.id,
               email,
               photoUrl,
+              emailVerified: true,
             },
           });
           done(null, createdUser);

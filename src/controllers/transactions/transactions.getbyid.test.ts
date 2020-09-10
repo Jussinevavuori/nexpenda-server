@@ -1,8 +1,14 @@
 import { TestClient } from "../../tests/TestClient";
 import { v4 as uuid } from "uuid";
 import { mockTransaction } from "../../tests/testUtils";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 describe("/api/transactions > GET by ID", () => {
+  beforeAll((done) => prisma.$connect().then(() => done()));
+  afterAll((done) => prisma.$disconnect().then(() => done()));
+
   it("blocks unauthenticated requests", async (done) => {
     const client = new TestClient();
     const response = await client.transactions().get();
@@ -12,7 +18,7 @@ describe("/api/transactions > GET by ID", () => {
 
   it("returns correct not found error", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const response = await client.transactions().get(uuid());
     expect(response.status).toBe(404);
     const error = await response.json();
@@ -22,7 +28,7 @@ describe("/api/transactions > GET by ID", () => {
 
   it("correctly finds created resource", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const constructable = mockTransaction({
       uid: client.authenticatedUid,
     });
@@ -42,8 +48,8 @@ describe("/api/transactions > GET by ID", () => {
   it("cannot find another user's resource", async (done) => {
     const client1 = new TestClient();
     const client2 = new TestClient();
-    await client1.authenticate();
-    await client2.authenticate();
+    await client1.authenticate(prisma);
+    await client2.authenticate(prisma);
 
     const constructable = mockTransaction({
       uid: client1.authenticatedUid,

@@ -6,13 +6,7 @@ import * as bodyParser from "body-parser";
 import * as cors from "cors";
 import * as path from "path";
 import * as cookieParser from "cookie-parser";
-import {
-  pingRouter,
-  authRouter,
-  transactionsRouter,
-  viewsRouter,
-} from "./controllers";
-import * as ejs from "ejs";
+import { pingRouter, authRouter, transactionsRouter } from "./controllers";
 import { conf } from "./conf";
 import { handleApplicationError } from "./middleware/handleApplicationError";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -60,12 +54,7 @@ export function startServer() {
       app.use(express.static(path.join(__dirname, "..", "build")));
       app.use(express.static(path.join(__dirname, "views")));
 
-      app.set("views", path.join(__dirname, "views"));
-      app.engine("html", ejs.renderFile);
-      app.set("view engine", "ejs");
-
       // Api endpoints
-      app.use("/", viewsRouter);
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
       app.use("/api/transactions", transactionsRouter);

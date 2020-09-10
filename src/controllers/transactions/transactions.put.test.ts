@@ -4,8 +4,14 @@ import {
   createTestClientWithTransactions,
 } from "../../tests/testUtils";
 import { v4 as uuid } from "uuid";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 describe("/api/transactions > PUT", () => {
+  beforeAll((done) => prisma.$connect().then(() => done()));
+  afterAll((done) => prisma.$disconnect().then(() => done()));
+
   it("blocks unauthorized requests", async (done) => {
     const client = new TestClient();
     const id = uuid();
@@ -17,7 +23,7 @@ describe("/api/transactions > PUT", () => {
 
   it("can create new resource", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const uid = client.authenticatedUid;
     const id = uuid();
     const put = {
@@ -41,7 +47,7 @@ describe("/api/transactions > PUT", () => {
   });
 
   it("can fully update existing resouce", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const id = ids[0];
     const put = {
       integerAmount: 99,
@@ -61,7 +67,7 @@ describe("/api/transactions > PUT", () => {
   });
 
   it("only updates targeted resource", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const put = {
       integerAmount: 99,
       time: 99,
@@ -79,7 +85,7 @@ describe("/api/transactions > PUT", () => {
   });
 
   it("works with ID and UID in request body", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const id = ids[0];
     const put = {
       uid,
@@ -98,7 +104,7 @@ describe("/api/transactions > PUT", () => {
   });
 
   it("blocks conflicting ID and UID in request body", async (done) => {
-    const { client, uid, ids } = await createTestClientWithTransactions();
+    const { client, uid, ids } = await createTestClientWithTransactions(prisma);
     const id = ids[0];
     const put1 = {
       uid: uuid(),
@@ -128,12 +134,9 @@ describe("/api/transactions > PUT", () => {
   });
 
   it("can null unrequired fields", async (done) => {
-    const {
-      client,
-      uid,
-      ids,
-      posts,
-    } = await createTestClientWithTransactions();
+    const { client, uid, ids, posts } = await createTestClientWithTransactions(
+      prisma
+    );
     const id = ids[0];
     const put = {
       ...posts[0],
@@ -153,7 +156,7 @@ describe("/api/transactions > PUT", () => {
 
   it("blocks requests with invalid data", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const uid = client.authenticatedUid;
     const id = uuid();
     const post = mockTransaction({
@@ -223,7 +226,7 @@ describe("/api/transactions > PUT", () => {
       ["client"]: client1,
       ["uid"]: uid1,
       ids,
-    } = await createTestClientWithTransactions();
+    } = await createTestClientWithTransactions(prisma);
     const client2 = new TestClient();
     const uid2 = client2.authenticatedUid;
     const id = ids[0];

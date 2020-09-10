@@ -1,8 +1,14 @@
 import { TestClient } from "../../tests/TestClient";
 import { mockTransaction } from "../../tests/testUtils";
 import { v4 as uuid } from "uuid";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 describe("/api/transactions > DELETE", () => {
+  beforeAll((done) => prisma.$connect().then(() => done()));
+  afterAll((done) => prisma.$disconnect().then(() => done()));
+
   it("blocks unauthenticated requests", async (done) => {
     const client = new TestClient();
     const response = await client.transactions().delete("id");
@@ -12,7 +18,7 @@ describe("/api/transactions > DELETE", () => {
 
   it("blocks requests with invalid ID", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const response = await client.transactions().delete("id");
     expect(response.status).toBe(404);
     done();
@@ -20,7 +26,7 @@ describe("/api/transactions > DELETE", () => {
 
   it("deletes own resources", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const uid = client.authenticatedUid;
     const ids = [uuid(), uuid(), uuid()];
     await Promise.all(
@@ -45,8 +51,8 @@ describe("/api/transactions > DELETE", () => {
   it("cannot delete other people's resources", async (done) => {
     const client1 = new TestClient();
     const client2 = new TestClient();
-    await client1.authenticate();
-    await client2.authenticate();
+    await client1.authenticate(prisma);
+    await client2.authenticate(prisma);
     const uid = client1.authenticatedUid;
     const id = uuid();
     await client1.transactions().post(mockTransaction({ id, uid }));

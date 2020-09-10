@@ -1,8 +1,14 @@
 import { TestClient } from "../../tests/TestClient";
 import { v4 as uuid } from "uuid";
 import { mockTransaction } from "../../tests/testUtils";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 describe("/api/transactions > GET", () => {
+  beforeAll((done) => prisma.$connect().then(() => done()));
+  afterAll((done) => prisma.$disconnect().then(() => done()));
+
   it("blocks unauthenticated requests", async (done) => {
     const client = new TestClient();
     const response = await client.transactions().get(uuid());
@@ -12,7 +18,7 @@ describe("/api/transactions > GET", () => {
 
   it("correctly responds with array of transactions in chronological order", async (done) => {
     const client = new TestClient();
-    await client.authenticate();
+    await client.authenticate(prisma);
     const uid = client.authenticatedUid;
 
     const options = [
@@ -54,8 +60,8 @@ describe("/api/transactions > GET", () => {
   it("only gets authenticated users' transactions", async (done) => {
     const client1 = new TestClient();
     const client2 = new TestClient();
-    await client1.authenticate();
-    await client2.authenticate();
+    await client1.authenticate(prisma);
+    await client2.authenticate(prisma);
     const uid1 = client1.authenticatedUid;
     const uid2 = client2.authenticatedUid;
 

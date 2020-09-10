@@ -30,6 +30,19 @@ export class ConfirmEmailToken
   }
 
   /**
+   * Generate a URL for resetting the password
+   */
+  generateURL() {
+    return [
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "http://expenceapp.herokuapp.com",
+      "confirmEmail",
+      this.jwt,
+    ].join("/");
+  }
+
+  /**
    * Schema for validating token payloads
    */
   static schema: yup.ObjectSchema<IConfirmEmailToken> = yup

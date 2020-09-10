@@ -47,7 +47,7 @@ export function extractAuthentication() {
 
     const user = await prisma.user.findOne({ where: { id: accessToken.uid } });
 
-    if (!user || user.disabled) {
+    if (!user || user.disabled || !user.emailVerified) {
       return next();
     }
 
