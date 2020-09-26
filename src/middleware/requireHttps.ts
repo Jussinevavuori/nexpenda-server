@@ -17,8 +17,8 @@ export function requireHttps(options?: {
     const insecure = req.protocol !== "https" && !req.get("x-forwarded-port");
 
     const ignore =
-      ignoredHosts.some((hostRegex) => hostRegex.test(req.get("host") ?? "")) ||
-      ignoredRoutes.some((routeRegex) => routeRegex.test(req.path));
+      ignoredHosts.find((hostRegex) => hostRegex.test(req.get("host") ?? "")) ||
+      ignoredRoutes.find((routeRegex) => routeRegex.test(req.path));
 
     if (insecure && !ignore) {
       return res.redirect(

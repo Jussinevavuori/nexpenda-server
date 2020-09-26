@@ -7,12 +7,14 @@ export function handleFailure(
   res: Response,
   next: NextFunction
 ) {
-  // console.log("Handling failure", error);
   if (!res.headersSent) {
-    // console.log("Headers not yet sent");
     if (error instanceof Failure) {
-      // console.log("Error is an instance of failure");
-      return error.value.send(res);
+      res.send({
+        data: error.value,
+        message: error.message,
+        status: error.status,
+        code: error.code,
+      });
     }
   }
   next(error);
