@@ -8,14 +8,15 @@ import "./ping/ping";
 
 import "./auth/login";
 import "./auth/logout";
-import "./auth/refresh_token";
 import "./auth/register";
 import "./auth/profile";
+import "./auth/googleOauth";
+import "./auth/confirm_email";
+import "./auth/refresh_token";
 import "./auth/forgot_password";
 import "./auth/change_password.get";
 import "./auth/change_password.post";
-import "./auth/confirm_email";
-import "./auth/googleOauth";
+import "./auth/request_confirm_email";
 
 import "./transactions/transactions.get";
 import "./transactions/transactions.getbyid";

@@ -8,7 +8,6 @@ import * as path from "path";
 import * as cookieParser from "cookie-parser";
 import { pingRouter, authRouter, transactionsRouter } from "./controllers";
 import { conf } from "./conf";
-import { handleApplicationError } from "./middleware/handleApplicationError";
 import { extractAuthentication } from "./middleware/extractAuthentication";
 import { PrismaClient } from "@prisma/client";
 import { initializeRequestData } from "./middleware/initializeData";
@@ -70,7 +69,6 @@ export function startServer() {
       // Error handler middlewares
       app.use(handleErrors);
       app.use(handleFailure);
-      app.use(handleApplicationError);
 
       // Start server
       server = http.listen(conf.port, function () {

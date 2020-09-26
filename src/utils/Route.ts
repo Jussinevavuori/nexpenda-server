@@ -1,7 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { User } from "@prisma/client";
 import { Result, Failure } from "./Result";
-import { Errors } from "../errors/Errors";
 
 type Resolver = (
   request: Request,
@@ -50,7 +49,7 @@ export class Route {
     return async (request: Request, response: Response, next: NextFunction) => {
       // Ensure authentication
       if (!request.data.user) {
-        return next(new Failure(Errors.Auth.Unauthenticated()));
+        return next(Failure.Unauthenticated());
       }
 
       const result = await resolver(request.data.user, request, response);

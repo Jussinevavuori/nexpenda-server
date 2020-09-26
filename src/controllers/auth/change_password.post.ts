@@ -5,7 +5,6 @@ import { prisma } from "../../server";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 import { passwordOnlyAuthSchema } from "../../schemas/auth.schema";
 import { Password } from "../../services/Password";
-import { Errors } from "../../errors/Errors";
 import { Failure } from "../../utils/Result";
 
 new Route(authRouter, "/change_password/:token").post(
@@ -20,7 +19,7 @@ new Route(authRouter, "/change_password/:token").post(
     const tokenVerified = await token.verify();
 
     if (!tokenVerified) {
-      return Failure.error(() => Errors.Token.Invalid());
+      return Failure.InvalidToken();
     }
 
     /**
@@ -29,8 +28,7 @@ new Route(authRouter, "/change_password/:token").post(
     const user = await prisma.user.findOne({ where: { id: token.uid } });
 
     if (!user || !user.email || user.disabled) {
-      return Failure.error(() => Errors.Auth.UserNotFound());
-      return;
+      return Failure.UserNotFound();
     }
 
     /**

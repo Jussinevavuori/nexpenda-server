@@ -1,7 +1,6 @@
 import { User, Transaction } from "@prisma/client";
 import { prisma } from "../server";
 import { Result, Failure, Success } from "./Result";
-import { Errors } from "../errors/Errors";
 
 /**
  * Helper function to fetch a transaction for user. Only allows accessing
@@ -18,11 +17,9 @@ export async function getProtectedTransaction(
    * Ensure ID exists
    */
   if (!id) {
-    return new Failure(
-      Errors.Data.InvalidRequestData({
-        _root: "No ID provided as URL parameter",
-      })
-    );
+    return Failure.InvalidRequestData({
+      id: "No ID provided as URL parameter",
+    });
   }
 
   /**
@@ -34,7 +31,7 @@ export async function getProtectedTransaction(
    * Ensure transaction exists and is user's
    */
   if (!transaction || transaction.uid !== user.id) {
-    return new Failure(Errors.Transaction.NotFound());
+    return Failure.TransactionNotFound();
   }
 
   /**

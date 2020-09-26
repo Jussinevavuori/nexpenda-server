@@ -5,7 +5,6 @@ import { getProtectedTransaction } from "../../utils/getProtectedTransaction";
 import { prisma } from "../../server";
 import { respondWithTransaction } from "../../utils/respondWithTransactions";
 import { Route } from "../../utils/Route";
-import { Errors } from "../../errors/Errors";
 import { Failure } from "../../utils/Result";
 
 new Route(transactionsRouter, "/:id").protected.patch(
@@ -37,22 +36,18 @@ new Route(transactionsRouter, "/:id").protected.patch(
      * Ensure ID is not changed
      */
     if (body.value.id && body.value.id !== transaction.value.id) {
-      return new Failure(
-        Errors.Data.InvalidRequestData({
-          id: "Cannot update transaction ID",
-        })
-      );
+      return Failure.InvalidRequestData({
+        id: "Cannot update transaction ID",
+      });
     }
 
     /**
      * Ensure UID is not changed
      */
     if (body.value.uid && body.value.uid !== transaction.value.uid) {
-      return new Failure(
-        Errors.Data.InvalidRequestData({
-          uid: "Cannot update transaction owner",
-        })
-      );
+      return Failure.InvalidRequestData({
+        uid: "Cannot update transaction owner",
+      });
     }
 
     /**

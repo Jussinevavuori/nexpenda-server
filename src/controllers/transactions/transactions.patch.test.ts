@@ -8,7 +8,6 @@ import { PrismaClient } from "@prisma/client";
 
 describe("/api/transactions > PATCH", () => {
   const prisma = new PrismaClient();
-  console.log("Prisma client: ", prisma);
 
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));

@@ -5,7 +5,6 @@ import { prisma } from "../../server";
 import { v4 as uuid } from "uuid";
 import { respondWithTransaction } from "../../utils/respondWithTransactions";
 import { Route } from "../../utils/Route";
-import { Errors } from "../../errors/Errors";
 import { Failure } from "../../utils/Result";
 
 new Route(transactionsRouter, "/").protected.post(async (user, req, res) => {
@@ -22,11 +21,9 @@ new Route(transactionsRouter, "/").protected.post(async (user, req, res) => {
    * Ensure UID is same as authenticated user's if it exists
    */
   if (body.value.uid && body.value.uid !== user.id) {
-    return new Failure(
-      Errors.Data.InvalidRequestData({
-        uid: "Cannot create transaction for another user id",
-      })
-    );
+    return Failure.InvalidRequestData({
+      uid: "Cannot create transaction for another user id",
+    });
   }
 
   /**
@@ -42,7 +39,7 @@ new Route(transactionsRouter, "/").protected.post(async (user, req, res) => {
   });
 
   if (existing) {
-    return new Failure(Errors.Transaction.AlreadyExists());
+    return Failure.TransactionAlreadyExists();
   }
 
   /**

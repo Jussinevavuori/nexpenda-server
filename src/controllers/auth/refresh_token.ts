@@ -2,7 +2,6 @@ import { authRouter } from "..";
 import { RefreshToken } from "../../services/RefreshToken";
 import { AccessToken } from "../../services/AccessToken";
 import { Route } from "../../utils/Route";
-import { Errors } from "../../errors/Errors";
 import { Failure } from "../../utils/Result";
 
 new Route(authRouter, "/refresh_token").get(async (request, response) => {
@@ -12,7 +11,7 @@ new Route(authRouter, "/refresh_token").get(async (request, response) => {
   const refreshToken = await RefreshToken.fromRequest(request);
 
   if (!refreshToken) {
-    return new Failure(Errors.Auth.Unauthenticated());
+    return Failure.Unauthenticated();
   }
 
   /**
@@ -21,7 +20,7 @@ new Route(authRouter, "/refresh_token").get(async (request, response) => {
   const refreshTokenVerified = await refreshToken.verify();
 
   if (!refreshTokenVerified) {
-    return new Failure(Errors.Auth.Unauthenticated());
+    return Failure.Unauthenticated();
   }
 
   /**
@@ -30,7 +29,7 @@ new Route(authRouter, "/refresh_token").get(async (request, response) => {
   const accessToken = new AccessToken(refreshToken);
 
   if (!accessToken) {
-    return new Failure(Errors.Auth.Unauthenticated());
+    return Failure.Unauthenticated();
   }
 
   /**
@@ -39,7 +38,7 @@ new Route(authRouter, "/refresh_token").get(async (request, response) => {
   const accessTokenVerified = await accessToken.verify();
 
   if (!accessTokenVerified) {
-    return new Failure(Errors.Auth.Unauthenticated());
+    return Failure.Unauthenticated();
   }
 
   /**

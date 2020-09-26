@@ -2,10 +2,8 @@ import { authRouter } from "..";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
-import { RefreshToken } from "../../services/RefreshToken";
 import { Password } from "../../services/Password";
 import { Route } from "../../utils/Route";
-import { Errors } from "../../errors/Errors";
 import { Failure } from "../../utils/Result";
 import { Mailer } from "../../services/Mailer";
 import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
@@ -29,7 +27,7 @@ new Route(authRouter, "/register").post(async (request, response) => {
   });
 
   if (existingUser) {
-    return new Failure(Errors.Auth.UserAlreadyExists());
+    return Failure.UserAlreadyExists();
   }
 
   /**

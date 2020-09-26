@@ -1,6 +1,5 @@
 import * as yup from "yup";
 import { Request } from "express";
-import { Errors } from "../errors/Errors";
 import { Result, Success, Failure } from "./Result";
 
 export async function validateRequestBody<T extends object>(
@@ -11,22 +10,18 @@ export async function validateRequestBody<T extends object>(
    * Ensure request body is defined
    */
   if (!request.body) {
-    return new Failure<T>(
-      Errors.Data.InvalidRequestData({
-        _root: "No data provided",
-      })
-    );
+    return Failure.InvalidRequestData<T>({
+      _root: "No data provided",
+    });
   }
 
   /**
    * Ensure request body is object
    */
   if (typeof request.body !== "object") {
-    return new Failure<T>(
-      Errors.Data.InvalidRequestData({
-        _root: "Provided data was not an object",
-      })
-    );
+    return Failure.InvalidRequestData<T>({
+      _root: "Provided data was not an object",
+    });
   }
 
   /**
@@ -38,11 +33,9 @@ export async function validateRequestBody<T extends object>(
    * This prevents us from running into that problem.)
    */
   if (Array.isArray(request.body)) {
-    return new Failure<T>(
-      Errors.Data.InvalidRequestData({
-        _root: "Provided data was an array",
-      })
-    );
+    return Failure.InvalidRequestData<T>({
+      _root: "Provided data was an array",
+    });
   }
 
   return schema
@@ -57,17 +50,15 @@ export async function validateRequestBody<T extends object>(
     .catch((error) => {
       // Parse yup validation error fields
       if (error instanceof yup.ValidationError) {
-        return new Failure<T>(
-          Errors.Data.InvalidRequestData<T>(
-            error.inner.reduce((errors, next) => {
-              return { ...errors, [next.path]: next.message };
-            }, {})
-          )
+        return Failure.InvalidRequestData<T>(
+          error.inner.reduce((errors, next) => {
+            return { ...errors, [next.path]: next.message };
+          })
         );
       } else {
-        return new Failure<T>(
-          Errors.Data.InvalidRequestData<T>({ _root: "Unknown error" })
-        );
+        return Failure.InvalidRequestData<T>({
+          _root: "Unknown data validation error",
+        });
       }
     });
 }

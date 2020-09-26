@@ -7,7 +7,6 @@ import { validateRequestBody } from "../../utils/validateRequestBody";
 import { emailOnlyAuthSchema } from "../../schemas/auth.schema";
 import { Route } from "../../utils/Route";
 import { Failure } from "../../utils/Result";
-import { Errors } from "../../errors/Errors";
 
 new Route(authRouter, "/forgot_password").post(async (req, res) => {
   /**
@@ -27,7 +26,7 @@ new Route(authRouter, "/forgot_password").post(async (req, res) => {
   });
 
   if (!user || !user.email) {
-    return new Failure(Errors.Auth.UserNotFound());
+    return Failure.UserNotFound();
   }
 
   /**
@@ -41,7 +40,7 @@ new Route(authRouter, "/forgot_password").post(async (req, res) => {
   const tokenVerified = await token.verify();
 
   if (!tokenVerified) {
-    return new Failure(Errors.Token.Invalid());
+    return Failure.InvalidToken();
   }
 
   /**

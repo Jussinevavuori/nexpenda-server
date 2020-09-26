@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { Errors } from "../errors/Errors";
 import { Failure } from "../utils/Result";
 
 export function handleErrors(
@@ -11,13 +10,18 @@ export function handleErrors(
   if (!res.headersSent) {
     if (error instanceof SyntaxError) {
       return next(
-        new Failure(
-          Errors.Data.InvalidRequestData({
-            _root: error.message,
-          })
-        )
+        Failure.InvalidRequestData({
+          _root: error.message,
+        })
       );
     }
+  } else {
+    return next(
+      new Failure<undefined>(undefined, {
+        code: error.name,
+        message: error.message,
+        status: 500,
+      })
+    );
   }
-  next(error);
 }

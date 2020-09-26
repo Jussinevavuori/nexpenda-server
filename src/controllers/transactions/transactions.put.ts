@@ -5,7 +5,6 @@ import { getProtectedTransaction } from "../../utils/getProtectedTransaction";
 import { prisma } from "../../server";
 import { respondWithTransaction } from "../../utils/respondWithTransactions";
 import { Route } from "../../utils/Route";
-import { Errors } from "../../errors/Errors";
 import { Failure } from "../../utils/Result";
 import { getUnprotectedTransaction } from "../../utils/getUnprotectedTransaction";
 
@@ -38,11 +37,9 @@ new Route(transactionsRouter, "/:id").protected.put(async (user, req, res) => {
      * Ensure UID is same as authenticated user's if it exists
      */
     if (body.value.uid && body.value.uid !== user.id) {
-      return new Failure(
-        Errors.Data.InvalidRequestData({
-          uid: "Cannot create transaction for another user id",
-        })
-      );
+      return Failure.InvalidRequestData({
+        uid: "Cannot create transaction for another user id",
+      });
     }
   }
 
@@ -54,22 +51,18 @@ new Route(transactionsRouter, "/:id").protected.put(async (user, req, res) => {
      * Ensure ID is not changed
      */
     if (body.value.id && body.value.id !== transaction.value.id) {
-      return new Failure(
-        Errors.Data.InvalidRequestData({
-          id: "Cannot update transaction ID",
-        })
-      );
+      return Failure.InvalidRequestData({
+        id: "Cannot update transaction ID",
+      });
     }
 
     /**
      * Ensure UID is not changed
      */
     if (body.value.uid && body.value.uid !== transaction.value.uid) {
-      return new Failure(
-        Errors.Data.InvalidRequestData({
-          uid: "Cannot update transaction owner",
-        })
-      );
+      return Failure.InvalidRequestData({
+        uid: "Cannot update transaction owner",
+      });
     }
   }
 

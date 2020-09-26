@@ -4,7 +4,6 @@ import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
 import { RefreshToken } from "../../services/RefreshToken";
 import { Password } from "../../services/Password";
-import { Errors } from "../../errors/Errors";
 import { Route } from "../../utils/Route";
 import { Failure } from "../../utils/Result";
 
@@ -26,21 +25,17 @@ new Route(authRouter, "/login").post(async (req, res) => {
   });
 
   if (!user) {
-    return new Failure(
-      Errors.Auth.UserNotFound(
-        `No user found with the email ${body.value.email}`
-      )
+    return Failure.UserNotFound().withMessage(
+      `No user found with the email ${body.value.email}`
     );
   }
 
   if (!user.emailVerified) {
-    return new Failure(Errors.Auth.EmailNotConfirmed());
+    return Failure.EmailNotConfirmed();
   }
 
   if (!user.password) {
-    return new Failure(
-      Errors.Auth.InvalidCredentials("User does not have a password")
-    );
+    return Failure.UserHasNoPassword();
   }
 
   /**
@@ -52,7 +47,7 @@ new Route(authRouter, "/login").post(async (req, res) => {
   );
 
   if (!passwordValid) {
-    return new Failure(Errors.Auth.InvalidCredentials("Wrong password"));
+    return Failure.InvalidCredentials().withMessage("Wrong password");
   }
 
   /**
