@@ -14,6 +14,7 @@ import { PrismaClient } from "@prisma/client";
 import { initializeRequestData } from "./middleware/initializeData";
 import { handleFailure } from "./middleware/handleFailure";
 import { handleErrors } from "./middleware/handleErrors";
+import { requireHttps } from "./middleware/requireHttps";
 
 export const app: express.Application = express();
 export const http = createServer(app);
@@ -34,6 +35,7 @@ export function startServer() {
       await prisma.$connect();
 
       // Middleware
+      app.use(requireHttps());
       app.use(passport.initialize());
       app.use(cookieParser());
       app.use(bodyParser.json());

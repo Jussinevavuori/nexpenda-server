@@ -53,13 +53,7 @@ export class ForgotPasswordToken
    * Generate a URL for resetting the password
    */
   generateURL() {
-    return [
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000"
-        : "http://expenceapp.herokuapp.com",
-      "changePassword",
-      this.jwt,
-    ].join("/");
+    return `${conf.hosts.client}/changePassword/${this.jwt}`;
   }
 
   /**
