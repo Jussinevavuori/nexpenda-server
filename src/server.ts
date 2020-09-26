@@ -35,7 +35,7 @@ export function startServer() {
       await prisma.$connect();
 
       // Middleware
-      app.use(requireHttps());
+      app.use(requireHttps({ ignoreHosts: [/localhost/] }));
       app.use(passport.initialize());
       app.use(cookieParser());
       app.use(bodyParser.json());
