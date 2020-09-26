@@ -13,9 +13,7 @@ export function requireHttps() {
      * Else if not localhost, redirect to HTTPS
      */
     if (!req.secure) {
-      res.redirect(`https://${req.headers.host}${req.url}`);
+      return res.redirect(`https://${req.headers.host}${req.url}`);
     }
-
-    return next();
   };
 }
