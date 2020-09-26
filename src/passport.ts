@@ -22,6 +22,8 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+console.log(`${conf.hosts.server}/api/auth/google/callback`);
+
 passport.use(
   new GoogleStrategy(
     {
