@@ -7,15 +7,16 @@ export function handleErrors(
   res: Response,
   next: NextFunction
 ) {
-  if (!res.headersSent) {
-    if (error instanceof SyntaxError) {
-      return next(
-        Failure.InvalidRequestData({
-          _root: error.message,
-        })
-      );
-    }
+  console.log(`>>>> Handling an error: ${error.message}`);
+  if (error instanceof SyntaxError) {
+    console.log(`>>>> Recognized as a syntax error`);
+    return next(
+      Failure.InvalidRequestData({
+        _root: error.message,
+      })
+    );
   } else {
+    console.log(`>>>> Unknown error`);
     return next(
       new Failure<undefined>(undefined, {
         code: error.name,

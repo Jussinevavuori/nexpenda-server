@@ -34,10 +34,13 @@ export class Route {
    */
   private createResolver(resolver: Resolver) {
     return async (request: Request, response: Response, next: NextFunction) => {
+      console.log(`>>>> New request at resolver at ${this.route}`);
       const result = await resolver(request, response);
       if (result && result.isFailure()) {
+        console.log(`>>>> Received failure from resolver: ${result.code}`);
         next(result);
       }
+      console.log(`>>>> Resolver succeeded`);
     };
   }
 

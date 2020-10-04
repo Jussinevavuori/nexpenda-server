@@ -6,6 +6,7 @@ export function initializeRequestData() {
     response: Response,
     next: NextFunction
   ) {
+    console.log(`>>>> Data initialized`);
     request.data = {};
     next();
   };

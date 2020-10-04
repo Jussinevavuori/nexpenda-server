@@ -5,12 +5,15 @@ import { Route } from "../../utils/Route";
 import { Failure } from "../../utils/Result";
 
 new Route(authRouter, "/refresh_token").get(async (request, response) => {
+  console.log(">>>> New refresh token request");
+
   /**
    * Get refresh token and ensure it exists
    */
   const refreshToken = await RefreshToken.fromRequest(request);
 
   if (!refreshToken) {
+    console.log(">>>> Failing with unauthenticated");
     return Failure.Unauthenticated();
   }
 
@@ -20,6 +23,7 @@ new Route(authRouter, "/refresh_token").get(async (request, response) => {
   const refreshTokenVerified = await refreshToken.verify();
 
   if (!refreshTokenVerified) {
+    console.log(">>>> Failing with unauthenticated");
     return Failure.Unauthenticated();
   }
 
@@ -29,6 +33,7 @@ new Route(authRouter, "/refresh_token").get(async (request, response) => {
   const accessToken = new AccessToken(refreshToken);
 
   if (!accessToken) {
+    console.log(">>>> Failing with unauthenticated");
     return Failure.Unauthenticated();
   }
 
@@ -38,11 +43,13 @@ new Route(authRouter, "/refresh_token").get(async (request, response) => {
   const accessTokenVerified = await accessToken.verify();
 
   if (!accessTokenVerified) {
+    console.log(">>>> Failing with unauthenticated");
     return Failure.Unauthenticated();
   }
 
   /**
    * Send access token as string to user
    */
+  console.log(">>>> Succeeding with access token");
   response.send(accessToken.jwt);
 });

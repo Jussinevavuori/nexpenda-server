@@ -9,6 +9,8 @@ export function extractAuthentication() {
     response: Response,
     next: NextFunction
   ) {
+    console.log(`>>>> Extracting authentication`);
+
     /**
      * Mark user as null initially to signal that this middleware
      * has taken place and no user was found (unless one is found)
@@ -25,6 +27,7 @@ export function extractAuthentication() {
     const refreshToken = await RefreshToken.fromRequest(request);
 
     if (!accessToken || !refreshToken) {
+      console.log(`>>>> No authentication`);
       return next();
     }
 
@@ -37,6 +40,7 @@ export function extractAuthentication() {
     const refreshTokenVerified = await refreshToken.verify();
 
     if (!accessTokenVerified || !refreshTokenVerified) {
+      console.log(`>>>> No authentication`);
       return next();
     }
 
@@ -48,6 +52,7 @@ export function extractAuthentication() {
     const user = await prisma.user.findOne({ where: { id: accessToken.uid } });
 
     if (!user || user.disabled || !user.emailVerified) {
+      console.log(`>>>> No authentication`);
       return next();
     }
 
@@ -61,6 +66,7 @@ export function extractAuthentication() {
 
     request.data.refreshToken = refreshToken;
 
+    console.log(`>>>> Authentication extracted`);
     next();
   };
 }
