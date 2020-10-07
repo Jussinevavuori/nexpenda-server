@@ -1,12 +1,15 @@
 import { authRouter } from "..";
-import { Route } from "../../utils/Route";
+import { UnauthenticatedFailure } from "../../utils/Failures";
 
-new Route(authRouter, "/profile").protected.get((user, req, res) => {
+authRouter.get("/profile", (req, res, next) => {
+  if (!req.data.user) {
+    return next(new UnauthenticatedFailure());
+  }
   res.json({
-    id: user.id,
-    displayName: user.displayName ?? undefined,
-    photoUrl: user.photoUrl ?? undefined,
-    email: user.email ?? undefined,
-    googleId: user.googleId ?? undefined,
+    id: req.data.user.id,
+    displayName: req.data.user.displayName ?? undefined,
+    photoUrl: req.data.user.photoUrl ?? undefined,
+    email: req.data.user.email ?? undefined,
+    googleId: req.data.user.googleId ?? undefined,
   });
 });

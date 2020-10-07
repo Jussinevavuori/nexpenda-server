@@ -1,11 +1,9 @@
-import { Route } from "../../utils/Route";
 import { authRouter } from "..";
 import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
 import { prisma } from "../../server";
-import { Failure, Success } from "../../utils/Result";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
 
-new Route(authRouter, "/confirm_email/:token").get(async (req, res) => {
+authRouter.get("/confirm_email/:token", async (req, res, next) => {
   /**
    * Get and verify token from request
    */
@@ -16,7 +14,7 @@ new Route(authRouter, "/confirm_email/:token").get(async (req, res) => {
   const tokenVerified = await token.verify();
 
   if (!tokenVerified) {
-    return new InvalidTokenFailure<void>();
+    return next(new InvalidTokenFailure());
   }
 
   /**
@@ -26,7 +24,7 @@ new Route(authRouter, "/confirm_email/:token").get(async (req, res) => {
   const user = await prisma.user.findOne({ where: { id: token.uid } });
 
   if (!user || !user.email || user.disabled) {
-    return new UserNotFoundFailure<void>();
+    return next(new UserNotFoundFailure());
   }
 
   /**
@@ -38,5 +36,5 @@ new Route(authRouter, "/confirm_email/:token").get(async (req, res) => {
     data: { emailVerified: true },
   });
 
-  return Success.Empty();
+  return res.end();
 });

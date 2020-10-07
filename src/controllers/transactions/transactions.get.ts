@@ -1,18 +1,22 @@
 import { transactionsRouter } from "..";
 import { prisma } from "../../server";
-import { respondWithTransactions } from "../../utils/respondWithTransactions";
-import { Route } from "../../utils/Route";
+import { UnauthenticatedFailure } from "../../utils/Failures";
+import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
-new Route(transactionsRouter, "/").protected.get(async (user, req, res) => {
+transactionsRouter.get("/", async (req, res, next) => {
+  if (!req.data.user) {
+    return next(new UnauthenticatedFailure());
+  }
+
   /**
    * Get all transactions for user
    */
   const transactions = await prisma.transaction.findMany({
-    where: { uid: user.id },
+    where: { uid: req.data.user.id },
   });
 
   /**
    * Send transactions to user
    */
-  respondWithTransactions(res, transactions);
+  res.json(mapTransactionToResponse(transactions));
 });

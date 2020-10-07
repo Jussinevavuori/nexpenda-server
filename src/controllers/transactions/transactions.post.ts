@@ -3,30 +3,36 @@ import { validateRequestBody } from "../../utils/validateRequestBody";
 import { postTransactionSchema } from "../../schemas/transaction.schema";
 import { prisma } from "../../server";
 import { v4 as uuid } from "uuid";
-import { respondWithTransaction } from "../../utils/respondWithTransactions";
-import { Route } from "../../utils/Route";
+import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 import {
   InvalidRequestDataFailure,
   TransactionAlreadyExistsFailure,
+  UnauthenticatedFailure,
 } from "../../utils/Failures";
 
-new Route(transactionsRouter, "/").protected.post(async (user, req, res) => {
+transactionsRouter.post("/", async (req, res, next) => {
+  if (!req.data.user) {
+    return next(new UnauthenticatedFailure());
+  }
+
   /**
    * Validate request body
    */
   const body = await validateRequestBody(req, postTransactionSchema);
 
   if (body.isFailure()) {
-    return body;
+    return next(body);
   }
 
   /**
    * Ensure UID is same as authenticated user's if it exists
    */
-  if (body.value.uid && body.value.uid !== user.id) {
-    return new InvalidRequestDataFailure({
-      uid: "Cannot create transaction for another user id",
-    });
+  if (body.value.uid && body.value.uid !== req.data.user.id) {
+    return next(
+      new InvalidRequestDataFailure({
+        uid: "Cannot create transaction for another user id",
+      })
+    );
   }
 
   /**
@@ -42,7 +48,7 @@ new Route(transactionsRouter, "/").protected.post(async (user, req, res) => {
   });
 
   if (existing) {
-    return new TransactionAlreadyExistsFailure();
+    return next(new TransactionAlreadyExistsFailure());
   }
 
   /**
@@ -51,7 +57,7 @@ new Route(transactionsRouter, "/").protected.post(async (user, req, res) => {
   const created = await prisma.transaction.create({
     data: {
       id,
-      user: { connect: { id: user.id } },
+      user: { connect: { id: req.data.user.id } },
       integerAmount: body.value.integerAmount,
       category: body.value.category,
       comment: body.value.comment,
@@ -62,5 +68,5 @@ new Route(transactionsRouter, "/").protected.post(async (user, req, res) => {
   /**
    * Send created transaction to user
    */
-  respondWithTransaction(res.status(201), created);
+  return res.json(mapTransactionToResponse(created));
 });

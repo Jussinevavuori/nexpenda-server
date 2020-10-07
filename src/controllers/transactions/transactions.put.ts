@@ -3,12 +3,19 @@ import { validateRequestBody } from "../../utils/validateRequestBody";
 import { putTransactionSchema } from "../../schemas/transaction.schema";
 import { getProtectedTransaction } from "../../utils/getProtectedTransaction";
 import { prisma } from "../../server";
-import { respondWithTransaction } from "../../utils/respondWithTransactions";
-import { Route } from "../../utils/Route";
 import { getUnprotectedTransaction } from "../../utils/getUnprotectedTransaction";
-import { InvalidRequestDataFailure } from "../../utils/Failures";
+import {
+  InvalidRequestDataFailure,
+  UnauthenticatedFailure,
+  UnauthorizedFailure,
+} from "../../utils/Failures";
+import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
-new Route(transactionsRouter, "/:id").protected.put(async (user, req, res) => {
+transactionsRouter.put("/:id", async (req, res, next) => {
+  if (!req.data.user) {
+    return next(new UnauthenticatedFailure());
+  }
+
   /**
    * Get ID from request parameters
    */
@@ -20,26 +27,26 @@ new Route(transactionsRouter, "/:id").protected.put(async (user, req, res) => {
   const body = await validateRequestBody(req, putTransactionSchema);
 
   if (body.isFailure()) {
-    return body;
+    return next(body);
   }
 
   /**
    * Get transaction for user
    */
-  const transaction = await getProtectedTransaction(user, id);
-  const doesNotExist = await (await getUnprotectedTransaction(id)).isFailure();
+  const transaction = await getProtectedTransaction(req.data.user, id);
+  const unprotectedTransaction = await getUnprotectedTransaction(id);
 
-  /**
-   * Validate when creating new resource
-   */
-  if (transaction.isFailure() && doesNotExist) {
-    /**
-     * Ensure UID is same as authenticated user's if it exists
-     */
-    if (body.value.uid && body.value.uid !== user.id) {
-      return new InvalidRequestDataFailure({
-        uid: "Cannot create transaction for another user id",
-      });
+  if (transaction.isFailure()) {
+    if (unprotectedTransaction.isSuccess()) {
+      return next(new UnauthorizedFailure());
+    } else {
+      if (body.value.uid && body.value.uid !== req.data.user.id) {
+        return next(
+          new InvalidRequestDataFailure({
+            uid: "Cannot create transaction for another user id",
+          })
+        );
+      }
     }
   }
 
@@ -73,7 +80,7 @@ new Route(transactionsRouter, "/:id").protected.put(async (user, req, res) => {
     where: { id },
     create: {
       id,
-      user: { connect: { id: user.id } },
+      user: { connect: { id: req.data.user.id } },
       integerAmount: body.value.integerAmount,
       category: body.value.category,
       comment: body.value.comment,
@@ -90,5 +97,5 @@ new Route(transactionsRouter, "/:id").protected.put(async (user, req, res) => {
   /**
    * Send upserted transaction to user
    */
-  respondWithTransaction(res, upserted);
+  return res.json(mapTransactionToResponse(upserted));
 });

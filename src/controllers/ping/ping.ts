@@ -1,10 +1,13 @@
 import { pingRouter } from "..";
-import { Route } from "../../utils/Route";
+import { UnauthenticatedFailure } from "../../utils/Failures";
 
-new Route(pingRouter, "/").get((_, res) => {
+pingRouter.get("/", async (req, res) => {
   res.send("pong");
 });
 
-new Route(pingRouter, "/protected").protected.get((user, __, res) => {
-  res.send("pong " + user.id);
+pingRouter.get("/protected", async (req, res, next) => {
+  if (!req.data.user) {
+    return next(new UnauthenticatedFailure());
+  }
+  return res.send("pong " + req.data.user.id);
 });

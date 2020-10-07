@@ -13,12 +13,11 @@ import { Result, Success } from "./Result";
  * @param user Requesting user
  * @param id   Id of requested transaction
  */
-export async function getProtectedTransaction(
-  user: User,
-  id?: string
-): Promise<Result<Transaction>> {
+export async function getProtectedTransaction(user: User, id?: string) {
   /**
    * Ensure ID exists
+   *
+   *
    */
   if (!id) {
     return new InvalidRequestDataFailure<Transaction>({

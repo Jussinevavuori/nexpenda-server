@@ -5,18 +5,16 @@ import { ForgotPasswordTemplate } from "../../mailTemplates/ForgotPasswordTempla
 import { ForgotPasswordToken } from "../../services/ForgotPasswordToken";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 import { emailOnlyAuthSchema } from "../../schemas/auth.schema";
-import { Route } from "../../utils/Route";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
-import { Success } from "../../utils/Result";
 
-new Route(authRouter, "/forgot_password").post(async (req, res) => {
+authRouter.post("/forgot_password", async (req, res, next) => {
   /**
    * Validate body
    */
   const body = await validateRequestBody(req, emailOnlyAuthSchema);
 
   if (body.isFailure()) {
-    return body;
+    return next(body);
   }
 
   /**
@@ -27,7 +25,7 @@ new Route(authRouter, "/forgot_password").post(async (req, res) => {
   });
 
   if (!user || !user.email) {
-    return new UserNotFoundFailure<void>();
+    return next(new UserNotFoundFailure());
   }
 
   /**
@@ -41,7 +39,7 @@ new Route(authRouter, "/forgot_password").post(async (req, res) => {
   const tokenVerified = await token.verify();
 
   if (!tokenVerified) {
-    return new InvalidTokenFailure<void>();
+    return next(new InvalidTokenFailure());
   }
 
   /**
@@ -56,5 +54,5 @@ new Route(authRouter, "/forgot_password").post(async (req, res) => {
 
   await mailer.sendTemplate(user.email, template);
 
-  Success.Empty();
+  res.end();
 });

@@ -3,21 +3,19 @@ import { validateRequestBody } from "../../utils/validateRequestBody";
 import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
 import { Password } from "../../services/Password";
-import { Route } from "../../utils/Route";
 import { Mailer } from "../../services/Mailer";
 import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
 import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
-import { Success } from "../../utils/Result";
 import { UserAlreadyExistsFailure } from "../../utils/Failures";
 
-new Route(authRouter, "/register").post(async (request, response) => {
+authRouter.post("/register", async (req, res, next) => {
   /**
    * Validate request body
    */
-  const body = await validateRequestBody(request, authSchema);
+  const body = await validateRequestBody(req, authSchema);
 
   if (body.isFailure()) {
-    return body;
+    return next(body);
   }
 
   /**
@@ -28,7 +26,7 @@ new Route(authRouter, "/register").post(async (request, response) => {
   });
 
   if (existingUser) {
-    return new UserAlreadyExistsFailure<void>();
+    return next(new UserAlreadyExistsFailure());
   }
 
   /**
@@ -66,5 +64,5 @@ new Route(authRouter, "/register").post(async (request, response) => {
     await mailer.sendTemplate(user.email, template);
   }
 
-  return Success.Empty();
+  res.end();
 });

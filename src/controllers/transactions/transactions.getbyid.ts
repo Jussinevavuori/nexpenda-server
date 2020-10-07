@@ -1,25 +1,27 @@
 import { transactionsRouter } from "..";
+import { UnauthenticatedFailure } from "../../utils/Failures";
 import { getProtectedTransaction } from "../../utils/getProtectedTransaction";
-import { respondWithTransaction } from "../../utils/respondWithTransactions";
-import { Route } from "../../utils/Route";
+import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
-new Route(transactionsRouter, "/:id").protected.get(async (user, req, res) => {
-  /**
-   * Get ID from request params
-   */
-  const id = req.params.id;
-
-  /**
-   * Get user's transaction with ID
-   */
-  const transaction = await getProtectedTransaction(user, id);
-
-  if (transaction.isFailure()) {
-    return transaction;
+transactionsRouter.get("/", async (req, res, next) => {
+  if (!req.data.user) {
+    return next(new UnauthenticatedFailure());
   }
 
   /**
-   * Send transaction to user
+   * Get all transactions for user
    */
-  respondWithTransaction(res, transaction.value);
+  const transaction = await getProtectedTransaction(
+    req.data.user,
+    req.params.id
+  );
+
+  if (transaction.isFailure()) {
+    return next(transaction);
+  }
+
+  /**
+   * Send transactions to user
+   */
+  return res.json(mapTransactionToResponse(transaction.value));
 });
