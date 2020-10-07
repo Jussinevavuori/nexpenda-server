@@ -27,8 +27,6 @@ export function requireHttps(options?: {
       );
     }
 
-    console.log(`>>>> HTTPS OK`);
-
     return next();
   };
 }
