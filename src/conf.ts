@@ -1,7 +1,6 @@
-import * as dotenv from "dotenv";
-
 if (process.env.NODE_ENV !== "production") {
   try {
+    const dotenv = require("dotenv");
     const envPath =
       process.env.NODE_ENV === "production"
         ? `.env`
