@@ -5,7 +5,12 @@ import { prisma } from "../../server";
 import { RefreshToken } from "../../services/RefreshToken";
 import { Password } from "../../services/Password";
 import { Route } from "../../utils/Route";
-import { Failure } from "../../utils/Result";
+import {
+  EmailNotConfirmedFailure,
+  InvalidCredentialsFailure,
+  UserHasNoPasswordFailure,
+  UserNotFoundFailure,
+} from "../../utils/Failures";
 
 new Route(authRouter, "/login").post(async (req, res) => {
   /**
@@ -25,17 +30,17 @@ new Route(authRouter, "/login").post(async (req, res) => {
   });
 
   if (!user) {
-    return Failure.UserNotFound().withMessage(
+    return new UserNotFoundFailure().withMessage(
       `No user found with the email ${body.value.email}`
     );
   }
 
   if (!user.emailVerified) {
-    return Failure.EmailNotConfirmed();
+    return new EmailNotConfirmedFailure();
   }
 
   if (!user.password) {
-    return Failure.UserHasNoPassword();
+    return new UserHasNoPasswordFailure();
   }
 
   /**
@@ -47,7 +52,7 @@ new Route(authRouter, "/login").post(async (req, res) => {
   );
 
   if (!passwordValid) {
-    return Failure.InvalidCredentials().withMessage("Wrong password");
+    return new InvalidCredentialsFailure().withMessage("Wrong password");
   }
 
   /**

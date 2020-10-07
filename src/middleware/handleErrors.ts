@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Failure } from "../utils/Result";
+import { ErrorFailure, InvalidRequestDataFailure } from "../utils/Failures";
 
 export function handleErrors(
   error: Error,
@@ -7,22 +7,13 @@ export function handleErrors(
   res: Response,
   next: NextFunction
 ) {
-  console.log(`>>>> Handling an error: ${error.message}`);
   if (error instanceof SyntaxError) {
-    console.log(`>>>> Recognized as a syntax error`);
     return next(
-      Failure.InvalidRequestData({
+      new InvalidRequestDataFailure({
         _root: error.message,
       })
     );
   } else {
-    console.log(`>>>> Unknown error`);
-    return next(
-      new Failure<undefined>(undefined, {
-        code: error.name,
-        message: error.message,
-        status: 500,
-      })
-    );
+    return next(new ErrorFailure(error));
   }
 }

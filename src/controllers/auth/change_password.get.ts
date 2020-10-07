@@ -2,7 +2,8 @@ import { authRouter } from "..";
 import { ForgotPasswordToken } from "../../services/ForgotPasswordToken";
 import { prisma } from "../../server";
 import { Route } from "../../utils/Route";
-import { Failure } from "../../utils/Result";
+import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
+import { Success } from "../../utils/Result";
 
 new Route(authRouter, "/change_password/:token").get(
   async (request, response) => {
@@ -16,7 +17,7 @@ new Route(authRouter, "/change_password/:token").get(
     const tokenVerified = await token.verify();
 
     if (!tokenVerified) {
-      return Failure.InvalidToken();
+      return new InvalidTokenFailure<string>();
     }
 
     /**
@@ -25,13 +26,13 @@ new Route(authRouter, "/change_password/:token").get(
     const user = await prisma.user.findOne({ where: { id: token.uid } });
 
     if (!user || !user.email || user.disabled) {
-      return Failure.UserNotFound();
+      return new UserNotFoundFailure<string>();
     }
 
     /**
      * Upon success, send user's email address as a response, signaling
      * a valid token
      */
-    response.send(user.email);
+    return new Success(user.email);
   }
 );

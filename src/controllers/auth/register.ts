@@ -4,10 +4,11 @@ import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
 import { Password } from "../../services/Password";
 import { Route } from "../../utils/Route";
-import { Failure } from "../../utils/Result";
 import { Mailer } from "../../services/Mailer";
 import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
 import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
+import { Success } from "../../utils/Result";
+import { UserAlreadyExistsFailure } from "../../utils/Failures";
 
 new Route(authRouter, "/register").post(async (request, response) => {
   /**
@@ -27,7 +28,7 @@ new Route(authRouter, "/register").post(async (request, response) => {
   });
 
   if (existingUser) {
-    return Failure.UserAlreadyExists();
+    return new UserAlreadyExistsFailure<void>();
   }
 
   /**
@@ -65,5 +66,5 @@ new Route(authRouter, "/register").post(async (request, response) => {
     await mailer.sendTemplate(user.email, template);
   }
 
-  response.end();
+  return Success.Empty();
 });

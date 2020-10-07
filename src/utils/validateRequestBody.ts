@@ -1,16 +1,17 @@
 import * as yup from "yup";
 import { Request } from "express";
-import { Result, Success, Failure } from "./Result";
+import { Success } from "./Result";
+import { InvalidRequestDataFailure } from "./Failures";
 
 export async function validateRequestBody<T extends object>(
   request: Request,
   schema: yup.ObjectSchema<T>
-): Promise<Result<T>> {
+) {
   /**
    * Ensure request body is defined
    */
   if (!request.body) {
-    return Failure.InvalidRequestData<T>({
+    return new InvalidRequestDataFailure<T>({
       _root: "No data provided",
     });
   }
@@ -19,7 +20,7 @@ export async function validateRequestBody<T extends object>(
    * Ensure request body is object
    */
   if (typeof request.body !== "object") {
-    return Failure.InvalidRequestData<T>({
+    return new InvalidRequestDataFailure<T>({
       _root: "Provided data was not an object",
     });
   }
@@ -33,7 +34,7 @@ export async function validateRequestBody<T extends object>(
    * This prevents us from running into that problem.)
    */
   if (Array.isArray(request.body)) {
-    return Failure.InvalidRequestData<T>({
+    return new InvalidRequestDataFailure<T>({
       _root: "Provided data was an array",
     });
   }
@@ -50,13 +51,13 @@ export async function validateRequestBody<T extends object>(
     .catch((error) => {
       // Parse yup validation error fields
       if (error instanceof yup.ValidationError) {
-        return Failure.InvalidRequestData<T>(
+        return new InvalidRequestDataFailure<T>(
           error.inner.reduce((errors, next) => {
             return { ...errors, [next.path]: next.message };
-          })
+          }, {})
         );
       } else {
-        return Failure.InvalidRequestData<T>({
+        return new InvalidRequestDataFailure<T>({
           _root: "Unknown data validation error",
         });
       }

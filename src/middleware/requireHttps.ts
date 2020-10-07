@@ -14,8 +14,6 @@ export function requireHttps(options?: {
     res: Response,
     next: NextFunction
   ) {
-    console.log(`>>>> Checking HTTPS requirements`);
-
     const insecure = req.protocol !== "https" && !req.get("x-forwarded-port");
 
     const ignore =
@@ -23,8 +21,6 @@ export function requireHttps(options?: {
       ignoredRoutes.find((routeRegex) => routeRegex.test(req.path));
 
     if (insecure && !ignore) {
-      console.log(`>>>> Insecure unignorable connection`);
-
       return res.redirect(
         redirectCode,
         `https://${req.headers.host}${req.url}`

@@ -2,11 +2,16 @@ import { Route } from "../../utils/Route";
 import { authRouter } from "..";
 import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
 import { prisma } from "../../server";
-import { Failure } from "../../utils/Result";
+import { Failure, Success } from "../../utils/Result";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 import { emailOnlyAuthSchema } from "../../schemas/auth.schema";
 import { Mailer } from "../../services/Mailer";
 import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
+import {
+  EmailAlreadyConfirmedFailure,
+  InvalidTokenFailure,
+  UserNotFoundFailure,
+} from "../../utils/Failures";
 
 new Route(authRouter, "/request_confirm_email").post(async (req, res) => {
   const body = await validateRequestBody(req, emailOnlyAuthSchema);
@@ -20,11 +25,11 @@ new Route(authRouter, "/request_confirm_email").post(async (req, res) => {
   });
 
   if (!user || !user.email || user.disabled) {
-    return Failure.UserNotFound();
+    return new UserNotFoundFailure<void>();
   }
 
   if (user.emailVerified) {
-    return Failure.EmailAlreadyConfirmed();
+    return new EmailAlreadyConfirmedFailure<void>();
   }
 
   /**
@@ -35,7 +40,7 @@ new Route(authRouter, "/request_confirm_email").post(async (req, res) => {
   const tokenVerified = await token.verify();
 
   if (!tokenVerified) {
-    return Failure.InvalidToken();
+    return new InvalidTokenFailure<void>();
   }
 
   /**
@@ -50,5 +55,5 @@ new Route(authRouter, "/request_confirm_email").post(async (req, res) => {
 
   await mailer.sendTemplate(user.email, template);
 
-  res.end();
+  return Success.Empty();
 });

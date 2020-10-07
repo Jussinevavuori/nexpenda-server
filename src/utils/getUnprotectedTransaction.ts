@@ -1,6 +1,10 @@
 import { Transaction } from "@prisma/client";
 import { prisma } from "../server";
-import { Result, Failure, Success } from "./Result";
+import {
+  InvalidRequestDataFailure,
+  TransactionNotFoundFailure,
+} from "./Failures";
+import { Result, Success } from "./Result";
 
 /**
  * Helper function to fetch a transaction for user.
@@ -14,7 +18,7 @@ export async function getUnprotectedTransaction(
    * Ensure ID exists
    */
   if (!id) {
-    return Failure.InvalidRequestData({
+    return new InvalidRequestDataFailure<Transaction>({
       id: "No ID provided as URL parameter",
     });
   }
@@ -28,7 +32,7 @@ export async function getUnprotectedTransaction(
    * Ensure transaction exists and is user's
    */
   if (!transaction) {
-    return Failure.TransactionNotFound();
+    return new TransactionNotFoundFailure<Transaction>();
   }
 
   /**

@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { User } from "@prisma/client";
-import { Result, Failure } from "./Result";
+import { Result } from "./Result";
+import { UnauthenticatedFailure } from "./Failures";
 
 type Resolver = (
   request: Request,
@@ -34,13 +35,12 @@ export class Route {
    */
   private createResolver(resolver: Resolver) {
     return async (request: Request, response: Response, next: NextFunction) => {
-      console.log(`>>>> New request at resolver at ${this.route}`);
       const result = await resolver(request, response);
       if (result && result.isFailure()) {
-        console.log(`>>>> Received failure from resolver: ${result.code}`);
         next(result);
+      } else if (result && result.isSuccess() && !response.headersSent) {
+        response.send(result.value);
       }
-      console.log(`>>>> Resolver succeeded`);
     };
   }
 
@@ -52,12 +52,14 @@ export class Route {
     return async (request: Request, response: Response, next: NextFunction) => {
       // Ensure authentication
       if (!request.data.user) {
-        return next(Failure.Unauthenticated());
+        return next(new UnauthenticatedFailure());
       }
 
       const result = await resolver(request.data.user, request, response);
       if (result && result.isFailure()) {
         next(result);
+      } else if (result && result.isSuccess() && !response.headersSent) {
+        response.send(result.value);
       }
     };
   }
