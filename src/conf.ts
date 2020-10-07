@@ -1,10 +1,15 @@
 import * as dotenv from "dotenv";
+
+console.log("Configuring");
+const envPath =
+  process.env.NODE_ENV === "production"
+    ? `.env`
+    : `.env${process.env.NODE_ENV ? "." : ""}${process.env.NODE_ENV || ""}`;
+console.log("Using env file:", envPath);
 dotenv.config({
-  path:
-    process.env.NODE_ENV === "production"
-      ? `.env`
-      : `.env.${process.env.NODE_ENV}`,
+  path: envPath,
 });
+console.log("Configured", process.env);
 
 export const conf = {
   google: {
