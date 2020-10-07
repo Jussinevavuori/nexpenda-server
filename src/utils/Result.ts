@@ -48,7 +48,7 @@ type FailureDetails<C = string> = {
  * Failure implementation
  */
 export class Failure<T, C = string> implements IResult<T, C> {
-  public readonly resultType: "success" = "success";
+  public readonly resultType: "failure" = "failure";
   public readonly details: FailureDetails<C>;
   public readonly code: C;
   public status: number;
@@ -85,6 +85,12 @@ export class Failure<T, C = string> implements IResult<T, C> {
   withMessage(message: string) {
     this.details.message = message;
     this.message = message;
+    return this;
+  }
+
+  withStatus(status: number) {
+    this.details.status = status;
+    this.status = status;
     return this;
   }
 }

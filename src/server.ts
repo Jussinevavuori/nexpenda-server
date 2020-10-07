@@ -37,7 +37,6 @@ export function startServer() {
       app.use(passport.initialize());
       app.use(cookieParser());
       app.use(bodyParser.json());
-      app.use(bodyParser.urlencoded({ extended: true }));
       app.use(
         cors({
           credentials: true,
@@ -45,7 +44,8 @@ export function startServer() {
             "http://localhost:3000",
             "http://localhost:4000",
             "https://expenceapp.herokuapp.com",
-            "https://expence.vercel.all",
+            "https://expence.vercel.app",
+            /https:\/\/expence-.*\.vercel\.app/,
           ],
         })
       );

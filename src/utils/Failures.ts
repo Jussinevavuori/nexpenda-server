@@ -79,6 +79,16 @@ export class InvalidTokenFailure<T> extends Failure<T, "auth/invalid-token"> {
   }
 }
 
+export class TokenFailure<T> extends Failure<T, "auth/token"> {
+  constructor() {
+    super({
+      code: "auth/token",
+      status: 400,
+      message: "Token failure",
+    });
+  }
+}
+
 export class UserHasNoPasswordFailure<T> extends Failure<
   T,
   "auth/user-has-no-password"

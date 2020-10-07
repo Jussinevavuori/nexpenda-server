@@ -38,15 +38,17 @@ transactionsRouter.put("/:id", async (req, res, next) => {
 
   if (transaction.isFailure()) {
     if (unprotectedTransaction.isSuccess()) {
-      return next(new UnauthorizedFailure());
-    } else {
-      if (body.value.uid && body.value.uid !== req.data.user.id) {
-        return next(
-          new InvalidRequestDataFailure({
-            uid: "Cannot create transaction for another user id",
-          })
-        );
-      }
+      return next(
+        new UnauthorizedFailure().withMessage(
+          "Cannot update another user's transactions."
+        )
+      );
+    } else if (body.value.uid && body.value.uid !== req.data.user.id) {
+      return next(
+        new InvalidRequestDataFailure({
+          uid: "Cannot create transaction for another user id",
+        })
+      );
     }
   }
 
@@ -58,18 +60,22 @@ transactionsRouter.put("/:id", async (req, res, next) => {
      * Ensure ID is not changed
      */
     if (body.value.id && body.value.id !== transaction.value.id) {
-      return new InvalidRequestDataFailure({
-        id: "Cannot update transaction ID",
-      });
+      return next(
+        new InvalidRequestDataFailure({
+          id: "Cannot update transaction ID",
+        })
+      );
     }
 
     /**
      * Ensure UID is not changed
      */
     if (body.value.uid && body.value.uid !== transaction.value.uid) {
-      return new InvalidRequestDataFailure({
-        uid: "Cannot update transaction owner",
-      });
+      return next(
+        new InvalidRequestDataFailure({
+          uid: "Cannot update transaction owner",
+        })
+      );
     }
   }
 

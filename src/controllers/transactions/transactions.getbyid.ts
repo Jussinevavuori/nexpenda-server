@@ -3,7 +3,7 @@ import { UnauthenticatedFailure } from "../../utils/Failures";
 import { getProtectedTransaction } from "../../utils/getProtectedTransaction";
 import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
-transactionsRouter.get("/", async (req, res, next) => {
+transactionsRouter.get("/:id", async (req, res, next) => {
   if (!req.data.user) {
     return next(new UnauthenticatedFailure());
   }

@@ -3,7 +3,7 @@ import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
 import { prisma } from "../../server";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
 
-authRouter.get("/confirm_email/:token", async (req, res, next) => {
+authRouter.post("/confirm_email/:token", async (req, res, next) => {
   /**
    * Get and verify token from request
    */

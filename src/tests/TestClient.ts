@@ -5,6 +5,7 @@ import * as jwt from "jsonwebtoken";
 import { testUtils } from "./testUtils";
 import { ConfirmEmailToken } from "../services/ConfirmEmailToken";
 import { User, PrismaClient } from "@prisma/client";
+import { ForgotPasswordToken } from "../services/ForgotPasswordToken";
 
 export class TestClient {
   /**
@@ -189,6 +190,13 @@ export class TestClient {
   }
 
   /**
+   * Fabricates a forgot password token
+   */
+  fabricateForgotPasswordToken(id: string | User) {
+    return new ForgotPasswordToken(id);
+  }
+
+  /**
    * Authentication function: automatically authenticates the client
    * and stores access token, refresh token and authenticated UID data
    */
@@ -197,7 +205,8 @@ export class TestClient {
     const password = faker.internet.password();
     await this.auth().register({ email, password });
     const record = await prisma.user.findOne({ where: { email } });
-    await this.auth().confirmEmail(this.fabricateConfirmEmailToken(record!.id));
+    const token = this.fabricateConfirmEmailToken(record!.id);
+    await this.auth().confirmEmail(token);
     await this.auth().login({ email, password });
     await this.auth().refreshToken();
     return email;
@@ -229,11 +238,11 @@ export class TestClient {
       profile() {
         return that.get("/auth/profile");
       },
-      forgotPassword() {
-        return that.post("/auth/forgot_password");
+      forgotPassword(data: any) {
+        return that.post("/auth/forgot_password", data);
       },
       confirmEmail(token: string) {
-        return that.get(`/auth/confirm_email/${token}`);
+        return that.post(`/auth/confirm_email/${token}`);
       },
       refreshToken() {
         return that.get("/auth/refresh_token").then(async (response) => {
@@ -248,6 +257,19 @@ export class TestClient {
           }
           return response;
         });
+      },
+      requestConfirmEmail(data: any) {
+        return that.post("/auth/request_confirm_email", data);
+      },
+      changePassword(token: string) {
+        return {
+          get() {
+            return that.get(`/auth/change_password/${token}`);
+          },
+          post(data: any) {
+            return that.post(`/auth/change_password/${token}`, data);
+          },
+        };
       },
     };
   }

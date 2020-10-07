@@ -30,5 +30,5 @@ authRouter.get("/change_password/:token", async (req, res, next) => {
    * Upon success, send user's email address as a response, signaling
    * a valid token
    */
-  res.json(user.email);
+  res.send(user.email);
 });

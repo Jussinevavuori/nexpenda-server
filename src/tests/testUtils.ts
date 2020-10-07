@@ -68,7 +68,14 @@ export function mockTransaction(
     category: faker.commerce.product(),
     comment: faker.lorem.words(5),
     time: faker.date.past(2).getTime(),
-  };
+  } as Partial<{
+    id: string;
+    uid: string;
+    integerAmount: number;
+    category: string;
+    comment: string;
+    time: number;
+  }>;
 
   if (remove) {
     if (remove.id) {

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ErrorFailure, InvalidRequestDataFailure } from "../utils/Failures";
+import { Failure } from "../utils/Result";
 
 export function handleErrors(
   error: Error,
@@ -7,7 +8,9 @@ export function handleErrors(
   res: Response,
   next: NextFunction
 ) {
-  if (error instanceof SyntaxError) {
+  if (error instanceof Failure) {
+    return next(error);
+  } else if (error instanceof SyntaxError) {
     return next(
       new InvalidRequestDataFailure({
         _root: error.message,

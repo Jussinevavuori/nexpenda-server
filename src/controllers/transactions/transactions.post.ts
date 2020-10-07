@@ -68,5 +68,5 @@ transactionsRouter.post("/", async (req, res, next) => {
   /**
    * Send created transaction to user
    */
-  return res.json(mapTransactionToResponse(created));
+  return res.status(201).json(mapTransactionToResponse(created));
 });

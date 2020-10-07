@@ -1,7 +1,11 @@
 import { authRouter } from "..";
 import { RefreshToken } from "../../services/RefreshToken";
 import { AccessToken } from "../../services/AccessToken";
-import { UnauthenticatedFailure } from "../../utils/Failures";
+import {
+  InvalidTokenFailure,
+  TokenFailure,
+  UnauthenticatedFailure,
+} from "../../utils/Failures";
 
 authRouter.get("/refresh_token", async (req, res, next) => {
   /**
@@ -28,7 +32,7 @@ authRouter.get("/refresh_token", async (req, res, next) => {
   const accessToken = new AccessToken(refreshToken);
 
   if (!accessToken) {
-    return next(new UnauthenticatedFailure());
+    return next(new TokenFailure());
   }
 
   /**
@@ -37,11 +41,11 @@ authRouter.get("/refresh_token", async (req, res, next) => {
   const accessTokenVerified = await accessToken.verify();
 
   if (!accessTokenVerified) {
-    return next(new UnauthenticatedFailure());
+    return next(new InvalidTokenFailure());
   }
 
   /**
    * Send access token as string to user
    */
-  res.json(accessToken.jwt);
+  return res.send(accessToken.jwt);
 });

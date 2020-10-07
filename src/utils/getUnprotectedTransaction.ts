@@ -11,9 +11,7 @@ import { Result, Success } from "./Result";
  *
  * @param id   Id of requested transaction
  */
-export async function getUnprotectedTransaction(
-  id?: string
-): Promise<Result<Transaction>> {
+export async function getUnprotectedTransaction(id?: string) {
   /**
    * Ensure ID exists
    */
