@@ -7,7 +7,7 @@ console.log(
   "Production mode",
   process.env.NODE_ENV === "production" ? "Yes" : "No"
 );
-console.log("[APP: ]", Object.keys(process.env), "items in ENV");
+console.log("[APP: ]", Object.keys(process.env).length, "items in ENV");
 console.log("[APP: ]", "Hosts_client:", process.env.HOSTS_CLIENT);
 console.log("[APP: ]", "Hosts_server:", process.env.HOSTS_SERVER);
 if (process.env.NODE_ENV !== "production") {
@@ -29,7 +29,7 @@ if (process.env.NODE_ENV !== "production") {
 } else {
   console.log("[APP: ]", "Skipping environment configuration");
 }
-console.log("[APP: ]", Object.keys(process.env), "items in ENV");
+console.log("[APP: ]", Object.keys(process.env).length, "items in ENV");
 console.log("[APP: ]", "Hosts_client:", process.env.HOSTS_CLIENT);
 console.log("[APP: ]", "Hosts_server:", process.env.HOSTS_SERVER);
 
