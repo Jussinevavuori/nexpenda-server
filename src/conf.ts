@@ -1,15 +1,37 @@
 import * as dotenv from "dotenv";
 
+console.log("[APP: ]", "Initializing configuration file");
+console.log("[APP: ]", "Node environment:", process.env.NODE_ENV);
+console.log(
+  "[APP: ]",
+  "Production mode",
+  process.env.NODE_ENV === "production" ? "Yes" : "No"
+);
+console.log("[APP: ]", Object.keys(process.env), "items in ENV");
+console.log("[APP: ]", "Hosts_client:", process.env.HOSTS_CLIENT);
+console.log("[APP: ]", "Hosts_server:", process.env.HOSTS_SERVER);
 if (process.env.NODE_ENV !== "production") {
-  console.log("Configuring");
-  const envPath =
-    process.env.NODE_ENV === "production"
-      ? `.env`
-      : `.env${process.env.NODE_ENV ? "." : ""}${process.env.NODE_ENV || ""}`;
-  dotenv.config({
-    path: envPath,
-  });
+  try {
+    console.log("[APP: ]", "Configuring environment");
+    const envPath =
+      process.env.NODE_ENV === "production"
+        ? `.env`
+        : `.env${process.env.NODE_ENV ? "." : ""}${process.env.NODE_ENV || ""}`;
+    console.log("[APP: ]", "Using path", envPath);
+    dotenv.config({
+      path: envPath,
+    });
+    console.log("[APP: ]", "Configured");
+  } catch (e) {
+    console.log("[APP: ]", "An error occured while configuring environment");
+    console.log("[APP: ]", e);
+  }
+} else {
+  console.log("[APP: ]", "Skipping environment configuration");
 }
+console.log("[APP: ]", Object.keys(process.env), "items in ENV");
+console.log("[APP: ]", "Hosts_client:", process.env.HOSTS_CLIENT);
+console.log("[APP: ]", "Hosts_server:", process.env.HOSTS_SERVER);
 
 export const conf = {
   google: {
