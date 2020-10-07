@@ -13,6 +13,7 @@ import { initializeRequestData } from "./middleware/initializeData";
 import { handleFailure } from "./middleware/handleFailure";
 import { handleErrors } from "./middleware/handleErrors";
 import { requireHttps } from "./middleware/requireHttps";
+import { redirect } from "./utils/redirect";
 
 export const app: express.Application = express();
 export const http = createServer(app);
@@ -56,6 +57,11 @@ export function startServer() {
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
       app.use("/api/transactions", transactionsRouter);
+
+      // Redirect users who navigate to backend URl
+      app.use("/", (req, res) => {
+        redirect(res).toFrontend("/");
+      });
 
       // Error handler middlewares
       app.use(handleErrors);
