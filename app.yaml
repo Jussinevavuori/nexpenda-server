@@ -1,0 +1,36 @@
+runtime: nodejs12
+
+instance_class: F1
+
+env_variables:
+  GOOGLE_CLIENTID: "465206191220-us6ea7q87b4tpmgbnj84o2nhd1oabeit.apps.googleusercontent.com"
+  GOOGLE_CLIENTSECRET: "U51O0vp_Sb8HG6gsmytB3QvT"
+  TOKEN_ISSUER: "expenceapp"
+  TOKEN_AUDIENCE: "expenceapp"
+  TOKEN_ACCESSTOKEN_SECRET: "3fe1664c-d253-4737-9ba3-4bf16b64781b"
+  TOKEN_ACCESSTOKEN_EXPIRESIN: "15m"
+  TOKEN_ACCESSTOKEN_EXPIRESINSECONDS: "900"
+  TOKEN_REFRESHTOKEN_NAME: "rt"
+  TOKEN_REFRESHTOKEN_SECRET: "cce3d1bb-bf82-4d00-9304-507952271a82"
+  TOKEN_REFRESHTOKEN_EXPIRESIN: "7d"
+  TOKEN_REFRESHTOKEN_EXPIRESINSECONDS: "604800"
+  TOKEN_FORGOTPASSWORDTOKEN_SECRET: "554c930d-f39a-4b23-9008-7ada2e304569"
+  TOKEN_FORGOTPASSWORDTOKEN_EXPIRESIN: "1d"
+  TOKEN_FORGOTPASSWORDTOKEN_EXPIRESINSECONDS: "86400"
+  TOKEN_CONFIRMEMAILTOKEN_SECRET: "0134ad37-936d-4cda-a8bc-b41152722b9c"
+  TOKEN_CONFIRMEMAILTOKEN_EXPIRESIN: "14d"
+  TOKEN_CONFIRMEMAILTOKEN_EXPIRESINSECONDS: "1209600"
+  EMAIL_HOST: "mail.pekafilter.com"
+  EMAIL_PORT: "26"
+  EMAIL_AUTH_USER: "admin@pekafilter.com"
+  EMAIL_AUTH_PASS: "P3kaTrad1ng"
+  EMAIL_DEFAULT_SENDER: "dev@pekafilter.com"
+  HOSTS_CLIENT: "https://expence.vercel.app"
+  HOSTS_SERVER: "https://expenceapp.herokuapp.com"
+  DATABASE_URL: "postgresql://feavaipwpepigo:fa0bc9f717e6c5743e68ef3ced246b3edee2c3ed43b23a78e2faae308c1aca99@ec2-54-247-118-139.eu-west-1.compute.amazonaws.com:5432/dck8ohmk876kjf?schema=public"
+
+handlers:
+  - url: /.*
+    secure: always
+    redirect_http_response_code: 301
+    script: auto
