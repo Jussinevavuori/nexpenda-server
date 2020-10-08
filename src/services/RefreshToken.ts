@@ -53,11 +53,12 @@ export class RefreshToken
    * Sends refresh token as cookie in response
    */
   send(response: Response): Response {
+    const secure = !["development", "test"].includes(conf.env);
     return response.cookie(conf.token.refreshToken.name, this.jwt, {
       maxAge: conf.token.refreshToken.expiresInSeconds * 1000,
       httpOnly: true,
-      secure: conf.env === "production",
-      sameSite: "strict",
+      secure,
+      sameSite: secure ? "none" : "lax",
     });
   }
 

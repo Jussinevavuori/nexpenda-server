@@ -5,11 +5,14 @@
 .env
 .env.*
 
+/prisma/.dev_env
+/prisma/.prod_env
+/prisma/.test_env
+
 ormconfig.json
 
 */secrets
 /coverage
-
 
 /dist
 

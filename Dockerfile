@@ -16,6 +16,6 @@ COPY . .
 
 EXPOSE 5000
 
-RUN npm run build
+RUN npm run build:initial
 
 CMD ["npm", "start"]
