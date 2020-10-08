@@ -4,15 +4,16 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "rimraf dist && prisma generate && tsc",
-    "start": "prisma generate && tsc && node ./dist/index.js",
+    "build": "rimraf dist && npx prisma generate && tsc",
+    "start": "node ./dist/index.js",
     "build:start": "npm run build && npm run start",
     "dev": "cross-env NODE_ENV=development nodemon -e ts -w ./src -x ts-node --files ./src/index.ts",
     "test": "cross-env NODE_ENV=test ts-node --files ./src/tests/runTests.ts",
     "migrate": "cd ./prisma && migrate.bat",
     "studio:dev": "cd ../prismastudio/dev && npx prisma studio --experimental",
     "studio:prod": "cd ../prismastudio/prod && npx prisma studio --experimental",
-    "studio:test": "cd ../prismastudio/test && npx prisma studio --experimental"
+    "studio:test": "cd ../prismastudio/test && npx prisma studio --experimental",
+    "deploy": "heroku container:push web && heroku container:release web"
   },
   "engines": {
     "node": "12.x",

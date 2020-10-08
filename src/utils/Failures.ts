@@ -17,7 +17,8 @@ export type ServerFailureCode =
   | "mail/error"
   | "failure/unimplemented"
   | "failure/error"
-  | "failure/unknown";
+  | "failure/unknown"
+  | "failure/cors";
 
 export class InvalidRequestDataFailure<T> extends Failure<
   T,
@@ -221,5 +222,11 @@ export class ErrorFailure<T> extends Failure<T, "failure/error"> {
 export class UnknownFailure<T> extends Failure<T, "failure/unknown"> {
   constructor() {
     super({ code: "failure/unknown", status: 500, message: "Unknown failure" });
+  }
+}
+
+export class CorsFailure<T> extends Failure<T, "failure/cors"> {
+  constructor() {
+    super({ code: "failure/cors", status: 400, message: "Cors failure" });
   }
 }
