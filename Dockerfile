@@ -6,6 +6,12 @@ COPY package*.json ./
 
 RUN npm install
 
+COPY .env ./
+
+COPY ./prisma ./prisma
+
+RUN npm run prisma:generate
+
 COPY . .
 
 EXPOSE 5000

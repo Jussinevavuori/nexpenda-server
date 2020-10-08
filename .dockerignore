@@ -1,6 +1,8 @@
 /.vscode
 /dist
 /node_modules
-jest.config.jest
+jest.config.js
 .gitignore
-.Procfile
+Procfile
+.env.development
+.env.test
