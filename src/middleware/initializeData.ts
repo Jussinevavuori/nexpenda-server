@@ -6,7 +6,9 @@ export function initializeRequestData() {
     response: Response,
     next: NextFunction
   ) {
-    request.data = {};
+    request.data = {
+      auth: {},
+    };
     next();
   };
 }
