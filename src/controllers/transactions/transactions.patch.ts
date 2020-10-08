@@ -10,7 +10,7 @@ import {
 } from "../../utils/Failures";
 
 transactionsRouter.patch("/:id", async (req, res, next) => {
-  if (!req.data.user) {
+  if (!req.data.auth.user) {
     return next(new UnauthenticatedFailure());
   }
 
@@ -22,7 +22,7 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
   /**
    * Get transaction for user
    */
-  const transaction = await getProtectedTransaction(req.data.user, id);
+  const transaction = await getProtectedTransaction(req.data.auth.user, id);
 
   if (transaction.isFailure()) {
     return next(transaction);

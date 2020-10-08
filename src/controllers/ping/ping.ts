@@ -6,8 +6,8 @@ pingRouter.get("/", async (req, res) => {
 });
 
 pingRouter.get("/protected", async (req, res, next) => {
-  if (!req.data.user) {
+  if (!req.data.auth.user) {
     return next(new UnauthenticatedFailure());
   }
-  return res.send("pong " + req.data.user.id);
+  return res.send("pong " + req.data.auth.user.id);
 });

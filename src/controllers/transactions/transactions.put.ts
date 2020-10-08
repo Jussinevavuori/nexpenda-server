@@ -12,7 +12,7 @@ import {
 import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
 transactionsRouter.put("/:id", async (req, res, next) => {
-  if (!req.data.user) {
+  if (!req.data.auth.user) {
     return next(new UnauthenticatedFailure());
   }
 
@@ -33,7 +33,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
   /**
    * Get transaction for user
    */
-  const transaction = await getProtectedTransaction(req.data.user, id);
+  const transaction = await getProtectedTransaction(req.data.auth.user, id);
   const unprotectedTransaction = await getUnprotectedTransaction(id);
 
   if (transaction.isFailure()) {
@@ -43,7 +43,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
           "Cannot update another user's transactions."
         )
       );
-    } else if (body.value.uid && body.value.uid !== req.data.user.id) {
+    } else if (body.value.uid && body.value.uid !== req.data.auth.user.id) {
       return next(
         new InvalidRequestDataFailure({
           uid: "Cannot create transaction for another user id",
@@ -86,7 +86,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
     where: { id },
     create: {
       id,
-      user: { connect: { id: req.data.user.id } },
+      user: { connect: { id: req.data.auth.user.id } },
       integerAmount: body.value.integerAmount,
       category: body.value.category,
       comment: body.value.comment,

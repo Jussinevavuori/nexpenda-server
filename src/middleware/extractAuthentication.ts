@@ -10,26 +10,20 @@ export function extractAuthentication() {
     next: NextFunction
   ) {
     /**
-     * Mark user as null initially to signal that this middleware
-     * has taken place and no user was found (unless one is found)
-     */
-    request.data.user = null;
-
-    /**
      * Get access token from request and verify
      */
     const accessToken = await AccessToken.fromRequest(request);
 
     if (accessToken) {
-      request.data.accessTokenFound = true;
+      request.data.auth.accessTokenFound = true;
 
       const verified = await accessToken.verify();
 
       if (verified) {
-        request.data.accessToken = accessToken;
+        request.data.auth.accessToken = accessToken;
       }
     } else {
-      request.data.accessTokenFound = false;
+      request.data.auth.accessTokenFound = false;
     }
 
     /**
@@ -38,22 +32,22 @@ export function extractAuthentication() {
     const refreshToken = await RefreshToken.fromRequest(request);
 
     if (refreshToken) {
-      request.data.refreshTokenFound = true;
+      request.data.auth.refreshTokenFound = true;
 
       const verified = await refreshToken.verify();
 
       if (verified) {
-        request.data.refreshToken = refreshToken;
+        request.data.auth.refreshToken = refreshToken;
       }
     } else {
-      request.data.refreshTokenFound = false;
+      request.data.auth.refreshTokenFound = false;
     }
 
     /**
      * Ensure both tokens were found and validated
      */
-    if (!request.data.refreshToken || !request.data.accessToken) {
-      request.data.noUserReason = "invalid-tokens";
+    if (!request.data.auth.refreshToken || !request.data.auth.accessToken) {
+      request.data.auth.noUserReason = "invalid-tokens";
       return next();
     }
 
@@ -62,14 +56,14 @@ export function extractAuthentication() {
      * are not disabled
      */
     const user = await prisma.user.findOne({
-      where: { id: request.data.accessToken.uid },
+      where: { id: request.data.auth.accessToken.uid },
     });
 
     /**
      * Ensure user exists
      */
     if (!user) {
-      request.data.noUserReason = "user-not-found";
+      request.data.auth.noUserReason = "user-not-found";
       return next();
     }
 
@@ -77,8 +71,8 @@ export function extractAuthentication() {
      * Ensure user not disabled
      */
     if (user.disabled) {
-      request.data.blockedUser = user;
-      request.data.noUserReason = "disabled";
+      request.data.auth.blockedUser = user;
+      request.data.auth.noUserReason = "disabled";
       return next();
     }
 
@@ -86,15 +80,15 @@ export function extractAuthentication() {
      * Ensure email is verified
      */
     if (!user.emailVerified) {
-      request.data.blockedUser = user;
-      request.data.noUserReason = "email-not-verified";
+      request.data.auth.blockedUser = user;
+      request.data.auth.noUserReason = "email-not-verified";
       return next();
     }
 
     /**
      * Apply found user to request and continue
      */
-    request.data.user = user;
+    request.data.auth.user = user;
     next();
   };
 }

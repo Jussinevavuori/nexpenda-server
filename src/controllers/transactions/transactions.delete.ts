@@ -4,7 +4,7 @@ import { prisma } from "../../server";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 
 transactionsRouter.delete("/:id", async (req, res, next) => {
-  if (!req.data.user) {
+  if (!req.data.auth.user) {
     return next(new UnauthenticatedFailure());
   }
 
@@ -16,7 +16,7 @@ transactionsRouter.delete("/:id", async (req, res, next) => {
   /**
    * Find user's transaction with given ID
    */
-  const transaction = await getProtectedTransaction(req.data.user, id);
+  const transaction = await getProtectedTransaction(req.data.auth.user, id);
 
   if (transaction.isFailure()) {
     return next(transaction);

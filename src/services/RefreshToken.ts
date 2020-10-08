@@ -56,6 +56,8 @@ export class RefreshToken
     return response.cookie(conf.token.refreshToken.name, this.jwt, {
       maxAge: conf.token.refreshToken.expiresInSeconds * 1000,
       httpOnly: true,
+      secure: conf.env === "production",
+      sameSite: "strict",
     });
   }
 

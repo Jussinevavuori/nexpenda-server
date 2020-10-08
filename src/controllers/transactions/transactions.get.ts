@@ -4,7 +4,7 @@ import { UnauthenticatedFailure } from "../../utils/Failures";
 import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
 transactionsRouter.get("/", async (req, res, next) => {
-  if (!req.data.user) {
+  if (!req.data.auth.user) {
     return next(new UnauthenticatedFailure());
   }
 
@@ -12,7 +12,7 @@ transactionsRouter.get("/", async (req, res, next) => {
    * Get all transactions for user
    */
   const transactions = await prisma.transaction.findMany({
-    where: { uid: req.data.user.id },
+    where: { uid: req.data.auth.user.id },
   });
 
   /**

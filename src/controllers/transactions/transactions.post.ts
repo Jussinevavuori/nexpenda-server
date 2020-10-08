@@ -11,7 +11,7 @@ import {
 } from "../../utils/Failures";
 
 transactionsRouter.post("/", async (req, res, next) => {
-  if (!req.data.user) {
+  if (!req.data.auth.user) {
     return next(new UnauthenticatedFailure());
   }
 
@@ -27,7 +27,7 @@ transactionsRouter.post("/", async (req, res, next) => {
   /**
    * Ensure UID is same as authenticated user's if it exists
    */
-  if (body.value.uid && body.value.uid !== req.data.user.id) {
+  if (body.value.uid && body.value.uid !== req.data.auth.user.id) {
     return next(
       new InvalidRequestDataFailure({
         uid: "Cannot create transaction for another user id",
@@ -57,7 +57,7 @@ transactionsRouter.post("/", async (req, res, next) => {
   const created = await prisma.transaction.create({
     data: {
       id,
-      user: { connect: { id: req.data.user.id } },
+      user: { connect: { id: req.data.auth.user.id } },
       integerAmount: body.value.integerAmount,
       category: body.value.category,
       comment: body.value.comment,
