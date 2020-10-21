@@ -8,7 +8,7 @@ export function initializeRequestData() {
   ) {
     request.data = {
       auth: {},
-    };
+		};
     next();
   };
 }

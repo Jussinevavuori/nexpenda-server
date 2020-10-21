@@ -2,22 +2,18 @@ import { createLogger } from "./utils/createLogger";
 
 const logger = createLogger({ name: "Conf" });
 
-logger("Running environment configurations");
+logger("Configuring environment");
 if (process.env.NODE_ENV !== "production") {
-  logger("Environment is not production, configuring via .env file");
 
   try {
     const dotenv = require("dotenv");
-    logger("Required dotenv");
     const envPath =
       process.env.NODE_ENV === "production"
         ? `.env`
         : `.env${process.env.NODE_ENV ? "." : ""}${process.env.NODE_ENV || ""}`;
-    logger("Created env file path as", envPath);
     dotenv.config({
       path: envPath,
     });
-    logger("Configured dotenv with env file");
   } catch (e) {
     console.warn("An error occured while configuring environment", e);
   }
@@ -80,10 +76,6 @@ export const conf = {
 
   databaseUrl: ENV("DATABASE_URL"),
 };
-
-logger("Configured the following environment:", JSON.stringify(conf));
-
-logger("Finished running environment configurations");
 
 /**
  * Helper functions for fetching environment variables from process.env

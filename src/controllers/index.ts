@@ -25,4 +25,5 @@ import "./transactions/transactions.put";
 import "./transactions/transactions.patch";
 import "./transactions/transactions.delete";
 
+import "./transactions/mass/transactions.mass.post"
 import "./transactions/mass/transactions.mass.delete";

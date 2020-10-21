@@ -1,11 +1,14 @@
 import { array, object, string } from "yup";
 import { transactionsRouter } from "../..";
+import { corsMiddleware } from "../../../middleware/corsMiddleware";
 import { prisma } from "../../../server";
 import {
   UnauthenticatedFailure,
   UnauthorizedFailure,
 } from "../../../utils/Failures";
 import { validateRequestBody } from "../../../utils/validateRequestBody";
+
+transactionsRouter.options("/mass/delete", corsMiddleware())
 
 transactionsRouter.post("/mass/delete", async (req, res, next) => {
   if (!req.data.auth.user) {

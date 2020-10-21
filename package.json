@@ -22,7 +22,7 @@
     "psql:dev": "psql expencedev postgres",
     "image:build": "docker build -t registry.heroku.com/expenceapp/web .",
     "image:push": "docker push registry.heroku.com/expenceapp/web",
-    "image:release": "heroku container:release web",
+    "image:release": "heroku container:release -a expenceapp web",
     "container:run": "docker run --rm -d -p 5000:5000 --name=expenceapp registry.heroku.com/expenceapp/web",
     "container:logs": "docker logs --follow expenceapp",
     "deploy": "npm run image:build && npm run image:push && npm run image:release"
