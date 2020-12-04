@@ -65,7 +65,7 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
    */
   const allExisting = await Promise.all(
     transactionsWithIds.map((_) => {
-      return prisma.transaction.findOne({
+      return prisma.transaction.findUnique({
         where: { id: _.id },
       });
     })

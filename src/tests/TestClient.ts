@@ -204,7 +204,7 @@ export class TestClient {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await this.auth().register({ email, password });
-    const record = await prisma.user.findOne({ where: { email } });
+    const record = await prisma.user.findUnique({ where: { email } });
     const token = this.fabricateConfirmEmailToken(record!.id);
     await this.auth().confirmEmail(token);
     await this.auth().login({ email, password });

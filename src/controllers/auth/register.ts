@@ -21,7 +21,7 @@ authRouter.post("/register", async (req, res, next) => {
   /**
    * Check for existing users with given email
    */
-  const existingUser = await prisma.user.findOne({
+  const existingUser = await prisma.user.findUnique({
     where: { email: body.value.email },
   });
 

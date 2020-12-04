@@ -14,7 +14,7 @@ describe("/auth/change_password > POST", () => {
   it("Changes the user's password", async (done) => {
     const client = new TestClient();
     const email = await client.authenticate(prisma);
-    const before = await prisma.user.findOne({ where: { email } });
+    const before = await prisma.user.findUnique({ where: { email } });
     const token = await client.fabricateForgotPasswordToken(before!);
     await client.auth().logout();
     const password = faker.internet.password();
@@ -30,7 +30,7 @@ describe("/auth/change_password > POST", () => {
       .changePassword(token.jwt)
       .post({ password });
     expect(response.status).toBe(200);
-    const after = await prisma.user.findOne({ where: { email } });
+    const after = await prisma.user.findUnique({ where: { email } });
     const loginAttempt2 = await client.auth().login({
       email,
       password,
@@ -44,7 +44,7 @@ describe("/auth/change_password > POST", () => {
   it("Fails after user has already changed password", async (done) => {
     const client = new TestClient();
     const email = await client.authenticate(prisma);
-    const userRecord = await prisma.user.findOne({ where: { email } });
+    const userRecord = await prisma.user.findUnique({ where: { email } });
     const token = client.fabricateForgotPasswordToken(userRecord!);
     const response1 = await client
       .auth()
@@ -94,7 +94,7 @@ describe("/auth/change_password > POST", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const record = await prisma.user.findOne({ where: { email } });
+    const record = await prisma.user.findUnique({ where: { email } });
     const token = jwt.sign(
       {
         uid: record!.id,
@@ -119,7 +119,7 @@ describe("/auth/change_password > POST", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const record = await prisma.user.findOne({ where: { email } });
+    const record = await prisma.user.findUnique({ where: { email } });
     const token = jwt.sign(
       {
         uid: record!.id,

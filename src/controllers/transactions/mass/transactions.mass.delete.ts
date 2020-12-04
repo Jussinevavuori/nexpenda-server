@@ -34,7 +34,11 @@ transactionsRouter.post("/mass/delete", async (req, res, next) => {
    * non-existing transacctions.
    */
   const transactions = await prisma.transaction.findMany({
-    where: { id: { in: body.value.ids } },
+		where: {
+			id: {
+				in: body.value.ids
+			}
+		}
   });
 
   if (transactions.some((_) => _.uid !== req.data!.auth!.user!.id)) {

@@ -20,7 +20,7 @@ authRouter.post("/forgot_password", async (req, res, next) => {
   /**
    * Find user by email
    */
-  const user = await prisma.user.findOne({
+  const user = await prisma.user.findUnique({
     where: { email: body.value.email },
   });
 

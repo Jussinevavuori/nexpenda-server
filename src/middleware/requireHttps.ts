@@ -7,7 +7,7 @@ export function requireHttps(options?: {
 }) {
   const ignoredHosts = options?.ignoreHosts ?? [];
   const ignoredRoutes = options?.ignoreRoutes ?? [];
-  const redirectCode = options?.redirectCode ?? 300;
+  const redirectCode = options?.redirectCode ?? 301;
 
   return function requireHttpsMiddleware(
     req: Request,

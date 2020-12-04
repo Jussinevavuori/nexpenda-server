@@ -70,7 +70,7 @@ export const conf = {
     server: ENV("HOSTS_SERVER"),
   },
 
-  port: ENV_NUM("PORT"),
+  port: ENV_NUM("PORT") || 8080,
 
   env: ENV("NODE_ENV"),
 

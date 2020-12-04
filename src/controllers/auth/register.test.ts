@@ -111,7 +111,7 @@ describe("/api/auth/register", () => {
       password: faker.internet.password(),
     });
     expect(response.status).toBe(200);
-    const userInDb = await prisma.user.findOne({ where: { email } });
+    const userInDb = await prisma.user.findUnique({ where: { email } });
     expect(userInDb).toBeDefined();
     expect(userInDb?.displayName).toBe(email);
     done();
@@ -126,7 +126,7 @@ describe("/api/auth/register", () => {
       password,
     });
     expect(response.status).toBe(200);
-    const userInDb = await prisma.user.findOne({ where: { email } });
+    const userInDb = await prisma.user.findUnique({ where: { email } });
     expect(userInDb?.password).toBeDefined();
     expect(userInDb?.password).not.toBe(password);
     done();

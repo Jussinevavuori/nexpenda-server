@@ -20,7 +20,7 @@ authRouter.get("/change_password/:token", async (req, res, next) => {
   /**
    * Attempt to get user from token, ensure user has email
    */
-  const user = await prisma.user.findOne({ where: { id: token.uid } });
+  const user = await prisma.user.findUnique({ where: { id: token.uid } });
 
   if (!user || !user.email || user.disabled) {
     return next(new UserNotFoundFailure());

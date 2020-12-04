@@ -10,7 +10,7 @@ passport.serializeUser(async (user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
     if (typeof id === "string") {
-      const existingUser = await prisma.user.findOne({
+      const existingUser = await prisma.user.findUnique({
         where: { id },
       });
       done(null, existingUser);
@@ -31,7 +31,7 @@ passport.use(
     },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
-        const existingUser = await prisma.user.findOne({
+        const existingUser = await prisma.user.findUnique({
           where: { googleId: profile.id },
         });
 

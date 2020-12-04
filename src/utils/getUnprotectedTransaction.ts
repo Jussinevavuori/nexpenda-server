@@ -24,7 +24,7 @@ export async function getUnprotectedTransaction(id?: string) {
   /**
    * Get transaction
    */
-  const transaction = await prisma.transaction.findOne({ where: { id } });
+  const transaction = await prisma.transaction.findUnique({ where: { id } });
 
   /**
    * Ensure transaction exists and is user's

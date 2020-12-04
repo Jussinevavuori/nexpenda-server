@@ -28,7 +28,7 @@ describe("/auth/confirm_email", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const record = await prisma.user.findOne({ where: { email } });
+    const record = await prisma.user.findUnique({ where: { email } });
     const token = client.fabricateConfirmEmailToken(record!.id);
     await client.auth().confirmEmail(token);
     const response = await client.auth().login({ email, password });
@@ -65,7 +65,7 @@ describe("/auth/confirm_email", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const record = await prisma.user.findOne({ where: { email } });
+    const record = await prisma.user.findUnique({ where: { email } });
     const token = jwt.sign(
       {
         uid: record!.id,
@@ -87,7 +87,7 @@ describe("/auth/confirm_email", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const record = await prisma.user.findOne({ where: { email } });
+    const record = await prisma.user.findUnique({ where: { email } });
     const token = jwt.sign(
       {
         uid: record!.id,

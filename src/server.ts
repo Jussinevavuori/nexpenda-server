@@ -41,7 +41,7 @@ export function startServer() {
       logger("Connected to database");
 
       // Middleware
-			app.use(requireHttps({ ignoreHosts: [/localhost/] }));
+			// app.use(requireHttps({ ignoreHosts: [/localhost/] }));
 			app.options("*", corsMiddleware())
       app.use(passport.initialize());
       app.use(cookieParser());
@@ -49,11 +49,7 @@ export function startServer() {
 			app.use(corsMiddleware())
       app.use(initializeRequestData());
 			app.use(extractAuthentication());
-			app.use((req,res,next) => {
-				console.log("Passed cors, continuing")
-				next()
-			})
-      logger("Configured middleware");
+			logger("Configured middleware");
 			
 			// Api endpoints
       app.use("/api/ping", pingRouter);
@@ -71,7 +67,7 @@ export function startServer() {
       app.use(handleFailure);
 
       // Start server
-      logger("Starting server");
+			logger("Starting server");
       server = http.listen(conf.port, function () {
         logger(`App is listening on port ${conf.port}`);
         resolve();

@@ -24,7 +24,7 @@ authRouter.post("/login", async (req, res, next) => {
   /**
    * Get user and ensure user exists and has password
    */
-  const user = await prisma.user.findOne({
+  const user = await prisma.user.findUnique({
     where: { email: body.value.email },
   });
 

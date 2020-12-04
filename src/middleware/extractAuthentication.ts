@@ -56,7 +56,7 @@ export function extractAuthentication() {
      * Get the user by the access token UID and ensure they exist and
      * are not disabled
      */
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: { id: request.data.auth.accessToken.uid },
     });
 

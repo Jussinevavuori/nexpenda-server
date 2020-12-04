@@ -12,7 +12,11 @@ transactionsRouter.get("/", async (req, res, next) => {
    * Get all transactions for user
    */
   const transactions = await prisma.transaction.findMany({
-    where: { uid: req.data.auth.user.id },
+    where: {
+			uid: {
+				equals: req.data.auth.user.id
+			}
+		}
   });
 
   /**

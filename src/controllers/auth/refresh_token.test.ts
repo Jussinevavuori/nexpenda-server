@@ -21,7 +21,7 @@ describe("/api/auth/refresh_token", () => {
     const email = faker.email();
     const password = faker.password();
     await client.auth().register({ email, password });
-    const user = await prisma.user.findOne({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
     await client
       .auth()
       .confirmEmail(client.fabricateConfirmEmailToken(user!.id));
@@ -49,7 +49,7 @@ describe("/api/auth/refresh_token", () => {
     const email = faker.email();
     const password = faker.password();
     await client.auth().register({ email, password });
-    const user = await prisma.user.findOne({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
     const token = client.fabricateConfirmEmailToken(user!.id);
     await client.auth().confirmEmail(token);
     await client.auth().login({ email, password });

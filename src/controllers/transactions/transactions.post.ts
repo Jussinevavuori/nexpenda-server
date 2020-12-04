@@ -43,7 +43,7 @@ transactionsRouter.post("/", async (req, res, next) => {
   /**
    * Check no transaction already exists with given ID
    */
-  const existing = await prisma.transaction.findOne({
+  const existing = await prisma.transaction.findUnique({
     where: { id: id },
   });
 

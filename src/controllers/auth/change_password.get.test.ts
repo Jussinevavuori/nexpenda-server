@@ -16,7 +16,7 @@ describe("/auth/change_password > GET", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const userRecord = await prisma.user.findOne({ where: { email } });
+    const userRecord = await prisma.user.findUnique({ where: { email } });
     const token = client.fabricateForgotPasswordToken(userRecord!);
     const response = await client.auth().changePassword(token.jwt).get();
     expect(response.status).toBe(200);
@@ -28,7 +28,7 @@ describe("/auth/change_password > GET", () => {
   it("Fails after user has already changed password", async (done) => {
     const client = new TestClient();
     const email = await client.authenticate(prisma);
-    const userRecord = await prisma.user.findOne({ where: { email } });
+    const userRecord = await prisma.user.findUnique({ where: { email } });
     const token1 = client.fabricateForgotPasswordToken(userRecord!);
     const token2 = client.fabricateForgotPasswordToken(userRecord!);
     const response1 = await client.auth().changePassword(token1.jwt).get();
@@ -73,7 +73,7 @@ describe("/auth/change_password > GET", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const record = await prisma.user.findOne({ where: { email } });
+    const record = await prisma.user.findUnique({ where: { email } });
     const token = jwt.sign(
       {
         uid: record!.id,
@@ -96,7 +96,7 @@ describe("/auth/change_password > GET", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const record = await prisma.user.findOne({ where: { email } });
+    const record = await prisma.user.findUnique({ where: { email } });
     const token = jwt.sign(
       {
         uid: record!.id,

@@ -18,7 +18,7 @@ authRouter.post("/request_confirm_email", async (req, res, next) => {
     return next(body);
   }
 
-  const user = await prisma.user.findOne({
+  const user = await prisma.user.findUnique({
     where: { email: body.value.email },
   });
 

@@ -70,7 +70,7 @@ describe("/api/auth/login", () => {
     await client
       .auth()
       .register({ email, password: faker.internet.password() });
-    const userInDb = await prisma.user.findOne({ where: { email } });
+    const userInDb = await prisma.user.findUnique({ where: { email } });
     const token = client.fabricateConfirmEmailToken(userInDb!.id);
     await client.auth().confirmEmail(token);
     const response = await client
@@ -87,7 +87,7 @@ describe("/api/auth/login", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const userInDb = await prisma.user.findOne({ where: { email } });
+    const userInDb = await prisma.user.findUnique({ where: { email } });
     const token = client.fabricateConfirmEmailToken(userInDb!.id);
     await client.auth().confirmEmail(token);
     const response = await client.auth().login({ email, password });
@@ -100,7 +100,7 @@ describe("/api/auth/login", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const userInDb = await prisma.user.findOne({ where: { email } });
+    const userInDb = await prisma.user.findUnique({ where: { email } });
     const token = client.fabricateConfirmEmailToken(userInDb!.id);
     await client.auth().confirmEmail(token);
     const response = await client.auth().login({ email, password });
