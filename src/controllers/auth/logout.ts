@@ -1,7 +1,18 @@
 import { authRouter } from "..";
-import { rateLimiters } from "../../middleware/rateLimiters";
+import { prisma } from "../../server";
 import { RefreshToken } from "../../services/RefreshToken";
 
-authRouter.post("/logout", (req, res) => {
+authRouter.post("/logout", async (req, res) => {
+  // Update user token version to invalidate all other JWT
+  // sessions.
+  const user = req.data.auth.user;
+  if (user) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { tokenVersion: user.tokenVersion + 1 },
+    });
+  }
+
+  // Clear cookie
   RefreshToken.clearCookie(res).end();
 });
