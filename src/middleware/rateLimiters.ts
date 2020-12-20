@@ -37,7 +37,7 @@ export const rateLimiters = {
       keyGenerator: (request) => {
         return `<${request.ip}>${request.method}@${request.path}`;
       },
-      windowMs: minutes(60),
+      windowMs: minutes(5),
       max: 5,
       handler: rateLimitExceededHandler,
     });

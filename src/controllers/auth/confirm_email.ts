@@ -6,7 +6,6 @@ import { rateLimiters } from "../../middleware/rateLimiters";
 
 authRouter.post(
   "/confirm_email/:token",
-
   rateLimiters.strict(),
   async (req, res, next) => {
     /**

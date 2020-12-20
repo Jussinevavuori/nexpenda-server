@@ -9,8 +9,9 @@ import "./ping/ping";
 import "./auth/login";
 import "./auth/logout";
 import "./auth/register";
-import "./auth/profile";
 import "./auth/googleOauth";
+import "./auth/profile.get";
+import "./auth/profile.patch";
 import "./auth/confirm_email";
 import "./auth/refresh_token";
 import "./auth/forgot_password";
@@ -25,5 +26,5 @@ import "./transactions/transactions.put";
 import "./transactions/transactions.patch";
 import "./transactions/transactions.delete";
 
-import "./transactions/mass/transactions.mass.post"
+import "./transactions/mass/transactions.mass.post";
 import "./transactions/mass/transactions.mass.delete";
