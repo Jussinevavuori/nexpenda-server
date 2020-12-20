@@ -10,11 +10,11 @@ import {
   InvalidTokenFailure,
   UserNotFoundFailure,
 } from "../../utils/Failures";
-import { rateLimiter } from "../../middleware/RateLimiter";
+import { rateLimiters } from "../../middleware/rateLimiters";
 
 authRouter.post(
   "/request_confirm_email",
-  rateLimiter.strict(),
+  rateLimiters.strict(),
   async (req, res, next) => {
     const body = await validateRequestBody(req, emailOnlyAuthSchema);
 

@@ -6,11 +6,11 @@ import { ForgotPasswordToken } from "../../services/ForgotPasswordToken";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 import { emailOnlyAuthSchema } from "../../schemas/auth.schema";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
-import { rateLimiter } from "../../middleware/RateLimiter";
+import { rateLimiters } from "../../middleware/rateLimiters";
 
 authRouter.post(
   "/forgot_password",
-  rateLimiter.strict(),
+  rateLimiters.strict(),
   async (req, res, next) => {
     /**
      * Validate body

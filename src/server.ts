@@ -3,6 +3,7 @@ import * as socketIO from "socket.io";
 import * as passport from "passport";
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
+import * as nocache from "nocache";
 import { createServer, Server } from "http";
 import { pingRouter, authRouter, transactionsRouter } from "./controllers";
 import { conf } from "./conf";
@@ -14,7 +15,7 @@ import { handleErrors } from "./middleware/handleErrors";
 import { redirect } from "./utils/redirect";
 import { createLogger } from "./utils/createLogger";
 import { corsMiddleware } from "./middleware/corsMiddleware";
-import { rateLimiter } from "./middleware/RateLimiter";
+import { rateLimiters } from "./middleware/rateLimiters";
 
 const logger = createLogger();
 
@@ -52,25 +53,11 @@ export function startServer() {
       logger("Configured middleware");
 
       // Rate limit
-      app.use(rateLimiter.general());
+      app.use(rateLimiters.general());
 
       // Disable cache
-      app.use((req, res, next) => {
-        res.set("Cache-Control", "no-store");
-        next();
-      });
-
-      app.use((req, res, next) => {
-        const user = req.data.auth.user;
-        if (!user) {
-          logger(
-            `Unauthenticated request received <${req.data.auth.noUserReason}> to ${req.path}`
-          );
-        } else {
-          logger(`Request from ${user.email} <${user.id}> to ${req.path}`);
-        }
-        next();
-      });
+      app.set("etag", false);
+      app.use(nocache());
 
       // Api endpoints
       app.use("/api/ping", pingRouter);

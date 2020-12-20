@@ -17,7 +17,7 @@ const rateLimitExceededHandler: RequestHandler = (req, res, next) => {
 /**
  * Application rate limiters
  */
-export const rateLimiter = {
+export const rateLimiters = {
   general() {
     if (process.env.NODE_ENV === "test") {
       return testRateLimiter;

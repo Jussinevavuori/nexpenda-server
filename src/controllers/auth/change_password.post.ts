@@ -5,11 +5,11 @@ import { validateRequestBody } from "../../utils/validateRequestBody";
 import { passwordOnlyAuthSchema } from "../../schemas/auth.schema";
 import { Password } from "../../services/Password";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
-import { rateLimiter } from "../../middleware/RateLimiter";
+import { rateLimiters } from "../../middleware/rateLimiters";
 
 authRouter.post(
   "/change_password/:token",
-  rateLimiter.strict(),
+  rateLimiters.strict(),
   async (req, res, next) => {
     /**
      * Get and verify token from request

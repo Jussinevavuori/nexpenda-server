@@ -2,11 +2,12 @@ import { authRouter } from "..";
 import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
 import { prisma } from "../../server";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
-import { rateLimiter } from "../../middleware/RateLimiter";
+import { rateLimiters } from "../../middleware/rateLimiters";
 
 authRouter.post(
   "/confirm_email/:token",
-  rateLimiter.strict(),
+
+  rateLimiters.strict(),
   async (req, res, next) => {
     /**
      * Get and verify token from request

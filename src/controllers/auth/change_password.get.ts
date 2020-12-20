@@ -2,11 +2,11 @@ import { authRouter } from "..";
 import { ForgotPasswordToken } from "../../services/ForgotPasswordToken";
 import { prisma } from "../../server";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
-import { rateLimiter } from "../../middleware/RateLimiter";
+import { rateLimiters } from "../../middleware/rateLimiters";
 
 authRouter.get(
   "/change_password/:token",
-  rateLimiter.strict(),
+  rateLimiters.strict(),
   async (req, res, next) => {
     /**
      * Get token from request and verify it

@@ -9,7 +9,6 @@ export function extractAuthentication() {
     response: Response,
     next: NextFunction
   ) {
-
     /**
      * Get access token from request and verify
      */

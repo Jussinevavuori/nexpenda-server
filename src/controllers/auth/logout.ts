@@ -1,5 +1,5 @@
 import { authRouter } from "..";
-import { rateLimiter } from "../../middleware/RateLimiter";
+import { rateLimiters } from "../../middleware/rateLimiters";
 import { RefreshToken } from "../../services/RefreshToken";
 
 authRouter.post("/logout", (req, res) => {
