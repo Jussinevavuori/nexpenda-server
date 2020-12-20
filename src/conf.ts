@@ -2,9 +2,8 @@ import { createLogger } from "./utils/createLogger";
 
 const logger = createLogger({ name: "Conf" });
 
-logger("Configuring environment");
+// logger("Configuring environment");
 if (process.env.NODE_ENV !== "production") {
-
   try {
     const dotenv = require("dotenv");
     const envPath =

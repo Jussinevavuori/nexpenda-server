@@ -1,7 +1,8 @@
 import { Failure } from "./Result";
 
 export type ServerFailureCode =
-  | "request/invalid-request-data"
+	| "request/invalid-request-data"
+	| "request/too-many-requests"
   | "transaction/already-exists"
   | "transaction/not-found"
   | "auth/missing-token"
@@ -32,6 +33,16 @@ export class InvalidRequestDataFailure<T> extends Failure<
       errors: errors,
     });
   }
+}
+
+export class TooManyRequestsFailure<T> extends Failure<T, "request/too-many-requests"> {
+	constructor() {
+		super({
+			code:"request/too-many-requests",
+			status:529,
+			message: "Too many requests, please try again later."
+		})
+	}
 }
 
 export class TransactionAlreadyExistsFailure<T> extends Failure<

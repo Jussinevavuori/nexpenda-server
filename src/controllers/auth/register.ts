@@ -7,8 +7,9 @@ import { Mailer } from "../../services/Mailer";
 import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
 import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
 import { UserAlreadyExistsFailure } from "../../utils/Failures";
+import { rateLimiter } from "../../middleware/RateLimiter";
 
-authRouter.post("/register", async (req, res, next) => {
+authRouter.post("/register", rateLimiter.strict(), async (req, res, next) => {
   /**
    * Validate request body
    */

@@ -10,8 +10,9 @@ import {
   UserHasNoPasswordFailure,
   UserNotFoundFailure,
 } from "../../utils/Failures";
+import { rateLimiter } from "../../middleware/RateLimiter";
 
-authRouter.post("/login", async (req, res, next) => {
+authRouter.post("/login", rateLimiter.strict(), async (req, res, next) => {
   /**
    * Validate body
    */

@@ -14,7 +14,7 @@ import { handleErrors } from "./middleware/handleErrors";
 import { redirect } from "./utils/redirect";
 import { createLogger } from "./utils/createLogger";
 import { corsMiddleware } from "./middleware/corsMiddleware";
-// import { requireHttps } from "./middleware/requireHttps";
+import { rateLimiter } from "./middleware/RateLimiter";
 
 const logger = createLogger();
 
@@ -25,7 +25,7 @@ export let prisma = new PrismaClient();
 export let server: undefined | Server;
 
 export function startServer() {
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     try {
       logger("Starting server in", process.env.NODE_ENV, "mode");
 
@@ -41,22 +41,45 @@ export function startServer() {
       logger("Connected to database");
 
       // Middleware
-			// app.use(requireHttps({ ignoreHosts: [/localhost/] }));
-			app.options("*", corsMiddleware())
+      // app.use(requireHttps({ ignoreHosts: [/localhost/] }));
+      app.options("*", corsMiddleware());
       app.use(passport.initialize());
       app.use(cookieParser());
-      app.use(bodyParser.json({limit:"10mb"}));
-			app.use(corsMiddleware())
+      app.use(bodyParser.json({ limit: "10mb" }));
+      app.use(corsMiddleware());
       app.use(initializeRequestData());
-			app.use(extractAuthentication());
-			logger("Configured middleware");
-			
-			// Api endpoints
+      app.use(extractAuthentication());
+      logger("Configured middleware");
+
+      // Rate limit
+      app.use(rateLimiter.general());
+
+      // Disable cache
+      app.use((req, res, next) => {
+        res.set("Cache-Control", "no-store");
+        next();
+      });
+
+      app.use((req, res, next) => {
+        const user = req.data.auth.user;
+        if (!user) {
+          logger(
+            `Unauthenticated request received <${req.data.auth.noUserReason}> to ${req.path}`
+          );
+        } else {
+          logger(`Request from ${user.email} <${user.id}> to ${req.path}`);
+          logger(`> Access token ${req.data.auth.accessToken}`);
+          logger(`> Refresh token ${req.data.auth.refreshToken}`);
+        }
+        next();
+      });
+
+      // Api endpoints
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
       app.use("/api/transactions", transactionsRouter);
       logger("Configured endpoints");
-			
+
       // Redirect users who navigate to backend URl
       app.use("/", (req, res) => {
         redirect(res).toFrontend("/");
@@ -67,7 +90,7 @@ export function startServer() {
       app.use(handleFailure);
 
       // Start server
-			logger("Starting server");
+      logger("Starting server");
       server = http.listen(conf.port, function () {
         logger(`App is listening on port ${conf.port}`);
         resolve();
