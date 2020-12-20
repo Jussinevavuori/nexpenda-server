@@ -68,8 +68,6 @@ export function startServer() {
           );
         } else {
           logger(`Request from ${user.email} <${user.id}> to ${req.path}`);
-          logger(`> Access token ${req.data.auth.accessToken}`);
-          logger(`> Refresh token ${req.data.auth.refreshToken}`);
         }
         next();
       });
