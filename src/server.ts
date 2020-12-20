@@ -14,7 +14,7 @@ import { handleErrors } from "./middleware/handleErrors";
 import { redirect } from "./utils/redirect";
 import { createLogger } from "./utils/createLogger";
 import { corsMiddleware } from "./middleware/corsMiddleware";
-import { requireHttps } from "./middleware/requireHttps";
+// import { requireHttps } from "./middleware/requireHttps";
 
 const logger = createLogger();
 

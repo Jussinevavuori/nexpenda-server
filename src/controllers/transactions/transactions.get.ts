@@ -1,9 +1,11 @@
+import * as compression from "compression"
 import { transactionsRouter } from "..";
 import { prisma } from "../../server";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
-transactionsRouter.get("/", async (req, res, next) => {
+
+transactionsRouter.get("/", compression(), async (req, res, next) => {
   if (!req.data.auth.user) {
     return next(new UnauthenticatedFailure());
   }
