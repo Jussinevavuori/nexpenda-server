@@ -6,6 +6,8 @@ import { passwordOnlyAuthSchema } from "../../schemas/auth.schema";
 import { Password } from "../../services/Password";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
+import { Mailer } from "../../services/Mailer";
+import { PasswordChangedTemplate } from "../../mailTemplates/PasswordChangedTemplate";
 
 authRouter.post(
   "/change_password/:token",
@@ -54,6 +56,17 @@ authRouter.post(
       where: { id: user.id },
       data: { tokenVersion: user.tokenVersion + 1, password },
     });
+
+    /**
+     * Send password changed mail alert
+     */
+    const mailer = new Mailer();
+
+    const passwordChangedTemplate = new PasswordChangedTemplate({
+      email: user.email,
+    });
+
+    await mailer.sendTemplate(user.email, passwordChangedTemplate);
 
     /**
      * Send 200 OK upon success

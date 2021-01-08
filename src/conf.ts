@@ -55,11 +55,11 @@ export const conf = {
   },
 
   email: {
-    host: ENV("EMAIL_HOST"),
-    port: ENV_NUM("EMAIL_PORT"),
-    auth: {
-      user: ENV("EMAIL_AUTH_USER"),
-      pass: ENV("EMAIL_AUTH_PASS"),
+    mailgun: {
+      apikey: ENV("EMAIL_MAILGUN_APIKEY"),
+      baseurl: ENV("EMAIL_MAILGUN_BASEURL"),
+      domain: ENV("EMAIL_MAILGUN_DOMAIN"),
+      host: ENV("EMAIL_MAILGUN_HOST"),
     },
     defaultSender: ENV("EMAIL_DEFAULT_SENDER"),
   },

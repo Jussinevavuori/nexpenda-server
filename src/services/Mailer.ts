@@ -1,55 +1,90 @@
-import * as nodemailer from "nodemailer";
+import * as mailgun from "mailgun-js";
 import { conf } from "../conf";
 import { AbstractTemplate } from "../mailTemplates/AbstractTemplate";
 
 export class Mailer {
-  transporter?: nodemailer.Transporter;
+  /**
+   * Mailgun instance
+   */
+  private mg: mailgun.Mailgun;
 
+  /**
+   * (In testing mode this should be true). When this flag is set to true, all
+   * methods will return early.
+   */
+  disabled: boolean;
+
+  /**
+   * The default sender
+   */
+  defaultSender: string;
+
+  /**
+   * Constructor initializes a mailgun instance.
+   */
   constructor() {
-    try {
-      this.transporter = nodemailer.createTransport({
-        host: conf.email.host,
-        port: conf.email.port,
-        pool: true,
-        secure: false,
-        tls: {
-          rejectUnauthorized: false,
-        },
-        auth: {
-          user: conf.email.auth.user,
-          pass: conf.email.auth.pass,
-        },
-      });
-    } catch (e) {
-      console.error("Error creating mailer transporter", e);
-    }
-  }
-
-  sendTemplate<T extends AbstractTemplate>(to: string, template: T) {
-    return this.sendMail({
-      from: conf.email.defaultSender,
-      to,
-      subject: template.subject,
-      text: template.text,
-      html: template.html,
-    });
-  }
-
-  sendMail(options: nodemailer.SendMailOptions) {
+    // Disable in testing mode
     if (process.env.NODE_ENV === "test") {
-      return Promise.resolve();
+      this.disabled = true;
     }
-    if (this.transporter) {
-      return this.transporter
-        .sendMail(options)
-        .then(() => {
-          console.log("Succesfully sent mail");
-        })
-        .catch((e) => {
-          console.error("Error sending mail", e);
-        });
-    } else if (process.env.NODE_ENV !== "test") {
-      console.warn("Could not send mail due to undefined transporter");
+
+    this.mg = mailgun({
+      apiKey: conf.email.mailgun.apikey,
+      domain: conf.email.mailgun.domain,
+      host: conf.email.mailgun.host,
+    });
+
+    this.disabled = false;
+
+    this.defaultSender = `Expence <${conf.email.defaultSender}>`;
+  }
+
+  /**
+   * Use the mailer's mailgun instance with a callback function.
+   * Returns the result of the callback function or void, if the Mailer was
+   * disabled.
+   *
+   * This was created to disable calling Mailer.mg directly from outside of the
+   * class. This way there is no need to write the following every time.
+   *
+   * ```
+   * if (!mailer.disabled) mailer.mailgun.doSomething()
+   * ```
+   *
+   * Instead, you are always be required to use the following version. This
+   * avoids sending mail accidentally in testing mode.
+   *
+   * ```
+   * mailer.useMailgun(mg => mg.doSomething())
+   * ```
+   */
+  useMailgun<T>(callback: (mg: mailgun.Mailgun) => T): T | Promise<void> {
+    if (this.disabled) return Promise.resolve();
+    return callback(this.mg);
+  }
+
+  /**
+   * Used to send templates to a receiver.
+   */
+  sendTemplate<T extends AbstractTemplate>(to: string, template: T) {
+    if (this.disabled) return Promise.resolve();
+    try {
+      return this.mg.messages().send(
+        {
+          from: this.defaultSender,
+          to,
+          subject: template.subject,
+          html: template.html,
+          text: template.text,
+        },
+        function (error) {
+          if (error) {
+            console.error(`Mailgun error`, error);
+          }
+        }
+      );
+    } catch (e) {
+      console.error(`An error occured in Mailer.sendTemplate`, e);
     }
   }
 }
