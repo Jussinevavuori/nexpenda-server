@@ -1,8 +1,24 @@
 export abstract class AbstractTemplate<T extends {} = {}> {
-  protected variables: T;
+  protected vars: T;
 
-  constructor(variables: T) {
-    this.variables = variables;
+  public templateName: string;
+
+  public mailgunTemplateAvailable: boolean;
+
+  constructor(
+    variables: T,
+    options: {
+      templateName: string;
+      mailgunTemplateAvailable: boolean;
+    }
+  ) {
+    this.vars = variables;
+    this.templateName = options.templateName;
+    this.mailgunTemplateAvailable = options.mailgunTemplateAvailable;
+  }
+
+  get variables() {
+    return this.vars;
   }
 
   abstract get subject(): string;

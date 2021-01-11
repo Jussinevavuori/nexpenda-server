@@ -2,11 +2,16 @@ import { AbstractTemplate } from "./AbstractTemplate";
 
 type ConfirmEmailTemplateVariables = { url: string; email: string };
 
-export class ConfirmEmailTemplate extends AbstractTemplate<
-  ConfirmEmailTemplateVariables
-> {
+export class ConfirmEmailTemplate extends AbstractTemplate<ConfirmEmailTemplateVariables> {
+  static get templateName() {
+    return "template.expence.confirm-email";
+  }
+
   constructor(variables: ConfirmEmailTemplateVariables) {
-    super(variables);
+    super(variables, {
+      templateName: ConfirmEmailTemplate.templateName,
+      mailgunTemplateAvailable: true,
+    });
   }
 
   get subject() {
@@ -15,12 +20,12 @@ export class ConfirmEmailTemplate extends AbstractTemplate<
 
   get text() {
     return [
-      `Confirm your email address (${this.variables.email}) `,
+      `Confirm your email address (${this.vars.email}) `,
       `to start using Expence.\n`,
       `\n`,
       `Confirm your email by clicking on the following link.\n`,
       `\n`,
-      `${this.variables.url}`,
+      `${this.vars.url}`,
       `\n`,
       `If you did not create this account, you can safely ignore`,
       `this email.\n`,
@@ -29,9 +34,9 @@ export class ConfirmEmailTemplate extends AbstractTemplate<
 
   get html() {
     return `
-		<p>Confirm your email address (${this.variables.email}) to start using Expence.</p>
+		<p>Confirm your email address (${this.vars.email}) to start using Expence.</p>
 		<p>Confirm your email by clicking on the following link.</p>
-		<a href="${this.variables.url}" target="_blank">
+		<a href="${this.vars.url}" target="_blank">
 			<b>Confirm email</b>
 		</a>
 		<p><i>

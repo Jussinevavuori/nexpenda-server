@@ -69,15 +69,27 @@ export class Mailer {
   sendTemplate<T extends AbstractTemplate>(to: string, template: T) {
     if (this.disabled) return Promise.resolve();
     try {
+      const body:
+        | Partial<mailgun.messages.SendData>
+        | Partial<mailgun.messages.BatchData>
+        | Partial<mailgun.messages.SendTemplateData> = template.mailgunTemplateAvailable
+        ? {
+            template: template.templateName,
+            "h:X-Mailgun-Variables": JSON.stringify(template.variables),
+          }
+        : {
+            html: template.html,
+            text: template.text,
+          };
+
       return this.mg.messages().send(
         {
           from: this.defaultSender,
           to,
           subject: template.subject,
-          html: template.html,
-          text: template.text,
+          ...body,
         },
-        function (error) {
+        (error) => {
           if (error) {
             console.error(`Mailgun error`, error);
           }
