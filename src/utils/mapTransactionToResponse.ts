@@ -1,14 +1,10 @@
-import { Category, Transaction } from "@prisma/client";
+import { Transaction } from "@prisma/client";
 
-export type TransactionMappable = Transaction & { category: Category };
+export type TransactionMappable = Transaction;
 
-export type TransactionResponse = Omit<
-  Transaction,
-  "time" | "comment" | "categoryId"
-> & {
+export type TransactionResponse = Omit<Transaction, "time" | "comment"> & {
   time: number;
   comment: string | undefined;
-  category: string;
 };
 
 export function mapTransactionToResponse(
@@ -31,7 +27,6 @@ export function mapTransactionToResponse(
       ...transaction,
       time: transaction.time.getTime(),
       comment: transaction.comment ?? undefined,
-      category: transaction.category.value,
     };
   }
 }

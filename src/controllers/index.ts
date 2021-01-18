@@ -3,6 +3,7 @@ import { Router } from "express";
 export const pingRouter = Router();
 export const authRouter = Router();
 export const transactionsRouter = Router();
+export const categoriesRouter = Router();
 
 import "./ping/ping";
 
@@ -18,6 +19,8 @@ import "./auth/forgot_password";
 import "./auth/change_password.get";
 import "./auth/change_password.post";
 import "./auth/request_confirm_email";
+
+import "./categories/categories.get";
 
 import "./transactions/transactions.get";
 import "./transactions/transactions.getbyid";

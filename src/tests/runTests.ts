@@ -4,6 +4,9 @@ import { startServer, prisma } from "../server";
 async function initialize() {
   await startServer();
 
+  await prisma.category.deleteMany({
+    where: { id: { not: { equals: "" } } },
+  });
   await prisma.transaction.deleteMany({
     where: { id: { not: { equals: "" } } },
   });

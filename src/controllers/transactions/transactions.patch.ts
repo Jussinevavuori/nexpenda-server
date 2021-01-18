@@ -89,9 +89,6 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
                 },
               },
       },
-      include: {
-        category: true,
-      },
     });
 
     /**

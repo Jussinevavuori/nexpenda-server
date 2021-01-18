@@ -1,13 +1,12 @@
 import * as compression from "compression";
-import { transactionsRouter } from "..";
+import { categoriesRouter } from "..";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
-import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
-transactionsRouter.get("/", compression(), async (req, res, next) => {
+categoriesRouter.get("/", compression(), async (req, res, next) => {
   try {
     if (!req.data.auth.user) {
       return next(new UnauthenticatedFailure());
@@ -16,7 +15,7 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
     /**
      * Get all transactions for user
      */
-    const transactions = await prisma.transaction.findMany({
+    const categories = await prisma.category.findMany({
       where: {
         uid: {
           equals: req.data.auth.user.id,
@@ -27,7 +26,7 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
     /**
      * Send transactions to user
      */
-    res.json(mapTransactionToResponse(transactions));
+    res.json(categories);
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

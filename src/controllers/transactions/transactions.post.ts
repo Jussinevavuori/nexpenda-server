@@ -83,9 +83,6 @@ transactionsRouter.post("/", async (req, res, next) => {
         comment: body.value.comment,
         time: new Date(body.value.time),
       },
-      include: {
-        category: true,
-      },
     });
 
     /**

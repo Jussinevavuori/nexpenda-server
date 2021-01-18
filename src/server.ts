@@ -5,7 +5,12 @@ import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as nocache from "nocache";
 import { createServer, Server } from "http";
-import { pingRouter, authRouter, transactionsRouter } from "./controllers";
+import {
+  pingRouter,
+  authRouter,
+  transactionsRouter,
+  categoriesRouter,
+} from "./controllers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
 import { PrismaClient } from "@prisma/client";
@@ -62,6 +67,7 @@ export function startServer() {
       // Api endpoints
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
+      app.use("/api/categories", categoriesRouter);
       app.use("/api/transactions", transactionsRouter);
       logger("Configured endpoints");
 
