@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { DatabaseAccessFailure } from "../utils/Failures";
 import { Failure } from "../utils/Result";
 
 export function handleFailure(
@@ -9,6 +10,10 @@ export function handleFailure(
 ) {
   if (!res.headersSent) {
     if (failure instanceof Failure) {
+      if (failure instanceof DatabaseAccessFailure) {
+        console.log(failure.code, failure.error);
+      }
+
       return res.status(failure.status).json({
         data: { errors: failure.errors },
         message: failure.message,

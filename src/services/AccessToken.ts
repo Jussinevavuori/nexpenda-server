@@ -61,7 +61,6 @@ export class AccessToken
    * the access token is valid and verified.
    */
   static async fromRequest(request: Request) {
-    if (!request.cookies) return;
     const authorizationHeader = request.headers.authorization;
     if (!authorizationHeader) return;
     if (!authorizationHeader.toLowerCase().startsWith("bearer ")) return;

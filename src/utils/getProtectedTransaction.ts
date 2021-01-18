@@ -28,7 +28,14 @@ export async function getProtectedTransaction(user: User, id?: string) {
   /**
    * Get transaction
    */
-  const transaction = await prisma.transaction.findUnique({ where: { id } });
+  const transaction = await prisma.transaction.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      category: true,
+    },
+  });
 
   /**
    * Ensure transaction exists and is user's

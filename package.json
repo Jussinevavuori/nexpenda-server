@@ -16,6 +16,7 @@
     "dev": "cross-env NODE_ENV=development nodemon -e ts -w ./src -x ts-node --files ./src/index.ts",
     "test": "cross-env NODE_ENV=test ts-node --files ./src/tests/runTests.ts",
     "migrate": "cd ./prisma && migrate.bat",
+    "migrate:dev": "cd ./prisma && migrate-dev.bat",
     "studio:dev": "cd ../prismastudio/dev && npx prisma studio --experimental",
     "studio:prod": "cd ../prismastudio/prod && npx prisma studio --experimental",
     "studio:test": "cd ../prismastudio/test && npx prisma studio --experimental",

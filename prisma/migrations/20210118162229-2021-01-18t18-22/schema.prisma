@@ -4,18 +4,18 @@ generator client {
 
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model Transaction {
   id            String    @id @default(uuid())
   uid           String
-  categoryId    String   @map("category_id")
+  categoryId    String?   @map("category_id")
   integerAmount Int       @map("integer_amount")
   time          DateTime
   comment       String?
   user          User      @relation(fields: [uid], references: [id])
-  category      Category @relation(fields: [categoryId], references: [id])
+  category      Category? @relation(fields: [categoryId], references: [id])
 
   @@map(name: "transactions")
 }

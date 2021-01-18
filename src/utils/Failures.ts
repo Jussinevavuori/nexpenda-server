@@ -1,8 +1,8 @@
 import { Failure } from "./Result";
 
 export type ServerFailureCode =
-	| "request/invalid-request-data"
-	| "request/too-many-requests"
+  | "request/invalid-request-data"
+  | "request/too-many-requests"
   | "transaction/already-exists"
   | "transaction/not-found"
   | "auth/missing-token"
@@ -16,6 +16,7 @@ export type ServerFailureCode =
   | "auth/email-not-confirmed"
   | "auth/email-already-confirmed"
   | "mail/error"
+  | "database/access-failure"
   | "failure/unimplemented"
   | "failure/error"
   | "failure/unknown"
@@ -35,14 +36,17 @@ export class InvalidRequestDataFailure<T> extends Failure<
   }
 }
 
-export class TooManyRequestsFailure<T> extends Failure<T, "request/too-many-requests"> {
-	constructor() {
-		super({
-			code:"request/too-many-requests",
-			status:529,
-			message: "Too many requests, please try again later."
-		})
-	}
+export class TooManyRequestsFailure<T> extends Failure<
+  T,
+  "request/too-many-requests"
+> {
+  constructor() {
+    super({
+      code: "request/too-many-requests",
+      status: 529,
+      message: "Too many requests, please try again later.",
+    });
+  }
 }
 
 export class TransactionAlreadyExistsFailure<T> extends Failure<
@@ -202,6 +206,21 @@ export class EmailAlreadyConfirmedFailure<T> extends Failure<
 export class MailErrorFailure<T> extends Failure<T, "mail/error"> {
   constructor() {
     super({ code: "mail/error", status: 500, message: "Mail error" });
+  }
+}
+
+export class DatabaseAccessFailure<T> extends Failure<
+  T,
+  "database/access-failure"
+> {
+  public readonly error?: Error;
+  constructor(error?: Error) {
+    super({
+      code: "database/access-failure",
+      status: 500,
+      message: "Database access failure",
+    });
+    this.error = error;
   }
 }
 
