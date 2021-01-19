@@ -1,14 +1,14 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import {
   mockTransaction,
   createTestClientWithTransactions,
-} from "../../tests/testUtils";
+} from "../../testUtils";
 import { v4 as uuid } from "uuid";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/api/transactions > PUT", () => {
+describe("/api/transactions/ [PUT]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 
@@ -38,11 +38,11 @@ describe("/api/transactions > PUT", () => {
     expect(created.id).toBe(id);
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
+    expect(result.uid).toBeUndefined();
     expect(result.integerAmount).toBe(2);
     expect(result.time).toBe(2);
     expect(result.comment).toBe("update");
-    expect(result.category).toBe("update");
+    expect(result.category.value).toBe("update");
     done();
   });
 
@@ -58,11 +58,11 @@ describe("/api/transactions > PUT", () => {
     await client.transactions().put(id, put);
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
+    expect(result.uid).toBeUndefined();
     expect(result.integerAmount).toBe(99);
     expect(result.time).toBe(99);
     expect(result.comment).toBe("update");
-    expect(result.category).toBe("update");
+    expect(result.category.value).toBe("update");
     done();
   });
 
@@ -78,9 +78,9 @@ describe("/api/transactions > PUT", () => {
     const result0 = await (await client.transactions().get(ids[0])).json();
     const result1 = await (await client.transactions().get(ids[1])).json();
     const result2 = await (await client.transactions().get(ids[2])).json();
-    expect(result0.category).toBe("update");
-    expect(result1.category).toBe("existing");
-    expect(result2.category).toBe("existing");
+    expect(result0.category.value).toBe("update");
+    expect(result1.category.value).toBe("existing");
+    expect(result2.category.value).toBe("existing");
     done();
   });
 
@@ -98,8 +98,8 @@ describe("/api/transactions > PUT", () => {
     await client.transactions().put(id, put);
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
-    expect(result.category).toBe("update");
+    expect(result.uid).toBeUndefined();
+    expect(result.category.value).toBe("update");
     done();
   });
 
@@ -128,8 +128,8 @@ describe("/api/transactions > PUT", () => {
     expect(response2.status).toBeGreaterThanOrEqual(400);
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
-    expect(result.category).toBe("existing");
+    expect(result.uid).toBeUndefined();
+    expect(result.category.value).toBe("existing");
     done();
   });
 
@@ -148,8 +148,8 @@ describe("/api/transactions > PUT", () => {
     expect(response.status).toBe(200);
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
-    expect(result.category).toBe("update");
+    expect(result.uid).toBeUndefined();
+    expect(result.category.value).toBe("update");
     expect(result.comment).toBeUndefined();
     done();
   });
@@ -240,8 +240,8 @@ describe("/api/transactions > PUT", () => {
     expect(response.status).toBeGreaterThanOrEqual(400);
     const result = await (await client1.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid1);
-    expect(result.category).toBe("existing");
+    expect(result.uid).toBeUndefined();
+    expect(result.category.value).toBe("existing");
     done();
   });
 });

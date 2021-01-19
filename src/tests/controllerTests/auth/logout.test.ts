@@ -1,11 +1,11 @@
-import { TestClient } from "../../tests/TestClient";
-import { conf } from "../../conf";
-import { testUtils } from "../../tests/testUtils";
+import { TestClient } from "../../TestClient";
+import { conf } from "../../../conf";
+import { testUtils } from "../../testUtils";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/api/auth/logout", () => {
+describe("/api/auth/logout/ [POST]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 

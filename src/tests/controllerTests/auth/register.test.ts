@@ -1,10 +1,10 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import * as faker from "faker";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/api/auth/register", () => {
+describe("/api/auth/register/ [POST]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 

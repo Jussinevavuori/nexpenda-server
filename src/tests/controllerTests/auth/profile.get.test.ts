@@ -1,9 +1,9 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/auth/profile > GET", () => {
+describe("/api/auth/profile [GET]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 

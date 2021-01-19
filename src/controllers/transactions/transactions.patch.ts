@@ -65,7 +65,9 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
      * Update transaction
      */
     const updated = await prisma.transaction.update({
-      where: { id: transaction.value.id },
+      where: {
+        id: transaction.value.id,
+      },
       data: {
         comment: body.value.comment,
         time: body.value.time ? new Date(body.value.time) : undefined,
@@ -88,6 +90,9 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
                   },
                 },
               },
+      },
+      include: {
+        category: true,
       },
     });
 

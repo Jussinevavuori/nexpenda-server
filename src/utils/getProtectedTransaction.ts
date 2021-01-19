@@ -32,6 +32,9 @@ export async function getProtectedTransaction(user: User, id?: string) {
     where: {
       id,
     },
+    include: {
+      category: true,
+    },
   });
 
   /**

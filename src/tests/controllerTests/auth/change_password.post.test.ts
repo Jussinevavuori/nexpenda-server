@@ -1,28 +1,29 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import { PrismaClient } from "@prisma/client";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
-import { conf } from "../../conf";
+import { conf } from "../../../conf";
 
 const prisma = new PrismaClient();
 
-describe("/auth/change_password > POST", () => {
+describe("/api/auth/change_password/ [POST]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 
   it("Changes the user's password", async (done) => {
     const client = new TestClient();
     const email = await client.authenticate(prisma);
-    const before = await prisma.user.findUnique({ where: { email } });
-    const token = await client.fabricateForgotPasswordToken(before!);
     await client.auth().logout();
+    const before = await prisma.user.findUnique({ where: { email } });
+    const token = await client.fabricateForgotPasswordToken(before!.id, prisma);
     const password = faker.internet.password();
     const loginAttempt1 = await client.auth().login({
       email,
       password,
     });
-    const loginAttempt1Code = (await loginAttempt1.json()).code;
+    const loginAttempt1Body = await loginAttempt1.json();
+    const loginAttempt1Code = loginAttempt1Body.code;
     expect(loginAttempt1.status).toBe(400);
     expect(loginAttempt1Code).toBe("auth/invalid-credentials");
     const response = await client
@@ -45,7 +46,10 @@ describe("/auth/change_password > POST", () => {
     const client = new TestClient();
     const email = await client.authenticate(prisma);
     const userRecord = await prisma.user.findUnique({ where: { email } });
-    const token = client.fabricateForgotPasswordToken(userRecord!);
+    const token = await client.fabricateForgotPasswordToken(
+      userRecord!.id,
+      prisma
+    );
     const response1 = await client
       .auth()
       .changePassword(token.jwt)

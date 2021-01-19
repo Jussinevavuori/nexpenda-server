@@ -1,10 +1,10 @@
-import { TestClient } from "../../tests/TestClient";
-import { mockTransaction } from "../../tests/testUtils";
+import { TestClient } from "../../TestClient";
+import { mockTransaction } from "../../testUtils";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/api/transactions > POST", () => {
+describe("/api/transactions/ [POST]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 
@@ -133,10 +133,10 @@ describe("/api/transactions > POST", () => {
 
     const created = await response.json();
 
-    expect(created.uid).toBe(client.authenticatedUid);
+    expect(created.uid).toBeUndefined();
     expect(created.id).toBe(transaction.id);
     expect(created.integerAmount).toBe(transaction.integerAmount);
-    expect(created.category).toBe(transaction.category);
+    expect(created.category.value).toBe(transaction.category);
     expect(created.comment).toBe(transaction.comment);
     expect(created.time).toBe(transaction.time);
 
@@ -155,7 +155,7 @@ describe("/api/transactions > POST", () => {
 
     const created = await response.json();
 
-    expect(created.uid).toBeDefined();
+    expect(created.uid).toBeUndefined();
     expect(created.id).toBeDefined();
 
     done();

@@ -4,15 +4,7 @@ import { startServer, prisma } from "../server";
 async function initialize() {
   await startServer();
 
-  await prisma.category.deleteMany({
-    where: { id: { not: { equals: "" } } },
-  });
-  await prisma.transaction.deleteMany({
-    where: { id: { not: { equals: "" } } },
-  });
-  await prisma.user.deleteMany({
-    where: { id: { not: { equals: "" } } },
-  });
+  await prisma.$executeRaw(`TRUNCATE TABLE users CASCADE`);
 }
 
 async function runTests(options?: {
@@ -45,12 +37,22 @@ async function teardown() {
 
 async function run() {
   await initialize();
+
+  const testNamePattern = getTestNamePattern();
+
+  if (testNamePattern) {
+    console.log(`# Running only tests matching ${testNamePattern}`);
+  } else {
+    console.log(`# Running all tests`);
+  }
+
   await runTests({
     runInBand: true,
     detectOpenHandles: true,
     forceExit: true,
-    testNamePattern: getTestNamePattern(),
+    testNamePattern,
   });
+
   await teardown();
 }
 

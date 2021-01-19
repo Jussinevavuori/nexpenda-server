@@ -1,12 +1,12 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
-import { conf } from "../../conf";
+import { conf } from "../../../conf";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/api/auth/login", () => {
+describe("/api/auth/login/ [POST]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 

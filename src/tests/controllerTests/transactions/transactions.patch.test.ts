@@ -1,12 +1,12 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import { v4 as uuid } from "uuid";
 import {
   mockTransaction,
   createTestClientWithTransactions,
-} from "../../tests/testUtils";
+} from "../../testUtils";
 import { PrismaClient } from "@prisma/client";
 
-describe("/api/transactions > PATCH", () => {
+describe("/api/transactions/ [PATCH]", () => {
   const prisma = new PrismaClient();
 
   beforeAll((done) => prisma.$connect().then(() => done()));
@@ -48,11 +48,11 @@ describe("/api/transactions > PATCH", () => {
     await client.transactions().put(id, patch);
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
+    expect(result.uid).toBeUndefined();
     expect(result.integerAmount).toBe(99);
     expect(result.time).toBe(99);
     expect(result.comment).toBe("update");
-    expect(result.category).toBe("update");
+    expect(result.category.value).toBe("update");
     done();
   });
 
@@ -69,18 +69,18 @@ describe("/api/transactions > PATCH", () => {
     expect(response.status).toBe(200);
     const updated = await response.json();
     expect(updated.id).toBe(id);
-    expect(updated.uid).toBe(uid);
+    expect(updated.uid).toBeUndefined();
     expect(updated.integerAmount).toBe(99);
     expect(updated.time).toBe(99);
     expect(updated.comment).toBe("update");
-    expect(updated.category).toBe("update");
+    expect(updated.category.value).toBe("update");
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
+    expect(result.uid).toBeUndefined();
     expect(result.integerAmount).toBe(99);
     expect(result.time).toBe(99);
     expect(result.comment).toBe("update");
-    expect(result.category).toBe("update");
+    expect(result.category.value).toBe("update");
     done();
   });
 
@@ -109,11 +109,11 @@ describe("/api/transactions > PATCH", () => {
     expect(response2.status).toBe(400);
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
+    expect(result.uid).toBeUndefined();
     expect(result.integerAmount).not.toBe(99);
     expect(result.time).not.toBe(99);
     expect(result.comment).not.toBe("update");
-    expect(result.category).not.toBe("update");
+    expect(result.category.value).not.toBe("update");
     done();
   });
 
@@ -141,15 +141,15 @@ describe("/api/transactions > PATCH", () => {
     expect(updated2.time).toBe(99);
     expect(updated2.comment).not.toBe("update");
     expect(updated3.comment).toBe("update");
-    expect(updated3.category).not.toBe("update");
-    expect(updated4.category).toBe("update");
+    expect(updated3.category.value).not.toBe("update");
+    expect(updated4.category.value).toBe("update");
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
+    expect(result.uid).toBeUndefined();
     expect(result.integerAmount).toBe(99);
     expect(result.time).toBe(99);
     expect(result.comment).toBe("update");
-    expect(result.category).toBe("update");
+    expect(result.category.value).toBe("update");
     done();
   });
 
@@ -161,11 +161,11 @@ describe("/api/transactions > PATCH", () => {
     expect(response.status).toBe(200);
     const updated = await response.json();
     expect(updated.id).toBe(id);
-    expect(updated.uid).toBe(uid);
+    expect(updated.uid).toBeUndefined();
     expect(updated.comment).toBeUndefined();
     const result = await (await client.transactions().get(id)).json();
     expect(result.id).toBe(id);
-    expect(result.uid).toBe(uid);
+    expect(result.uid).toBeUndefined();
     expect(result.comment).toBeUndefined();
     done();
   });
@@ -181,7 +181,7 @@ describe("/api/transactions > PATCH", () => {
     const response = await client2.transactions().patch(id, patch);
     expect(response.status).toBe(404);
     const result = await (await client1.transactions().get(id)).json();
-    expect(result.category).not.toBe("unauthorized");
+    expect(result.category.value).not.toBe("unauthorized");
     done();
   });
 });

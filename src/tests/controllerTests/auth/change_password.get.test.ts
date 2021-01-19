@@ -1,13 +1,13 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import { PrismaClient } from "@prisma/client";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
-import { conf } from "../../conf";
+import { conf } from "../../../conf";
 
 const prisma = new PrismaClient();
 
-describe("/auth/change_password > GET", () => {
+describe("/api/auth/change_password [GET]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 
@@ -17,7 +17,10 @@ describe("/auth/change_password > GET", () => {
     const password = faker.internet.password();
     await client.auth().register({ email, password });
     const userRecord = await prisma.user.findUnique({ where: { email } });
-    const token = client.fabricateForgotPasswordToken(userRecord!);
+    const token = await client.fabricateForgotPasswordToken(
+      userRecord!.id,
+      prisma
+    );
     const response = await client.auth().changePassword(token.jwt).get();
     expect(response.status).toBe(200);
     const text = await response.text();
@@ -29,8 +32,14 @@ describe("/auth/change_password > GET", () => {
     const client = new TestClient();
     const email = await client.authenticate(prisma);
     const userRecord = await prisma.user.findUnique({ where: { email } });
-    const token1 = client.fabricateForgotPasswordToken(userRecord!);
-    const token2 = client.fabricateForgotPasswordToken(userRecord!);
+    const token1 = await client.fabricateForgotPasswordToken(
+      userRecord!.id,
+      prisma
+    );
+    const token2 = await client.fabricateForgotPasswordToken(
+      userRecord!.id,
+      prisma
+    );
     const response1 = await client.auth().changePassword(token1.jwt).get();
     expect(response1.status).toBe(200);
     await client

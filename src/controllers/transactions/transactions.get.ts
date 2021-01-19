@@ -1,11 +1,11 @@
 import * as compression from "compression";
 import { transactionsRouter } from "..";
 import { prisma } from "../../server";
+import { compressTransactions } from "../../utils/compressTransactions";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
-import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 
 transactionsRouter.get("/", compression(), async (req, res, next) => {
   try {
@@ -22,12 +22,15 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
           equals: req.data.auth.user.id,
         },
       },
+      include: {
+        category: true,
+      },
     });
 
     /**
      * Send transactions to user
      */
-    res.json(mapTransactionToResponse(transactions));
+    res.json(compressTransactions(transactions));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

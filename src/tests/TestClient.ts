@@ -192,8 +192,14 @@ export class TestClient {
   /**
    * Fabricates a forgot password token
    */
-  fabricateForgotPasswordToken(id: string | User) {
-    return new ForgotPasswordToken(id);
+  async fabricateForgotPasswordToken(id: string, prisma: PrismaClient) {
+    const userRecord = await prisma.user.findUnique({ where: { id } });
+    if (!userRecord) {
+      throw Error(
+        "Did not find user record for fabricating the forgot password token"
+      );
+    }
+    return new ForgotPasswordToken(userRecord);
   }
 
   /**

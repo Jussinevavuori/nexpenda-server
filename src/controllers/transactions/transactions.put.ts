@@ -128,6 +128,9 @@ transactionsRouter.put("/:id", async (req, res, next) => {
           },
         },
       },
+      include: {
+        category: true,
+      },
     });
 
     /**

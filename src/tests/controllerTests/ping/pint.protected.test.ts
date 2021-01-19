@@ -1,22 +1,10 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
+
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/api/ping", () => {
-  beforeAll((done) => prisma.$connect().then(() => done()));
-  afterAll((done) => prisma.$disconnect().then(() => done()));
-
-  it("pongs", async (done) => {
-    const client = new TestClient();
-    const response = await client.ping();
-    const text = await response.text();
-    expect(text).toBe("pong");
-    done();
-  });
-});
-
-describe("/api/ping/protected", () => {
+describe("/api/ping/protected/ [GET]", () => {
   it("does not pong on unauthenticated", async (done) => {
     const client = new TestClient();
     const response = await client.ping({ protected: true });

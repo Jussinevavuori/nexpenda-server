@@ -1,13 +1,25 @@
 steps:
-# Build the container image
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/expence-296310/expence-image', '.']
-# Push the container image to Container Registry
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/expence-296310/expence-image']
-# Deploy container image to Cloud Run
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: gcloud
-  args: ['run', 'deploy', 'expence-cloud-run', '--image', 'gcr.io/expence-296310/expence-image', '--region', 'europe-north1', '--platform', 'managed', '--allow-unauthenticated']
+  # Build the container image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/expence-296310/expence-image", "."]
+  # Push the container image to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/expence-296310/expence-image"]
+  # Deploy container image to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      [
+        "run",
+        "deploy",
+        "expence-cloud-run",
+        "--image",
+        "gcr.io/expence-296310/expence-image",
+        "--region",
+        "europe-north1",
+        "--platform",
+        "managed",
+        "--allow-unauthenticated",
+      ]
 images:
-- gcr.io/expence-296310/expence-image
+  - gcr.io/expence-296310/expence-image

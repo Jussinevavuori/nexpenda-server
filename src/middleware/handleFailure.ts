@@ -11,7 +11,12 @@ export function handleFailure(
   if (!res.headersSent) {
     if (failure instanceof Failure) {
       if (failure instanceof DatabaseAccessFailure) {
-        console.log(failure.code, failure.error);
+        console.log(
+          `[HANDLE_FAILURE]:`,
+          `Caught database access failure`,
+          failure.code,
+          failure.error
+        );
       }
 
       return res.status(failure.status).json({

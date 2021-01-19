@@ -40,7 +40,9 @@ export class ForgotPasswordToken
           const user = await prisma.user.findUnique({
             where: { id: payload.uid },
           });
-          if (!user) return false;
+          if (!user) {
+            return false;
+          }
           return user.tokenVersion === payload.vrs;
         },
       }

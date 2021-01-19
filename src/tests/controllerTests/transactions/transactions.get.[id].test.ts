@@ -1,11 +1,11 @@
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import { v4 as uuid } from "uuid";
-import { mockTransaction } from "../../tests/testUtils";
+import { mockTransaction } from "../../testUtils";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/api/transactions > GET by ID", () => {
+describe("/api/transactions/:id/ [GET]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 
@@ -37,10 +37,10 @@ describe("/api/transactions > GET by ID", () => {
     expect(response.status).toBe(200);
     const result = await response.json();
     expect(result.id).toBe(constructable.id);
-    expect(result.uid).toBe(client.authenticatedUid);
+    expect(result.uid).toBeUndefined();
     expect(result.integerAmount).toBe(constructable.integerAmount);
     expect(result.comment).toBe(constructable.comment);
-    expect(result.category).toBe(constructable.category);
+    expect(result.category.value).toBe(constructable.category);
     expect(result.time).toBe(constructable.time);
     done();
   });

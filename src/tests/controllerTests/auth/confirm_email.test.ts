@@ -1,13 +1,13 @@
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
-import { TestClient } from "../../tests/TestClient";
+import { TestClient } from "../../TestClient";
 import { v4 as uuid } from "uuid";
-import { conf } from "../../conf";
+import { conf } from "../../../conf";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/auth/confirm_email", () => {
+describe("/api/auth/confirm_email/ [POST]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 

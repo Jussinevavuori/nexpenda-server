@@ -104,6 +104,9 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
             comment: _.comment,
             time: new Date(_.time),
           },
+          include: {
+            category: true,
+          },
         });
       })
     );

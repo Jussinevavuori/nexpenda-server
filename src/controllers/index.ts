@@ -23,7 +23,7 @@ import "./auth/request_confirm_email";
 import "./categories/categories.get";
 
 import "./transactions/transactions.get";
-import "./transactions/transactions.getbyid";
+import "./transactions/transactions.[id].get";
 import "./transactions/transactions.post";
 import "./transactions/transactions.put";
 import "./transactions/transactions.patch";
