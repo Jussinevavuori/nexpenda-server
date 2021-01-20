@@ -1,9 +1,9 @@
 {
-  "name": "expence-server",
+  "name": "nexpenda-server",
   "version": "1.0.0",
-  "description": "expence server",
+  "description": "nexpenda server",
   "repository": {
-    "url": "https://github.com/Jussinevavuori/expence-server.git",
+    "url": "https://github.com/Jussinevavuori/nexpenda-server.git",
     "type": "git"
   },
   "main": "./dist/index.js",
@@ -21,12 +21,6 @@
     "studio:prod": "cd ../prismastudio/prod && npx prisma studio --experimental",
     "studio:test": "cd ../prismastudio/test && npx prisma studio --experimental",
     "psql:dev": "psql expencedev postgres",
-    "heroku:build": "docker build -t registry.heroku.com/expenceapp/web .",
-    "heroku:push": "docker push registry.heroku.com/expenceapp/web",
-    "heroku:release": "heroku container:release -a expenceapp web",
-    "container:run": "docker run --rm -d -p 5000:5000 --name=expenceapp registry.heroku.com/expenceapp/web",
-    "container:logs": "docker logs --follow expenceapp",
-    "heroku:deploy": "npm run heroku:build && npm run heroku:push && npm run heroku:release",
     "deploy": "gcloud builds submit"
   },
   "engines": {

@@ -4,7 +4,7 @@ type ForgotPasswordTemplateVariables = { url: string; email: string };
 
 export class ForgotPasswordTemplate extends AbstractTemplate<ForgotPasswordTemplateVariables> {
   static get templateName() {
-    return "template.expence.forgot-password";
+    return "template.nexpenda.forgot-password";
   }
 
   constructor(variables: ForgotPasswordTemplateVariables) {

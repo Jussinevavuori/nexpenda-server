@@ -4,7 +4,7 @@ type PasswordChangedTemplateVariables = { email: string };
 
 export class PasswordChangedTemplate extends AbstractTemplate<PasswordChangedTemplateVariables> {
   static get templateName() {
-    return "template.expence.password-changed";
+    return "template.nexpenda.password-changed";
   }
 
   constructor(variables: PasswordChangedTemplateVariables) {
@@ -23,7 +23,7 @@ export class PasswordChangedTemplate extends AbstractTemplate<PasswordChangedTem
 			The password for the account ${this.vars.email} was changed.
 
 			If you changed the password yourself, you can safely dismiss this email.
-			If you did not change the password yourself, your Expence account and / or
+			If you did not change the password yourself, your Nexpenda account and / or
 			your email account may have been compromised.
 		`;
   }
@@ -33,7 +33,7 @@ export class PasswordChangedTemplate extends AbstractTemplate<PasswordChangedTem
 		<p>The password for the account ${this.vars.email} was changed.</p>
 		<p><i>
 		If you changed the password yourself, you can safely dismiss this email.
-		If you did not change the password yourself, your Expence account and / or
+		If you did not change the password yourself, your Nexpenda account and / or
 		your email account may have been compromised.
 		</i></p>
 		`;

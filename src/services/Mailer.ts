@@ -36,7 +36,7 @@ export class Mailer {
 
     this.disabled = false;
 
-    this.defaultSender = `Expence <${conf.email.defaultSender}>`;
+    this.defaultSender = `Nexpenda <${conf.email.defaultSender}>`;
   }
 
   /**

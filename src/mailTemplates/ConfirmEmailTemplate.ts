@@ -4,7 +4,7 @@ type ConfirmEmailTemplateVariables = { url: string; email: string };
 
 export class ConfirmEmailTemplate extends AbstractTemplate<ConfirmEmailTemplateVariables> {
   static get templateName() {
-    return "template.expence.confirm-email";
+    return "template.nexpenda.confirm-email";
   }
 
   constructor(variables: ConfirmEmailTemplateVariables) {
@@ -15,13 +15,13 @@ export class ConfirmEmailTemplate extends AbstractTemplate<ConfirmEmailTemplateV
   }
 
   get subject() {
-    return `Expence: Confirm your email address`;
+    return `Nexpenda: Confirm your email address`;
   }
 
   get text() {
     return [
       `Confirm your email address (${this.vars.email}) `,
-      `to start using Expence.\n`,
+      `to start using Nexpenda.\n`,
       `\n`,
       `Confirm your email by clicking on the following link.\n`,
       `\n`,
@@ -34,7 +34,7 @@ export class ConfirmEmailTemplate extends AbstractTemplate<ConfirmEmailTemplateV
 
   get html() {
     return `
-		<p>Confirm your email address (${this.vars.email}) to start using Expence.</p>
+		<p>Confirm your email address (${this.vars.email}) to start using Nexpenda.</p>
 		<p>Confirm your email by clicking on the following link.</p>
 		<a href="${this.vars.url}" target="_blank">
 			<b>Confirm email</b>
