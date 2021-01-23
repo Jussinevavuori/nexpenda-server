@@ -11,8 +11,7 @@ export type TransactionResponse = {
   category: {
     id: string;
     value: string;
-    incomeIcon: string;
-    expenseIcon: string;
+    icon: string;
   };
 };
 
@@ -27,8 +26,7 @@ export type CompressedDataJson = {
   c: {
     id: string; // ID
     v: string; // Value
-    ii: string; // Income icon
-    ei: string; // Expense icon
+    i: string; // Icon
   }[];
 };
 
@@ -65,8 +63,7 @@ export class TransactionService {
         category: {
           id: transaction.category.id,
           value: transaction.category.value,
-          incomeIcon: transaction.category.incomeIcon,
-          expenseIcon: transaction.category.expenseIcon,
+          icon: transaction.category.icon || "",
         },
       };
     }
@@ -99,8 +96,7 @@ export class TransactionService {
       c: categories.map((c) => ({
         id: c.id,
         v: c.value,
-        ii: c.incomeIcon,
-        ei: c.expenseIcon,
+        i: c.icon || "",
       })),
     };
   }

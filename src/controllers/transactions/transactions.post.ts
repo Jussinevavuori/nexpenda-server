@@ -80,9 +80,7 @@ transactionsRouter.post("/", async (req, res, next) => {
     /**
      * Send created transaction to user with 201 status
      */
-    return res
-      .status(201)
-      .json(TransactionService.mapTransactionToResponse(created));
+    return res.json(TransactionService.mapTransactionToResponse(created));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

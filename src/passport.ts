@@ -86,6 +86,7 @@ passport.use(
               email,
               photoUrl,
               emailVerified: true,
+              tokenVersion: 1,
             },
           });
           done(null, createdUser);
