@@ -31,23 +31,52 @@ passport.use(
     },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
-        const existingUser = await prisma.user.findUnique({
-          where: { googleId: profile.id },
-        });
+        // Extract profile details
+        const googleId = profile.id;
+        const email =
+          profile.emails && profile.emails[0]
+            ? profile.emails[0].value
+            : undefined;
+        const photoUrl =
+          profile.photos && profile.photos[0]
+            ? profile.photos[0].value
+            : undefined;
 
+        if (!email) {
+          throw Error("Email not found in Google profile");
+        }
+
+        // Seek existing user by email
+        const existingUser = await prisma.user.findUnique({ where: { email } });
+
+        // Existing user found:
         if (existingUser) {
+          // Check which fields should be updated
+          const shouldUpdate = {
+            googleId: !existingUser.googleId,
+            photoUrl: !existingUser.photoUrl,
+            displayName: existingUser.displayName === existingUser.email,
+          };
+
+          // If there were any updatable properties, update them
+          const shouldUpdateAny = Object.values(shouldUpdate).some(Boolean);
+          if (shouldUpdateAny) {
+            prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                googleId: shouldUpdate.googleId ? googleId : undefined,
+                displayName: shouldUpdate.displayName
+                  ? profile.displayName
+                  : undefined,
+                photoUrl: shouldUpdate.photoUrl ? photoUrl : undefined,
+              },
+            });
+          }
+
+          // Return existing user
           done(null, existingUser);
         } else {
-          const email =
-            profile.emails && profile.emails[0]
-              ? profile.emails[0].value
-              : undefined;
-
-          const photoUrl =
-            profile.photos && profile.photos[0]
-              ? profile.photos[0].value
-              : undefined;
-
+          // Create user if existing user not found.
           const createdUser = await prisma.user.create({
             data: {
               displayName: profile.displayName,

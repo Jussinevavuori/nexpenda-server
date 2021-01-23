@@ -53,8 +53,15 @@ authRouter.post(
      * Update user token version and password
      */
     await prisma.user.update({
-      where: { id: user.id },
-      data: { tokenVersion: user.tokenVersion + 1, password },
+      where: {
+        id: user.id,
+      },
+      data: {
+        tokenVersion: {
+          increment: 1,
+        },
+        password,
+      },
     });
 
     /**

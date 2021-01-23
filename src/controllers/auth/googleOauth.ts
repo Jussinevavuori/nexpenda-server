@@ -3,6 +3,7 @@ import * as passport from "passport";
 import { redirect } from "../../utils/redirect";
 import { prisma } from "../../server";
 import { RefreshToken } from "../../services/RefreshToken";
+import { getUrl } from "../../utils/getUrl";
 
 authRouter.get(
   "/google",
@@ -16,6 +17,7 @@ authRouter.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
+    failureRedirect: getUrl.toFrontend("/login"),
   }),
   async (request, response, next) => {
     try {
@@ -31,7 +33,7 @@ authRouter.get(
       }
       throw Error();
     } catch (error) {
-      redirect(response).toFrontend("/login");
+      return redirect(response).toFrontend("/login");
     }
   }
 );

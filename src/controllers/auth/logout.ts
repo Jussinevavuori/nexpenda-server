@@ -9,7 +9,11 @@ authRouter.post("/logout", async (req, res) => {
   if (user) {
     await prisma.user.update({
       where: { id: user.id },
-      data: { tokenVersion: user.tokenVersion + 1 },
+      data: {
+        tokenVersion: {
+          increment: 1,
+        },
+      },
     });
   }
 
