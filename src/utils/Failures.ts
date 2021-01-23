@@ -3,6 +3,8 @@ import { Failure } from "./Result";
 export type ServerFailureCode =
   | "request/invalid-request-data"
   | "request/too-many-requests"
+  | "request/missing-query-parameters"
+  | "request/missing-url-parameters"
   | "transaction/already-exists"
   | "transaction/not-found"
   | "auth/missing-token"
@@ -46,6 +48,46 @@ export class TooManyRequestsFailure<T> extends Failure<
       status: 529,
       message: "Too many requests, please try again later.",
     });
+  }
+}
+
+export class MissingUrlParametersFailure<T> extends Failure<
+  T,
+  "request/missing-url-parameters"
+> {
+  public readonly missingValues: string[];
+
+  constructor(missingValues: string[]) {
+    super({
+      code: "request/missing-url-parameters",
+      message: `Missing url parameters: ${missingValues.join(", ")}`,
+      status: 400,
+      errors: missingValues.reduce(
+        (e, v) => ({ ...e, [v]: "missing" }),
+        {} as Record<string, string>
+      ),
+    });
+    this.missingValues = missingValues;
+  }
+}
+
+export class MissingQueryParametersFailure<T> extends Failure<
+  T,
+  "request/missing-query-parameters"
+> {
+  public readonly missingValues: string[];
+
+  constructor(missingValues: string[]) {
+    super({
+      code: "request/missing-query-parameters",
+      message: `Missing query parameters: ${missingValues.join(", ")}`,
+      status: 400,
+      errors: missingValues.reduce(
+        (e, v) => ({ ...e, [v]: "missing" }),
+        {} as Record<string, string>
+      ),
+    });
+    this.missingValues = missingValues;
   }
 }
 

@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import * as rateLimit from "express-rate-limit";
-import { conf } from "../conf";
 import { TooManyRequestsFailure } from "../utils/Failures";
 
 /**
@@ -23,6 +22,9 @@ export const rateLimiters = {
       return testRateLimiter;
     }
     return rateLimit({
+      keyGenerator: (request) => {
+        return `<${request.ip}>${request.method}@${request.path}#general`;
+      },
       windowMs: minutes(1),
       max: 500,
       handler: rateLimitExceededHandler,
@@ -35,7 +37,7 @@ export const rateLimiters = {
     }
     return rateLimit({
       keyGenerator: (request) => {
-        return `<${request.ip}>${request.method}@${request.path}`;
+        return `<${request.ip}>${request.method}@${request.path}#strict`;
       },
       windowMs: minutes(5),
       max: 5,

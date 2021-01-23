@@ -1,48 +1,47 @@
 import { transactionsRouter } from "..";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 import { patchTransactionSchema } from "../../schemas/transaction.schema";
-import { getProtectedTransaction } from "../../utils/getProtectedTransaction";
 import { prisma } from "../../server";
-import { mapTransactionToResponse } from "../../utils/mapTransactionToResponse";
 import {
   DatabaseAccessFailure,
   InvalidRequestDataFailure,
+  MissingUrlParametersFailure,
+  TransactionNotFoundFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
+import { TransactionService } from "../../services/TransactionService";
 
 transactionsRouter.patch("/:id", async (req, res, next) => {
   try {
+    // Ensure authenticated
     if (!req.data.auth.user) {
       return next(new UnauthenticatedFailure());
     }
 
-    /**
-     * Get ID from request parameters
-     */
-    const id = req.params.id;
-
-    /**
-     * Get transaction for user
-     */
-    const transaction = await getProtectedTransaction(req.data.auth.user, id);
-
-    if (transaction.isFailure()) {
-      return next(transaction);
+    // Ensure query parameter ID provided
+    if (!req.params.id) {
+      return next(new MissingUrlParametersFailure(["id"]));
     }
 
-    /**
-     * Validate request body
-     */
-    const body = await validateRequestBody(req, patchTransactionSchema);
+    // Get transaction
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: req.params.id },
+      include: { category: true },
+    });
 
+    // Ensure transaction found and belongs to authenticated user
+    if (!transaction || transaction.uid !== req.data.auth.user.id) {
+      return next(new TransactionNotFoundFailure());
+    }
+
+    // Validate request body
+    const body = await validateRequestBody(req, patchTransactionSchema);
     if (body.isFailure()) {
       return next(body);
     }
 
-    /**
-     * Ensure ID is not changed
-     */
-    if (body.value.id && body.value.id !== transaction.value.id) {
+    // Ensure ID is not being changed
+    if (body.value.id && body.value.id !== transaction.id) {
       return next(
         new InvalidRequestDataFailure({
           id: "Cannot update transaction ID",
@@ -50,10 +49,8 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
       );
     }
 
-    /**
-     * Ensure UID is not changed
-     */
-    if (body.value.uid && body.value.uid !== transaction.value.uid) {
+    // Ensure UID is not being changed
+    if (body.value.uid && body.value.uid !== transaction.uid) {
       return next(
         new InvalidRequestDataFailure({
           uid: "Cannot update transaction owner",
@@ -61,12 +58,10 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
       );
     }
 
-    /**
-     * Update transaction
-     */
+    // Update transaction
     const updated = await prisma.transaction.update({
       where: {
-        id: transaction.value.id,
+        id: transaction.id,
       },
       data: {
         comment: body.value.comment,
@@ -99,7 +94,7 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
     /**
      * Send updated transaction to user
      */
-    return res.json(mapTransactionToResponse(updated));
+    return res.json(TransactionService.mapTransactionToResponse(updated));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

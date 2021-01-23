@@ -6,24 +6,22 @@ import {
 } from "../../../schemas/transaction.schema";
 import { prisma } from "../../../server";
 import { v4 as uuid } from "uuid";
-import { mapTransactionToResponse } from "../../../utils/mapTransactionToResponse";
 import {
   DatabaseAccessFailure,
   InvalidRequestDataFailure,
-  TransactionAlreadyExistsFailure,
   UnauthenticatedFailure,
 } from "../../../utils/Failures";
 import { array, object } from "yup";
+import { TransactionService } from "../../../services/TransactionService";
 
 transactionsRouter.post("/mass/post", async (req, res, next) => {
   try {
+    // Ensure authenticated
     if (!req.data.auth.user) {
       return next(new UnauthenticatedFailure());
     }
 
-    /**
-     * Get request body and validate it
-     */
+    // Get request body and validate it
     const body = await validateRequestBody<{
       transactions: PostTransactionSchema[];
     }>(
@@ -32,18 +30,15 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
         transactions: array().of(postTransactionSchema).defined(),
       }).defined()
     );
-
     if (body.isFailure()) {
       return next(body);
     }
 
-    /**
-     * Ensure UID is same as authenticated user's if it exists
-     */
-    const invalidUids = body.value.transactions.some((_) => {
+    // Ensure UIDs are same as authenticated user's if they exist
+    const hasInvalidUids = body.value.transactions.some((_) => {
       _.uid && _.uid !== req.data.auth!.user!.id;
     });
-    if (invalidUids) {
+    if (hasInvalidUids) {
       return next(
         new InvalidRequestDataFailure({
           uid: "Cannot create transactions for another user id",
@@ -51,69 +46,68 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
       );
     }
 
-    /**
-     * Generate IDs or use provided IDs
-     */
-    const transactionsWithIds = body.value.transactions.map((_) => {
-      return {
-        ..._,
-        id: _.id || uuid(),
-      };
+    // Generate IDs or use provided IDs
+    const transactionsWithIds = body.value.transactions.map((transaction) => {
+      return { ...transaction, id: transaction.id || uuid() };
     });
 
-    /**
-     * Check no transaction already exists with IDs
-     */
-    const allExisting = await Promise.all(
-      transactionsWithIds.map((_) => {
-        return prisma.transaction.findUnique({
-          where: { id: _.id },
-        });
-      })
-    );
+    // Check no transaction already exists with IDs
+    const overlappingTransactions = await prisma.transaction.findMany({
+      where: {
+        id: {
+          in: transactionsWithIds.map((_) => _.id),
+        },
+      },
+    });
 
-    if (allExisting.some((_) => _ !== null)) {
-      return next(new TransactionAlreadyExistsFailure());
-    }
+    // Create lookup object of overlapping IDs for computational efficiency
+    const overlappingIds = overlappingTransactions.reduce((ids, _) => {
+      return { ...ids, [_.id]: true };
+    }, {} as Record<string, boolean>);
 
-    /**
-     * Create new transactions from body
-     */
-    const allCreated = await Promise.all(
-      transactionsWithIds.map((_) => {
-        return prisma.transaction.create({
-          data: {
-            id: _.id,
-            user: { connect: { id: req.data!.auth!.user!.id } },
-            integerAmount: _.integerAmount,
-            category: {
-              connectOrCreate: {
-                where: {
-                  value: _.category,
+    // Create new transactions from body
+    const allCreatedTransactions = await Promise.all(
+      transactionsWithIds
+        .filter((transaction) => !overlappingIds[transaction.id])
+        .map((transaction) => {
+          return prisma.transaction.create({
+            data: {
+              id: transaction.id,
+              integerAmount: transaction.integerAmount,
+              comment: transaction.comment,
+              time: new Date(transaction.time),
+              user: {
+                connect: {
+                  id: req.data!.auth!.user!.id,
                 },
-                create: {
-                  value: _.category,
-                  user: {
-                    connect: {
-                      id: req.data!.auth!.user!.id,
+              },
+              category: {
+                connectOrCreate: {
+                  where: {
+                    value: transaction.category,
+                  },
+                  create: {
+                    value: transaction.category,
+                    user: {
+                      connect: {
+                        id: req.data!.auth!.user!.id,
+                      },
                     },
                   },
                 },
               },
             },
-            comment: _.comment,
-            time: new Date(_.time),
-          },
-          include: {
-            category: true,
-          },
-        });
-      })
+            include: {
+              category: true,
+            },
+          });
+        })
     );
-    /**
-     * Send created transaction to user
-     */
-    return res.status(201).json(mapTransactionToResponse(allCreated));
+
+    // Send created transaction to user
+    return res
+      .status(201)
+      .json(TransactionService.compressTransactions(allCreatedTransactions));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

@@ -1,8 +1,8 @@
 import { authRouter } from "..";
 import { patchProfileSchema } from "../../schemas/profile.schema";
 import { prisma } from "../../server";
+import { UserService } from "../../services/UserService";
 import { UnauthenticatedFailure } from "../../utils/Failures";
-import { getPublicProfile } from "../../utils/getPublicProfile";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 
 authRouter.patch("/profile", async (req, res, next) => {
@@ -26,6 +26,9 @@ authRouter.patch("/profile", async (req, res, next) => {
     },
   });
 
+  // Create user service for updated user
+  const userService = new UserService(updatedUser);
+
   // Respond with updated profile record
-  res.json(getPublicProfile(updatedUser));
+  res.json(userService.getPublicProfileDetails());
 });

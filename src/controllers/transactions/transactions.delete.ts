@@ -1,40 +1,40 @@
 import { transactionsRouter } from "..";
-import { getProtectedTransaction } from "../../utils/getProtectedTransaction";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
+  MissingUrlParametersFailure,
+  TransactionNotFoundFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
 
 transactionsRouter.delete("/:id", async (req, res, next) => {
   try {
+    // Ensure authenticated
     if (!req.data.auth.user) {
       return next(new UnauthenticatedFailure());
     }
 
-    /**
-     * Get ID from request params
-     */
-    const id = req.params.id;
-
-    /**
-     * Find user's transaction with given ID
-     */
-    const transaction = await getProtectedTransaction(req.data.auth.user, id);
-
-    if (transaction.isFailure()) {
-      return next(transaction);
+    // Ensure query parameter ID provided
+    if (!req.params.id) {
+      return next(new MissingUrlParametersFailure(["id"]));
     }
 
-    /**
-     * Delete transaction
-     */
-    await prisma.transaction.delete({ where: { id: transaction.value.id } });
+    // Get transaction
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: req.params.id },
+      include: { category: true },
+    });
 
-    /**
-     * Respond with 204
-     */
-    return res.status(204).end();
+    // Ensure transaction found and belongs to authenticated user
+    if (!transaction || transaction.uid !== req.data.auth.user.id) {
+      return next(new TransactionNotFoundFailure());
+    }
+
+    // Delete transaction
+    await prisma.transaction.delete({ where: { id: transaction.id } });
+
+    // Respond with 204 and deleted ID for succesful deletion
+    return res.status(204).send({ id: transaction.id });
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

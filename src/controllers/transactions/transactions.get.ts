@@ -1,7 +1,7 @@
 import * as compression from "compression";
 import { transactionsRouter } from "..";
 import { prisma } from "../../server";
-import { compressTransactions } from "../../utils/compressTransactions";
+import { TransactionService } from "../../services/TransactionService";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
@@ -30,7 +30,7 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
     /**
      * Send transactions to user
      */
-    res.json(compressTransactions(transactions));
+    res.json(TransactionService.compressTransactions(transactions));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

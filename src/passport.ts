@@ -10,15 +10,13 @@ passport.serializeUser(async (user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
     if (typeof id === "string") {
-      const existingUser = await prisma.user.findUnique({
-        where: { id },
-      });
-      done(null, existingUser);
+      const user = await prisma.user.findUnique({ where: { id } });
+      done(null, user);
     } else {
-      done(null, undefined);
+      done(null, null);
     }
   } catch (e) {
-    done(e, undefined);
+    done(e, null);
   }
 });
 
@@ -49,32 +47,36 @@ passport.use(
         // Seek existing user by email
         const existingUser = await prisma.user.findUnique({ where: { email } });
 
-        // Existing user found:
+        // Existing user found: update missing fields and return
         if (existingUser) {
-          // Check which fields should be updated
-          const shouldUpdate = {
-            googleId: !existingUser.googleId,
-            photoUrl: !existingUser.photoUrl,
-            displayName: existingUser.displayName === existingUser.email,
-          };
+          let user = existingUser;
 
-          // If there were any updatable properties, update them
-          const shouldUpdateAny = Object.values(shouldUpdate).some(Boolean);
-          if (shouldUpdateAny) {
-            prisma.user.update({
-              where: { id: existingUser.id },
-              data: {
-                googleId: shouldUpdate.googleId ? googleId : undefined,
-                displayName: shouldUpdate.displayName
-                  ? profile.displayName
-                  : undefined,
-                photoUrl: shouldUpdate.photoUrl ? photoUrl : undefined,
-              },
+          // Update Google ID if none set
+          if (!user.googleId) {
+            user = await prisma.user.update({
+              where: { id: user.id },
+              data: { googleId },
+            });
+          }
+
+          // Update photo URL if none set
+          if (!user.photoUrl) {
+            user = await prisma.user.update({
+              where: { id: user.id },
+              data: { photoUrl },
+            });
+          }
+
+          // Update display name if none or default set
+          if (!user.displayName || user.displayName === email) {
+            user = await prisma.user.update({
+              where: { id: user.id },
+              data: { displayName: profile.displayName },
             });
           }
 
           // Return existing user
-          done(null, existingUser);
+          done(null, user);
         } else {
           // Create user if existing user not found.
           const createdUser = await prisma.user.create({

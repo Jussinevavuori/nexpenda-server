@@ -6,35 +6,31 @@ export class Mailer {
   /**
    * Mailgun instance
    */
-  private mg: mailgun.Mailgun;
+  public readonly mg: mailgun.Mailgun;
 
   /**
    * (In testing mode this should be true). When this flag is set to true, all
    * methods will return early.
    */
-  disabled: boolean;
+  public readonly isDisabled: boolean;
 
   /**
    * The default sender
    */
-  defaultSender: string;
+  public readonly defaultSender: string;
 
   /**
    * Constructor initializes a mailgun instance.
    */
   constructor() {
     // Disable in testing mode
-    if (process.env.NODE_ENV === "test") {
-      this.disabled = true;
-    }
+    this.isDisabled = process.env.NODE_ENV === "test";
 
     this.mg = mailgun({
       apiKey: conf.email.mailgun.apikey,
       domain: conf.email.mailgun.domain,
       host: conf.email.mailgun.host,
     });
-
-    this.disabled = false;
 
     this.defaultSender = `Nexpenda <${conf.email.defaultSender}>`;
   }
@@ -59,15 +55,18 @@ export class Mailer {
    * ```
    */
   useMailgun<T>(callback: (mg: mailgun.Mailgun) => T): T | Promise<void> {
-    if (this.disabled) return Promise.resolve();
+    if (this.isDisabled) return Promise.resolve();
     return callback(this.mg);
   }
 
   /**
    * Used to send templates to a receiver.
    */
-  sendTemplate<T extends AbstractTemplate>(to: string, template: T) {
-    if (this.disabled) return Promise.resolve();
+  async sendTemplate<T extends AbstractTemplate>(to: string, template: T) {
+    if (this.isDisabled) {
+      return;
+    }
+
     try {
       const body:
         | Partial<mailgun.messages.SendData>
@@ -97,6 +96,7 @@ export class Mailer {
       );
     } catch (e) {
       console.error(`An error occured in Mailer.sendTemplate`, e);
+      return;
     }
   }
 }

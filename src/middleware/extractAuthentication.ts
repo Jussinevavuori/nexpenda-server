@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { prisma } from "../server";
 import { AccessToken } from "../services/AccessToken";
 import { RefreshToken } from "../services/RefreshToken";
+import { UserService } from "../services/UserService";
 
 export function extractAuthentication() {
   return async function extractAuthenticationMiddleware(
@@ -89,6 +90,7 @@ export function extractAuthentication() {
      * Apply found user to request and continue
      */
     request.data.auth.user = user;
+
     next();
   };
 }

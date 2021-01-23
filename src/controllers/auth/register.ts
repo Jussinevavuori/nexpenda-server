@@ -6,64 +6,55 @@ import { Password } from "../../services/Password";
 import { Mailer } from "../../services/Mailer";
 import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
 import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
-import { UserAlreadyExistsFailure } from "../../utils/Failures";
+import {
+  DatabaseAccessFailure,
+  UserAlreadyExistsFailure,
+} from "../../utils/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
 
 authRouter.post("/register", rateLimiters.strict(), async (req, res, next) => {
-  /**
-   * Validate request body
-   */
-  const body = await validateRequestBody(req, authSchema);
+  try {
+    // Validate request body
+    const body = await validateRequestBody(req, authSchema);
+    if (body.isFailure()) {
+      return next(body);
+    }
 
-  if (body.isFailure()) {
-    return next(body);
-  }
+    // Check for existing users with given email
+    const existingUser = await prisma.user.findUnique({
+      where: { email: body.value.email },
+    });
+    if (existingUser) {
+      return next(new UserAlreadyExistsFailure());
+    }
 
-  /**
-   * Check for existing users with given email
-   */
-  const existingUser = await prisma.user.findUnique({
-    where: { email: body.value.email },
-  });
+    // Hash password
+    const hashedPassword = await Password.hash(body.value.password);
 
-  if (existingUser) {
-    return next(new UserAlreadyExistsFailure());
-  }
-
-  /**
-   * Hash given password
-   */
-  const hashedPassword = await Password.hash(body.value.password);
-
-  /**
-   * Create user
-   */
-  const user = await prisma.user.create({
-    data: {
-      displayName: body.value.email,
-      email: body.value.email,
-      password: hashedPassword,
-    },
-  });
-
-  /**
-   * Generate confirm email token for user
-   */
-  const token = new ConfirmEmailToken(user);
-
-  if (user.email) {
-    /**
-     * Send confirm email to user
-     */
-    const mailer = new Mailer();
-
-    const template = new ConfirmEmailTemplate({
-      email: user.email,
-      url: token.generateURL(),
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        displayName: body.value.email,
+        email: body.value.email,
+        password: hashedPassword,
+      },
     });
 
-    await mailer.sendTemplate(user.email, template);
-  }
+    // Generate confirm email token for user
+    const token = new ConfirmEmailToken(user);
 
-  res.end();
+    // Send confirmation email if email given
+    if (user.email) {
+      const mailer = new Mailer();
+      const template = new ConfirmEmailTemplate({
+        email: user.email,
+        url: token.generateURL(),
+      });
+      await mailer.sendTemplate(user.email, template);
+    }
+
+    return res.end();
+  } catch (e) {
+    return next(new DatabaseAccessFailure());
+  }
 });
