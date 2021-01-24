@@ -5,6 +5,7 @@ const uid = () => string();
 const integerAmount = () => number().integer();
 const time = () => number().positive().integer();
 const category = () => string().min(1);
+const categoryIcon = () => string();
 const comment = () => string();
 
 export const postTransactionSchema = object({
@@ -13,6 +14,7 @@ export const postTransactionSchema = object({
   time: time().required(),
   comment: comment(),
   category: category().required(),
+  categoryIcon: categoryIcon(),
   integerAmount: integerAmount().required(),
 }).required();
 
@@ -24,6 +26,7 @@ export const putTransactionSchema = object({
   time: time().defined().required(),
   comment: comment(),
   category: category().defined().required(),
+  categoryIcon: categoryIcon(),
   integerAmount: integerAmount().defined().required(),
 }).required();
 
@@ -35,6 +38,7 @@ export const patchTransactionSchema = object({
   time: time(),
   comment: comment().nullable(),
   category: category(),
+  categoryIcon: categoryIcon(),
   integerAmount: integerAmount(),
 }).required();
 

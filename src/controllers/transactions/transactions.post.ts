@@ -10,6 +10,7 @@ import {
   UnauthenticatedFailure,
 } from "../../utils/Failures";
 import { TransactionService } from "../../services/TransactionService";
+import { connect } from "http2";
 
 transactionsRouter.post("/", async (req, res, next) => {
   try {
@@ -77,10 +78,36 @@ transactionsRouter.post("/", async (req, res, next) => {
       },
     });
 
+    // Update icon if updated icon given
+    if (
+      body.value.categoryIcon &&
+      body.value.categoryIcon !== created.category.icon
+    ) {
+      const updatedCategory = await prisma.category.update({
+        where: {
+          id: created.category.id,
+        },
+        data: {
+          icon: body.value.categoryIcon,
+        },
+      });
+
+      // Short-circuit and send transaction to user with 201 status
+      // and updated category
+      return res.status(201).json(
+        TransactionService.mapTransactionToResponse({
+          ...created,
+          category: updatedCategory,
+        })
+      );
+    }
+
     /**
      * Send created transaction to user with 201 status
      */
-    return res.json(TransactionService.mapTransactionToResponse(created));
+    return res
+      .status(201)
+      .json(TransactionService.mapTransactionToResponse(created));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

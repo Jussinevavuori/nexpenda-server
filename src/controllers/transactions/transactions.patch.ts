@@ -91,9 +91,30 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
       },
     });
 
-    /**
-     * Send updated transaction to user
-     */
+    // Update icon if updated icon given
+    if (
+      body.value.categoryIcon &&
+      body.value.categoryIcon !== updated.category.icon
+    ) {
+      const updatedCategory = await prisma.category.update({
+        where: {
+          id: updated.category.id,
+        },
+        data: {
+          icon: body.value.categoryIcon,
+        },
+      });
+
+      // Short-circuit and send transaction and updated category to user
+      return res.json(
+        TransactionService.mapTransactionToResponse({
+          ...updated,
+          category: updatedCategory,
+        })
+      );
+    }
+
+    // Send updated transaction to user
     return res.json(TransactionService.mapTransactionToResponse(updated));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
