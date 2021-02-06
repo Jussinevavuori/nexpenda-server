@@ -84,7 +84,10 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
               category: {
                 connectOrCreate: {
                   where: {
-                    value: transaction.category,
+                    Category_uid_value_unique_constraint: {
+                      uid: req.data!.auth!.user!.id,
+                      value: transaction.category,
+                    },
                   },
                   create: {
                     value: transaction.category,
