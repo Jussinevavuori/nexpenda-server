@@ -1,11 +1,11 @@
-import * as yup from "yup";
+import { ObjectSchema, ValidationError } from "yup";
 import { Request } from "express";
 import { Success } from "./Result";
 import { InvalidRequestDataFailure } from "./Failures";
 
 export async function validateRequestBody<T extends object>(
   request: Request,
-  schema: yup.ObjectSchema<T>
+  schema: ObjectSchema<T>
 ) {
   /**
    * Ensure request body is defined
@@ -50,7 +50,7 @@ export async function validateRequestBody<T extends object>(
     })
     .catch((error) => {
       // Parse yup validation error fields
-      if (error instanceof yup.ValidationError) {
+      if (error instanceof ValidationError) {
         return new InvalidRequestDataFailure<T>(
           error.inner.reduce((errors, next) => {
             return { ...errors, [next.path]: next.message };

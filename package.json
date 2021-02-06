@@ -60,6 +60,7 @@
     "ts-node": "^8.10.2"
   },
   "dependencies": {
+    "@google-cloud/firestore": "^4.9.2",
     "@prisma/client": "^2.12.1",
     "@types/mailgun-js": "^0.22.11",
     "bcryptjs": "^2.4.3",

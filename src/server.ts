@@ -4,12 +4,14 @@ import * as passport from "passport";
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as nocache from "nocache";
+import { Firestore } from "@google-cloud/firestore";
 import { createServer, Server } from "http";
 import {
   pingRouter,
   authRouter,
   transactionsRouter,
   categoriesRouter,
+  configurationRouter,
 } from "./controllers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -28,6 +30,10 @@ export const app: express.Application = express();
 export const http = createServer(app);
 export const io = socketIO(http);
 export let prisma = new PrismaClient();
+export let firestore = new Firestore({
+  projectId: conf.google.projectId,
+  keyFilename: conf.google.applicationCredentials,
+});
 export let server: undefined | Server;
 
 export function startServer() {
@@ -69,6 +75,7 @@ export function startServer() {
       app.use("/api/auth", authRouter);
       app.use("/api/categories", categoriesRouter);
       app.use("/api/transactions", transactionsRouter);
+      app.use("/api/config", configurationRouter);
       logger("Configured endpoints");
 
       // Redirect users who navigate to backend URl

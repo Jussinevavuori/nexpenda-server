@@ -4,6 +4,7 @@ export const pingRouter = Router();
 export const authRouter = Router();
 export const transactionsRouter = Router();
 export const categoriesRouter = Router();
+export const configurationRouter = Router();
 
 import "./ping/ping";
 
@@ -31,3 +32,6 @@ import "./transactions/transactions.delete";
 
 import "./transactions/mass/transactions.mass.post";
 import "./transactions/mass/transactions.mass.delete";
+
+import "./configuration/configuration.get";
+import "./configuration/configuration.patch";

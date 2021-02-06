@@ -22,6 +22,8 @@ export const conf = {
   google: {
     clientId: ENV("GOOGLE_CLIENTID"),
     clientSecret: ENV("GOOGLE_CLIENTSECRET"),
+    applicationCredentials: ENV("GOOGLE_APPLICATION_CREDENTIALS"),
+    projectId: ENV("GOOGLE_PROJECTID"),
   },
 
   token: {

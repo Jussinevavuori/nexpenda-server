@@ -19,6 +19,7 @@ export type ServerFailureCode =
   | "auth/email-already-confirmed"
   | "mail/error"
   | "database/access-failure"
+  | "failure/validation"
   | "failure/unimplemented"
   | "failure/error"
   | "failure/unknown"
@@ -266,6 +267,16 @@ export class DatabaseAccessFailure<T> extends Failure<
   }
 }
 
+export class ValidationFailure<T> extends Failure<T, "failure/validation"> {
+  constructor(errors: Failure<T, "invalid-request-data">["errors"]) {
+    super({
+      code: "failure/validation",
+      status: 500,
+      message: "Unknown validation failure",
+      errors: errors,
+    });
+  }
+}
 export class UnimplementedFailure<T> extends Failure<
   T,
   "failure/unimplemented"
