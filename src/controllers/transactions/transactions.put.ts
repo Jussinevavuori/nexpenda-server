@@ -84,7 +84,10 @@ transactionsRouter.put("/:id", async (req, res, next) => {
         category: {
           connectOrCreate: {
             where: {
-              value: body.value.category,
+              Category_uid_value_unique_constraint: {
+                uid: req.data.auth.user.id,
+                value: body.value.category,
+              },
             },
             create: {
               value: body.value.category,
