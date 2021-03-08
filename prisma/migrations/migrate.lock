@@ -6,3 +6,5 @@
 20210123124455-category-icon-user-is-admin
 20210206133241-remove-category-value-unique-constraint
 20210206134437-category-uid-value-unique-constraint
+20210308134612-add-preferes-color-scheme
+20210308134646-prefers-color-schema-map

@@ -4,7 +4,7 @@ generator client {
 
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model Transaction {
@@ -31,7 +31,7 @@ model User {
   tokenVersion       Int     @default(1) @map("token_version")
   disabled           Boolean @default(false)
   isAdmin            Boolean @default(false)
-  prefersColorScheme String? @map("prefers_color_scheme")
+  prefersColorScheme String?
 
   transactions Transaction[]
   categories   Category[]

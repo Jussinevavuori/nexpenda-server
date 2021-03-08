@@ -66,6 +66,11 @@ export const conf = {
     defaultSender: ENV("EMAIL_DEFAULT_SENDER"),
   },
 
+  stripe: {
+    publishableKey: ENV("STRIPE_PUBLISHABLE_KEY"),
+    secretKey: ENV("STRIPE_SECRET_KEY"),
+  },
+
   hosts: {
     client: ENV("HOSTS_CLIENT"),
     server: ENV("HOSTS_SERVER"),

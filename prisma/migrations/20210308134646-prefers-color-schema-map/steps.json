@@ -1,0 +1,30 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "prefersColorScheme"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "prefersColorScheme"
+        },
+        "directive": "map"
+      },
+      "argument": "",
+      "value": "\"prefers_color_scheme\""
+    }
+  ]
+}

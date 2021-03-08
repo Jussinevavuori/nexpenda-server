@@ -23,6 +23,7 @@ authRouter.patch("/profile", async (req, res, next) => {
     where: { id: user.id },
     data: {
       displayName: body.value.displayName,
+      prefersColorScheme: body.value.prefersColorScheme,
     },
   });
 

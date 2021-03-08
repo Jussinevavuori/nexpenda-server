@@ -14,6 +14,7 @@ export class UserService {
       photoUrl: this.user.photoUrl ?? undefined,
       email: this.user.email ?? undefined,
       googleId: this.user.googleId ?? undefined,
+      prefersColorScheme: this.user.prefersColorScheme ?? undefined,
     };
   }
 }
