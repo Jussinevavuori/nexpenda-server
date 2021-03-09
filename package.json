@@ -17,9 +17,9 @@
     "test": "cross-env NODE_ENV=test ts-node --files ./src/tests/runTests.ts",
     "migrate": "cd ./prisma && migrate.bat",
     "migrate:dev": "cd ./prisma && migrate-dev.bat",
-    "studio:dev": "cd ../prismastudio/dev && node update-schema && npx prisma studio --experimental",
-    "studio:prod": "cd ../prismastudio/prod && node update-schema && npx prisma studio --experimental",
-    "studio:test": "cd ../prismastudio/test && node update-schema && npx prisma studio --experimental",
+    "studio:dev": "cd ../nexpenda-prismastudio/dev && node update-schema && npx prisma studio --experimental",
+    "studio:prod": "cd ../nexpenda-prismastudio/prod && node update-schema && npx prisma studio --experimental",
+    "studio:test": "cd ../nexpenda-prismastudio/test && node update-schema && npx prisma studio --experimental",
     "psql:dev": "psql expencedev postgres",
     "deploy": "gcloud builds submit"
   },
