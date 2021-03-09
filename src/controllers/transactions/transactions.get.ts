@@ -13,6 +13,8 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
       return next(new UnauthenticatedFailure());
     }
 
+		const start =  new Date()
+
     /**
      * Get all transactions for user
      */
@@ -26,6 +28,12 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
         category: true,
       },
     });
+
+		const end =  new Date()
+
+		const ms = end.getTime() - start.getTime()
+
+		console.log(`Fetching ${transactions.length} transactions took ${ms}ms`)
 
     /**
      * Send transactions to user
