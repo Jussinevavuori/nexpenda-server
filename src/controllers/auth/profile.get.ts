@@ -7,7 +7,5 @@ authRouter.get("/profile", (req, res, next) => {
     return next(new UnauthenticatedFailure());
   }
 
-  const userService = new UserService(req.data.auth.user);
-
-  return res.json(userService.getPublicProfileDetails());
+  return res.json(UserService.getPublicProfileDetails(req.data.auth.user));
 });

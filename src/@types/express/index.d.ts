@@ -22,11 +22,6 @@ declare namespace Express {
         user?: import("@prisma/client").User;
 
         /**
-         * User service for user
-         */
-        userService?: import("../../services/UserService").UserService;
-
-        /**
          * Was an access token found in the request?
          */
         accessTokenFound?: boolean;

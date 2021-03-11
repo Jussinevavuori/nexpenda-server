@@ -27,9 +27,6 @@ authRouter.patch("/profile", async (req, res, next) => {
     },
   });
 
-  // Create user service for updated user
-  const userService = new UserService(updatedUser);
-
   // Respond with updated profile record
-  res.json(userService.getPublicProfileDetails());
+  res.json(UserService.getPublicProfileDetails(updatedUser));
 });

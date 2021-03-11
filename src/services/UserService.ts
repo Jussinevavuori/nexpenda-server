@@ -1,20 +1,15 @@
 import { User } from "@prisma/client";
 
 export class UserService {
-  public readonly user: User;
-
-  constructor(user: User) {
-    this.user = user;
-  }
-
-  public getPublicProfileDetails() {
+  static getPublicProfileDetails(user: User) {
     return {
-      id: this.user.id,
-      displayName: this.user.displayName ?? undefined,
-      photoUrl: this.user.photoUrl ?? undefined,
-      email: this.user.email ?? undefined,
-      googleId: this.user.googleId ?? undefined,
-      prefersColorScheme: this.user.prefersColorScheme ?? undefined,
+      id: user.id,
+      displayName: user.displayName ?? undefined,
+      photoUrl: user.photoUrl ?? undefined,
+      email: user.email ?? undefined,
+      googleId: user.googleId ?? undefined,
+      prefersColorScheme: user.prefersColorScheme ?? undefined,
+      isAdmin: user.isAdmin,
     };
   }
 }
