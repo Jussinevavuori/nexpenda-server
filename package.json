@@ -17,6 +17,7 @@
     "test": "cross-env NODE_ENV=test ts-node --files ./src/tests/runTests.ts",
     "migrate": "cd ./prisma && migrate.bat",
     "migrate:dev": "cd ./prisma && migrate-dev.bat",
+    "migrate:prod": "cd ./prisma && migrate-prod.bat",
     "studio:dev": "cd ../nexpenda-prismastudio/dev && node update-schema && npx prisma studio --experimental",
     "studio:prod": "cd ../nexpenda-prismastudio/prod && node update-schema && npx prisma studio --experimental",
     "studio:test": "cd ../nexpenda-prismastudio/test && node update-schema && npx prisma studio --experimental",
@@ -63,6 +64,7 @@
     "@google-cloud/firestore": "^4.9.2",
     "@prisma/client": "^2.12.1",
     "@types/mailgun-js": "^0.22.11",
+    "@types/stripe": "^8.0.417",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
@@ -84,6 +86,7 @@
     "passport-google-oauth": "^2.0.0",
     "pg": "^8.3.0",
     "socket.io": "^2.3.0",
+    "stripe": "^8.137.0",
     "typescript": "^3.9.7",
     "uuid": "^8.3.0",
     "yup": "^0.29.3"

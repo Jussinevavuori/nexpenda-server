@@ -14,6 +14,26 @@
             },
             {
               "name": "name",
+              "value": "\"unique_uid_value\""
+            }
+          ]
+        },
+        "directive": "unique"
+      }
+    },
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Model",
+          "model": "Category",
+          "arguments": [
+            {
+              "name": "",
+              "value": "[uid, value]"
+            },
+            {
+              "name": "name",
               "value": "\"Category_uid_value_unique_constraint\""
             }
           ]

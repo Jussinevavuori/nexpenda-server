@@ -5,6 +5,7 @@ export const authRouter = Router();
 export const transactionsRouter = Router();
 export const categoriesRouter = Router();
 export const configurationRouter = Router();
+export const stripeRouter = Router();
 
 import "./ping/ping";
 
@@ -35,3 +36,6 @@ import "./transactions/mass/transactions.mass.delete";
 
 import "./configuration/configuration.get";
 import "./configuration/configuration.patch";
+
+import "./stripe/create_checkout_session.post";
+import "./stripe/products.get";

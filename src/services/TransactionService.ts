@@ -6,6 +6,7 @@ export type TransactionResponseMappable = Transaction & { category: Category };
 export type TransactionResponse = {
   id: string;
   time: number;
+  createdAt: number;
   integerAmount: number;
   comment?: string | undefined;
   category: {
@@ -18,7 +19,8 @@ export type TransactionResponse = {
 export type CompressedDataJson = {
   t: {
     id: string; // ID
-    t: number; // Time (epoch)
+    t: number; // Time (epoch, seconds)
+    ca: number; // Time (epoch, seconds)
     cid: string; // Category ID
     a: number; // Amount
     c?: string | undefined; // Comment
@@ -60,6 +62,7 @@ export class TransactionService {
         time: transaction.time.getTime(),
         integerAmount: transaction.integerAmount,
         comment: transaction.comment ?? undefined,
+        createdAt: transaction.createdAt.getTime(),
         category: {
           id: transaction.category.id,
           value: transaction.category.value,
@@ -90,7 +93,8 @@ export class TransactionService {
         id: t.id,
         cid: t.categoryId,
         a: t.integerAmount,
-        t: t.time.getTime(),
+        t: Math.floor(t.time.getTime() / 1000),
+        ca: Math.floor(t.createdAt.getTime() / 1000),
         c: t.comment ?? undefined,
       })),
       c: categories.map((c) => ({

@@ -4,7 +4,7 @@ generator client {
 
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model Transaction {
@@ -56,6 +56,6 @@ model Category {
 
   Transaction Transaction[]
 
-  @@unique([uid, value], name: "unique_uid_value")
+  @@unique([uid, value], name: "Category_uid_value_unique_constraint")
   @@map(name: "categories")
 }

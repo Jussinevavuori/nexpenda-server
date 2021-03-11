@@ -7,8 +7,8 @@ move .env .env_temporary
 cd ./prisma
 
 
-ECHO @ Loading DEV environment
-move .dev_env .env
+ECHO @ Loading PROD environment
+move .prod_env .env
 cd ..
 
 
@@ -16,22 +16,7 @@ ECHO @ Creating migrations
 call npx prisma migrate save --experimental
 
 
-ECHO @ Running migrations on DEV
-call npx prisma migrate up --experimental
-
-
-ECHO @ Loading TEST environment
-cd .\prisma
-move .env .dev_env
-move .test_env .env
-cd ..
-
-
-ECHO @ Creating migrations
-call npx prisma migrate save --experimental
-
-
-ECHO @ Running migrations on TEST
+ECHO @ Running migrations on PROD
 call npx prisma migrate up --experimental
 
 

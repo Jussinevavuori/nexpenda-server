@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { DatabaseAccessFailure } from "../utils/Failures";
+import { DatabaseAccessFailure, StripeFailure } from "../utils/Failures";
 import { Failure } from "../utils/Result";
 
 export function handleFailure(
@@ -17,6 +17,10 @@ export function handleFailure(
           failure.code,
           failure.error
         );
+      }
+
+      if (failure instanceof StripeFailure) {
+        console.log(failure);
       }
 
       return res.status(failure.status).json({

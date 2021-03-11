@@ -5,6 +5,8 @@
 .env
 .env.*
 
+connect-to-prod-db.cmd
+
 /prisma/.dev_env
 /prisma/.prod_env
 /prisma/.test_env

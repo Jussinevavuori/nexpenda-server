@@ -12,6 +12,7 @@ import {
   transactionsRouter,
   categoriesRouter,
   configurationRouter,
+  stripeRouter,
 } from "./controllers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -76,6 +77,7 @@ export function startServer() {
       app.use("/api/categories", categoriesRouter);
       app.use("/api/transactions", transactionsRouter);
       app.use("/api/config", configurationRouter);
+      app.use("/api/stripe", stripeRouter);
       logger("Configured endpoints");
 
       // Redirect users who navigate to backend URl

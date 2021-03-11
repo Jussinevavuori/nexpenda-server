@@ -102,12 +102,11 @@ describe("/api/transactions/ [GET]", () => {
     expect(full[0].id).toBe(transactions[0].id);
     expect(full[0].c).toBe(transactions[0].comment);
     expect(full[0].a).toBe(transactions[0].integerAmount);
-    expect(full[0].t).toBe(transactions[0].time);
+    expect(full[0].t).toBe(Math.floor(transactions[0].time / 1000));
     expect(full[0].uid).toBeUndefined();
     expect(full[0].category.id).toBeDefined();
     expect(full[0].category.v).toBe(transactions[0].category);
-    expect(full[0].category.ii).toBeDefined();
-    expect(full[0].category.ei).toBeDefined();
+    expect(full[0].category.i).toBeDefined();
 
     expect(body.t).toHaveLength(2);
     expect(body.c).toHaveLength(2);

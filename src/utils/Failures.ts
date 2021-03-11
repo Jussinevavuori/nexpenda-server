@@ -19,6 +19,7 @@ export type ServerFailureCode =
   | "auth/email-already-confirmed"
   | "mail/error"
   | "database/access-failure"
+  | "stripe/failure"
   | "failure/validation"
   | "failure/unimplemented"
   | "failure/error"
@@ -311,5 +312,17 @@ export class UnknownFailure<T> extends Failure<T, "failure/unknown"> {
 export class CorsFailure<T> extends Failure<T, "failure/cors"> {
   constructor() {
     super({ code: "failure/cors", status: 400, message: "Cors failure" });
+  }
+}
+
+export class StripeFailure<T> extends Failure<T, "stripe/failure"> {
+  errorName: string;
+  constructor(error: Error) {
+    super({
+      code: "stripe/failure",
+      status: 400,
+      message: error.message,
+    });
+    this.errorName = error.name;
   }
 }

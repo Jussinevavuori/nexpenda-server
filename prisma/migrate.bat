@@ -27,6 +27,10 @@ move .test_env .env
 cd ..
 
 
+ECHO @ Creating migrations
+call npx prisma migrate save --experimental
+
+
 ECHO @ Running migrations on TEST
 call npx prisma migrate up --experimental
 
@@ -36,6 +40,10 @@ cd .\prisma
 move .env .test_env
 move .prod_env .env
 cd ..
+
+
+ECHO @ Creating migrations
+call npx prisma migrate save --experimental
 
 
 ECHO @ Running migrations on PROD

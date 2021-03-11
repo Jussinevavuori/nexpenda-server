@@ -1,10 +1,4 @@
 # Prisma Migrate lockfile v1
 
-20200903094505-init
-20210118162229-2021-01-18t18-22
-20210118175805-no-null-category
-20210123124455-category-icon-user-is-admin
-20210206133241-remove-category-value-unique-constraint
-20210206134437-category-uid-value-unique-constraint
-20210308134612-add-preferes-color-scheme
-20210308134646-prefers-color-schema-map
+20210311094709-init-2021-03-11
+20210311095359-rename-unique-categories-constraint

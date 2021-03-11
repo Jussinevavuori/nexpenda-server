@@ -65,7 +65,7 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
       return { ...ids, [_.id]: true };
     }, {} as Record<string, boolean>);
 
-    // Create new transactions from body
+	    // Create new transactions from body
     const allCreatedTransactions = await Promise.all(
       transactionsWithIds
         .filter((transaction) => !overlappingIds[transaction.id])
@@ -84,7 +84,7 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
               category: {
                 connectOrCreate: {
                   where: {
-                    Category_uid_value_unique_constraint: {
+                    unique_uid_value: {
                       uid: req.data!.auth!.user!.id,
                       value: transaction.category,
                     },
