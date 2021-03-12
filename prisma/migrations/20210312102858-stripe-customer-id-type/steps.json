@@ -1,0 +1,42 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "stripeCustomerId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "stripeCustomerId"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "stripeCustomerId"
+        },
+        "directive": "map"
+      },
+      "argument": "",
+      "value": "\"stripe_customer_id\""
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "stripeCustomedId"
+    }
+  ]
+}

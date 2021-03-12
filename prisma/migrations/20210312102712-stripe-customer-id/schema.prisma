@@ -4,7 +4,7 @@ generator client {
 
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model Transaction {
@@ -37,7 +37,7 @@ model User {
   prefersColorScheme String?  @map("prefers_color_scheme")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
-  stripeCustomerId   String?  @map("stripe_customer_id")
+  stripeCustomedId   String?  @map("stripe_customer_id")
 
   transactions Transaction[]
   categories   Category[]

@@ -12,7 +12,6 @@ authRouter.get("/refresh_token", async (req, res, next) => {
    * Get refresh token and ensure it exists
    */
   const refreshToken = await RefreshToken.fromRequest(req);
-
   if (!refreshToken) {
     return next(new UnauthenticatedFailure());
   }
@@ -21,7 +20,6 @@ authRouter.get("/refresh_token", async (req, res, next) => {
    * Verify refresh token
    */
   const refreshTokenVerified = await refreshToken.verify();
-
   if (!refreshTokenVerified) {
     return next(new UnauthenticatedFailure());
   }
@@ -30,18 +28,16 @@ authRouter.get("/refresh_token", async (req, res, next) => {
    * Create access token
    */
   const accessToken = new AccessToken(refreshToken);
-
   if (!accessToken) {
-    return next(new TokenFailure());
+    return next(new TokenFailure().withStatus(500));
   }
 
   /**
    * Verify created access token
    */
   const accessTokenVerified = await accessToken.verify();
-
   if (!accessTokenVerified) {
-    return next(new InvalidTokenFailure());
+    return next(new InvalidTokenFailure().withStatus(500));
   }
 
   /**

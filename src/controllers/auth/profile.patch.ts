@@ -1,6 +1,7 @@
 import { authRouter } from "..";
 import { patchProfileSchema } from "../../schemas/profile.schema";
 import { prisma } from "../../server";
+import { StripeUtils } from "../../services/Stripe";
 import { UserService } from "../../services/UserService";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 import { validateRequestBody } from "../../utils/validateRequestBody";
@@ -27,6 +28,16 @@ authRouter.patch("/profile", async (req, res, next) => {
     },
   });
 
+  const customer = await StripeUtils.getUserCustomer(updatedUser);
+  const subscriptions = customer
+    ? await StripeUtils.getSubscriptionsForCustomer(customer.id)
+    : undefined;
+
   // Respond with updated profile record
-  res.json(UserService.getPublicProfileDetails(updatedUser));
+  res.json(
+    UserService.getPublicProfileDetails(updatedUser, {
+      customer,
+      subscriptions,
+    })
+  );
 });
