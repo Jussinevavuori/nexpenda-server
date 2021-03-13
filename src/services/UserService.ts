@@ -33,7 +33,7 @@ export class UserService {
           object: sub.object,
           cancel_at: sub.cancel_at,
           canceled_at: sub.canceled_at,
-          canceled_at_period_end: sub.cancel_at_period_end,
+          cancel_at_period_end: sub.cancel_at_period_end,
           collection_method: sub.collection_method,
           created: sub.created,
           current_period_end: sub.current_period_end,
