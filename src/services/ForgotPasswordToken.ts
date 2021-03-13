@@ -1,13 +1,10 @@
-import * as yup from "yup";
+import * as z from "zod";
 import { conf } from "../conf";
 import { User } from "@prisma/client";
 import { AbstractToken } from "./AbstractToken";
 import { prisma } from "../server";
 
-type IForgotPasswordToken = {
-  uid: string;
-  vrs: number;
-};
+type IForgotPasswordToken = z.TypeOf<typeof ForgotPasswordToken["schema"]>;
 
 export class ForgotPasswordToken
   extends AbstractToken<IForgotPasswordToken>
@@ -31,7 +28,7 @@ export class ForgotPasswordToken
     super(
       typeof arg === "string" ? arg : { uid: arg.id, vrs: arg.tokenVersion },
       {
-        schema: ForgotPasswordToken.schema,
+        schema: (_) => _.merge(ForgotPasswordToken.schema),
         tkt: "forgot_password",
         secret: conf.token.forgotPasswordToken.secret,
         expiresIn: conf.token.forgotPasswordToken.expiresIn,
@@ -61,10 +58,8 @@ export class ForgotPasswordToken
   /**
    * Schema for validating token payloads
    */
-  static schema: yup.ObjectSchema<IForgotPasswordToken> = yup
-    .object({
-      uid: yup.string().required(),
-      vrs: yup.number().required().integer(),
-    })
-    .required();
+  static schema = z.object({
+    uid: z.string(),
+    vrs: z.number().int(),
+  });
 }

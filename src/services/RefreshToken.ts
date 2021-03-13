@@ -1,14 +1,11 @@
+import * as z from "zod";
 import { Request, Response } from "express";
 import { User } from "@prisma/client";
 import { conf } from "../conf";
-import * as yup from "yup";
 import { prisma } from "../server";
 import { AbstractToken } from "./AbstractToken";
 
-type IRefreshToken = {
-  uid: string;
-  vrs: number;
-};
+type IRefreshToken = z.TypeOf<typeof RefreshToken["schema"]>;
 
 export class RefreshToken
   extends AbstractToken<IRefreshToken>
@@ -31,7 +28,7 @@ export class RefreshToken
     super(
       typeof arg === "string" ? arg : { uid: arg.id, vrs: arg.tokenVersion },
       {
-        schema: RefreshToken.schema,
+        schema: (_) => _.merge(RefreshToken.schema),
         tkt: "refresh",
         secret: conf.token.refreshToken.secret,
         expiresIn: conf.token.refreshToken.expiresIn,
@@ -65,12 +62,10 @@ export class RefreshToken
   /**
    * The refresh token schema for validating a refresh token upon parsing
    */
-  static schema: yup.ObjectSchema<IRefreshToken> = yup
-    .object({
-      uid: yup.string().required(),
-      vrs: yup.number().required().integer(),
-    })
-    .required();
+  static schema = z.object({
+    uid: z.string(),
+    vrs: z.number().int(),
+  });
 
   /**
    * Get refresh token from request cookies. Only returns a refresh token if

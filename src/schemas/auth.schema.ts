@@ -1,20 +1,20 @@
-import { object, string, InferType } from "yup";
+import * as z from "zod";
 
-export const emailOnlyAuthSchema = object({
-  email: string().required().email().max(255),
-}).required();
+export const emailOnlyAuthSchema = z.object({
+  email: z.string().email().max(255),
+});
 
-export const passwordOnlyAuthSchema = object({
-  password: string().required().min(6).max(255),
-}).required();
+export const passwordOnlyAuthSchema = z.object({
+  password: z.string().min(6).max(255),
+});
 
-export const authSchema = object({
-  email: string().required().email().max(255),
-  password: string().required().min(6).max(255),
-}).required();
+export const authSchema = z.object({
+  email: z.string().email().max(255),
+  password: z.string().min(6).max(255),
+});
 
-export type EmailOnlyAuthSchema = InferType<typeof emailOnlyAuthSchema>;
+export type EmailOnlyAuthSchema = z.TypeOf<typeof emailOnlyAuthSchema>;
 
-export type PasswordOnlyAuthSchema = InferType<typeof passwordOnlyAuthSchema>;
+export type PasswordOnlyAuthSchema = z.TypeOf<typeof passwordOnlyAuthSchema>;
 
-export type AuthSchema = InferType<typeof authSchema>;
+export type AuthSchema = z.TypeOf<typeof authSchema>;

@@ -1,6 +1,5 @@
 import { User } from "@prisma/client";
 import Stripe from "stripe";
-import { resolveTripleslashReference } from "typescript";
 
 export class UserService {
   static getPublicProfileDetails(
@@ -20,34 +19,32 @@ export class UserService {
       isAdmin: user.isAdmin,
       isPremium: stripe.subscriptions?.some((sub) => sub.status === "active"),
 
-      stripe: {
-        customer: stripe.customer
-          ? {
-              id: stripe.customer.id,
-              object: stripe.customer.object,
-            }
-          : undefined,
-        subscriptions: (stripe.subscriptions ?? [])?.map((sub) => {
-          return {
-            id: sub.id,
-            items: sub.items.data,
-            status: sub.status,
-            object: sub.object,
-            cancel_at: sub.cancel_at,
-            canceled_at: sub.canceled_at,
-            canceled_at_period_end: sub.cancel_at_period_end,
-            collection_method: sub.collection_method,
-            created: sub.created,
-            current_period_end: sub.current_period_end,
-            current_period_start: sub.current_period_start,
-            days_until_due: sub.days_until_due,
-            discount: sub.discount,
-            ended_at: sub.ended_at,
-            start_date: sub.start_date,
-            metadata: sub.metadata,
-          };
-        }),
-      },
+      customer: stripe.customer
+        ? {
+            id: stripe.customer.id,
+            object: stripe.customer.object,
+          }
+        : undefined,
+      subscriptions: (stripe.subscriptions ?? [])?.map((sub) => {
+        return {
+          id: sub.id,
+          items: sub.items.data,
+          status: sub.status,
+          object: sub.object,
+          cancel_at: sub.cancel_at,
+          canceled_at: sub.canceled_at,
+          canceled_at_period_end: sub.cancel_at_period_end,
+          collection_method: sub.collection_method,
+          created: sub.created,
+          current_period_end: sub.current_period_end,
+          current_period_start: sub.current_period_start,
+          days_until_due: sub.days_until_due,
+          discount: sub.discount,
+          ended_at: sub.ended_at,
+          start_date: sub.start_date,
+          metadata: sub.metadata,
+        };
+      }),
     };
   }
 }

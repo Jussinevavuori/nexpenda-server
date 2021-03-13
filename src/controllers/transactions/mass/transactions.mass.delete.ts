@@ -1,6 +1,6 @@
-import { array, object, string } from "yup";
 import { transactionsRouter } from "../..";
 import { corsMiddleware } from "../../../middleware/corsMiddleware";
+import { deleteTransactionsSchema } from "../../../schemas/transaction.schema";
 import { prisma } from "../../../server";
 import {
   DatabaseAccessFailure,
@@ -18,10 +18,7 @@ transactionsRouter.post("/mass/delete", async (req, res, next) => {
     }
 
     // Validate request body
-    const body = await validateRequestBody<{ ids: string[] }>(
-      req,
-      object({ ids: array().of(string().defined()).defined() }).defined()
-    );
+    const body = await validateRequestBody(req, deleteTransactionsSchema);
     if (body.isFailure()) {
       return next(body);
     }

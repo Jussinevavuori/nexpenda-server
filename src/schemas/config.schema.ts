@@ -1,14 +1,10 @@
-import { object, string, InferType } from "yup";
+import * as z from "zod";
 
-const Status = () => string().oneOf(["online", "offline"]);
+export const configSchema = z.object({
+  status: z.enum(["online", "offline"]),
+});
 
-export const configSchema = object({
-  status: Status().required(),
-}).required();
+export const patchConfigSchema = configSchema.partial();
 
-export const patchConfigSchema = object({
-  status: Status(),
-}).required();
-
-export type ConfigSchema = InferType<typeof configSchema>;
-export type PatchConfigSchema = InferType<typeof patchConfigSchema>;
+export type ConfigSchema = z.TypeOf<typeof configSchema>;
+export type PatchConfigSchema = z.TypeOf<typeof patchConfigSchema>;

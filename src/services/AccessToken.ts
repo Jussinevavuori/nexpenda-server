@@ -1,15 +1,11 @@
 import { Request } from "express";
 import { conf } from "../conf";
-import * as yup from "yup";
+import * as z from "zod";
 import { RefreshToken } from "./RefreshToken";
 import { AbstractToken } from "./AbstractToken";
 import { prisma } from "../server";
 
-type IAccessToken = {
-  uid: string;
-  vrs: number;
-};
-
+type IAccessToken = z.TypeOf<typeof AccessToken["schema"]>;
 export class AccessToken
   extends AbstractToken<IAccessToken>
   implements IAccessToken {
@@ -29,7 +25,7 @@ export class AccessToken
    */
   constructor(arg: RefreshToken | string) {
     super(typeof arg === "string" ? arg : { uid: arg.uid, vrs: arg.vrs }, {
-      schema: AccessToken.schema,
+      schema: (_) => _.merge(AccessToken.schema),
       tkt: "access",
       secret: conf.token.accessToken.secret,
       expiresIn: conf.token.accessToken.expiresIn,
@@ -49,12 +45,10 @@ export class AccessToken
   /**
    * The access token schema for validating a access token upon parsing
    */
-  static schema: yup.ObjectSchema<IAccessToken> = yup
-    .object({
-      uid: yup.string().required(),
-      vrs: yup.number().required().integer(),
-    })
-    .required();
+  static schema = z.object({
+    uid: z.string(),
+    vrs: z.number().int(),
+  });
 
   /**
    * Get access token from request cookies. Only returns a access token if

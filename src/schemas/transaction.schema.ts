@@ -1,45 +1,39 @@
-import { object, string, number, InferType } from "yup";
+import * as z from "zod";
 
-const id = () => string();
-const uid = () => string();
-const integerAmount = () => number().integer();
-const time = () => number().positive().integer();
-const category = () => string().min(1);
-const categoryIcon = () => string();
-const comment = () => string();
+export const transactionSchema = z.object({
+  id: z.string().optional(),
+  uid: z.string().optional(),
+  time: z.number().positive().int(),
+  category: z.string().nonempty(),
+  integerAmount: z.number().int(),
+  comment: z.string().optional(),
+  categoryIcon: z.string().optional(),
+});
 
-export const postTransactionSchema = object({
-  id: id(),
-  uid: uid(),
-  time: time().required(),
-  comment: comment(),
-  category: category().required(),
-  categoryIcon: categoryIcon(),
-  integerAmount: integerAmount().required(),
-}).required();
+export const postTransactionSchema = transactionSchema;
+export const putTransactionSchema = transactionSchema;
+export const patchTransactionSchema = transactionSchema
+  .partial()
+  .omit({ comment: true })
+  .merge(
+    z.object({
+      comment: z.string().optional().nullable(),
+    })
+  );
 
-export type PostTransactionSchema = InferType<typeof postTransactionSchema>;
+export const deleteTransactionsSchema = z.object({
+  ids: z.array(z.string()),
+});
 
-export const putTransactionSchema = object({
-  id: id(),
-  uid: uid(),
-  time: time().defined().required(),
-  comment: comment(),
-  category: category().defined().required(),
-  categoryIcon: categoryIcon(),
-  integerAmount: integerAmount().defined().required(),
-}).required();
+export const postTransactionsSchema = z.object({
+  transactions: z.array(postTransactionSchema),
+});
 
-export type PutTransactionSchema = InferType<typeof putTransactionSchema>;
-
-export const patchTransactionSchema = object({
-  id: id(),
-  uid: uid(),
-  time: time(),
-  comment: comment().nullable(),
-  category: category(),
-  categoryIcon: categoryIcon(),
-  integerAmount: integerAmount(),
-}).required();
-
-export type PatchTransactionSchema = InferType<typeof patchTransactionSchema>;
+export type TransactionSchema = z.TypeOf<typeof transactionSchema>;
+export type PostTransactionSchema = z.TypeOf<typeof postTransactionSchema>;
+export type PutTransactionSchema = z.TypeOf<typeof putTransactionSchema>;
+export type PatchTransactionSchema = z.TypeOf<typeof patchTransactionSchema>;
+export type PostTransactionsSchema = z.TypeOf<typeof postTransactionsSchema>;
+export type DeleteTransactionsSchema = z.TypeOf<
+  typeof deleteTransactionsSchema
+>;

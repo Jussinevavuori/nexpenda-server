@@ -1,9 +1,6 @@
 import { transactionsRouter } from "../..";
 import { validateRequestBody } from "../../../utils/validateRequestBody";
-import {
-  PostTransactionSchema,
-  postTransactionSchema,
-} from "../../../schemas/transaction.schema";
+import { postTransactionsSchema } from "../../../schemas/transaction.schema";
 import { prisma } from "../../../server";
 import { v4 as uuid } from "uuid";
 import {
@@ -11,8 +8,8 @@ import {
   InvalidRequestDataFailure,
   UnauthenticatedFailure,
 } from "../../../utils/Failures";
-import { array, object } from "yup";
 import { TransactionService } from "../../../services/TransactionService";
+import { Transaction, Category } from "@prisma/client";
 
 transactionsRouter.post("/mass/post", async (req, res, next) => {
   try {
@@ -22,14 +19,7 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
     }
 
     // Get request body and validate it
-    const body = await validateRequestBody<{
-      transactions: PostTransactionSchema[];
-    }>(
-      req,
-      object({
-        transactions: array().of(postTransactionSchema).defined(),
-      }).defined()
-    );
+    const body = await validateRequestBody(req, postTransactionsSchema);
     if (body.isFailure()) {
       return next(body);
     }
@@ -65,52 +55,54 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
       return { ...ids, [_.id]: true };
     }, {} as Record<string, boolean>);
 
-	    // Create new transactions from body
-    const allCreatedTransactions = await Promise.all(
-      transactionsWithIds
-        .filter((transaction) => !overlappingIds[transaction.id])
-        .map((transaction) => {
-          return prisma.transaction.create({
-            data: {
-              id: transaction.id,
-              integerAmount: transaction.integerAmount,
-              comment: transaction.comment,
-              time: new Date(transaction.time),
-              user: {
-                connect: {
-                  id: req.data!.auth!.user!.id,
-                },
-              },
-              category: {
-                connectOrCreate: {
-                  where: {
-                    unique_uid_value: {
-                      uid: req.data!.auth!.user!.id,
-                      value: transaction.category,
-                    },
-                  },
-                  create: {
-                    value: transaction.category,
-                    user: {
-                      connect: {
-                        id: req.data!.auth!.user!.id,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            include: {
-              category: true,
-            },
-          });
-        })
+    const createTransactions = transactionsWithIds.filter(
+      (transaction) => !overlappingIds[transaction.id]
     );
+
+    const createdTransactions: Array<Transaction & { category: Category }> = [];
+
+    for (const transaction of createTransactions) {
+      const createdTransaction = await prisma.transaction.create({
+        data: {
+          id: transaction.id,
+          integerAmount: transaction.integerAmount,
+          comment: transaction.comment,
+          time: new Date(transaction.time),
+          user: {
+            connect: {
+              id: req.data!.auth!.user!.id,
+            },
+          },
+          category: {
+            connectOrCreate: {
+              where: {
+                unique_uid_value: {
+                  uid: req.data!.auth!.user!.id,
+                  value: transaction.category,
+                },
+              },
+              create: {
+                value: transaction.category,
+                user: {
+                  connect: {
+                    id: req.data!.auth!.user!.id,
+                  },
+                },
+              },
+            },
+          },
+        },
+        include: {
+          category: true,
+        },
+      });
+      createdTransactions.push(createdTransaction);
+    }
 
     // Send created transaction to user
     return res
       .status(201)
-      .json(TransactionService.compressTransactions(allCreatedTransactions));
+      .json(TransactionService.compressTransactions(createdTransactions));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

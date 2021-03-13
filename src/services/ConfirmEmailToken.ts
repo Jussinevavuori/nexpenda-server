@@ -1,11 +1,9 @@
-import * as yup from "yup";
+import * as z from "zod";
 import { conf } from "../conf";
 import { User } from "@prisma/client";
 import { AbstractToken } from "./AbstractToken";
 
-type IConfirmEmailToken = {
-  uid: string;
-};
+type IConfirmEmailToken = z.TypeOf<typeof ConfirmEmailToken["schema"]>;
 
 export class ConfirmEmailToken
   extends AbstractToken<IConfirmEmailToken>
@@ -20,7 +18,7 @@ export class ConfirmEmailToken
    */
   constructor(arg: string | User) {
     super(typeof arg === "string" ? arg : { uid: arg.id }, {
-      schema: ConfirmEmailToken.schema,
+      schema: (_) => _.merge(ConfirmEmailToken.schema),
       tkt: "confirm_email",
       secret: conf.token.confirmEmailToken.secret,
       expiresIn: conf.token.confirmEmailToken.expiresIn,
@@ -39,9 +37,5 @@ export class ConfirmEmailToken
   /**
    * Schema for validating token payloads
    */
-  static schema: yup.ObjectSchema<IConfirmEmailToken> = yup
-    .object({
-      uid: yup.string().required(),
-    })
-    .required();
+  static schema = z.object({ uid: z.string() });
 }

@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import * as yup from "yup";
+import * as z from "zod";
 import { conf } from "../conf";
 
 export type IAbstractToken = {
@@ -51,7 +51,7 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
   /**
    * Merged schema from jwt metadata schema and data schema
    */
-  private mergedSchema: yup.ObjectSchema<TokenPayload<T>>;
+  private mergedSchema: z.Schema<TokenPayload<T>>;
 
   /**
    * Secret to use while verifying jwt
@@ -77,7 +77,11 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
   constructor(
     token: string | T,
     options: {
-      schema: yup.ObjectSchema<T>;
+      schema:
+        | z.Schema<TokenPayload<T>>
+        | ((
+            schema: typeof AbstractToken["metadataSchema"]
+          ) => z.Schema<TokenPayload<T>>);
       secret: string;
       tkt: string;
       expiresIn: string;
@@ -88,7 +92,10 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
     /**
      * Merge metadata and specific data schemas
      */
-    this.mergedSchema = options.schema.concat(AbstractToken.metadataSchema);
+    this.mergedSchema =
+      typeof options.schema === "function"
+        ? options.schema(AbstractToken.metadataSchema)
+        : options.schema;
 
     /**
      * Store secret and intended token type
@@ -118,17 +125,12 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
      * Parse and verify resulting token and store information
      */
     const decoded = jwt.decode(this.jwt);
-    try {
-      /**
-       * If validation succeeds, use validated values and register as valid
-       */
-      this.payload = this.mergedSchema.validateSync(decoded);
+    const parseResult = this.mergedSchema.safeParse(decoded);
+
+    if (parseResult.success) {
+      this.payload = parseResult.data;
       this.valid = true;
-    } catch (e) {
-      /**
-       * If validation fails, fallback to default values and register
-       * as invalid
-       */
+    } else {
       this.payload = {
         aud: "",
         iss: "",
@@ -139,6 +141,7 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
       };
       this.valid = false;
     }
+
     this.iat = this.payload.iat;
     this.exp = this.payload.exp;
     this.aud = this.payload.aud;
@@ -179,15 +182,13 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
   /**
    * Schema for JWT metadata
    */
-  private static metadataSchema = yup
-    .object({
-      iat: yup.number().required().integer(),
-      exp: yup.number().required().integer(),
-      aud: yup.string().required(),
-      iss: yup.string().required(),
-      tkt: yup.string().required(),
-    })
-    .required();
+  private static metadataSchema = z.object({
+    iat: z.number().int(),
+    exp: z.number().int(),
+    aud: z.string(),
+    iss: z.string(),
+    tkt: z.string(),
+  });
 
   /**
    * Generic verification function
@@ -214,7 +215,10 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
        * Verify the payload of the verified token. If verification fails, an
        * error is thrown and the function automatically returns false
        */
-      this.mergedSchema.validateSync(decoded);
+      const valid = this.mergedSchema.check(decoded);
+      if (!valid) {
+        return false;
+      }
 
       /**
        * Run extra verification steps if specified

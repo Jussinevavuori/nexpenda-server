@@ -1,11 +1,11 @@
-import { ObjectSchema, ValidationError } from "yup";
+import * as z from "zod";
 import { Request } from "express";
 import { Success } from "./Result";
 import { InvalidRequestDataFailure } from "./Failures";
 
 export async function validateRequestBody<T extends object>(
   request: Request,
-  schema: ObjectSchema<T>
+  schema: z.Schema<T>
 ) {
   /**
    * Ensure request body is defined
@@ -39,27 +39,17 @@ export async function validateRequestBody<T extends object>(
     });
   }
 
-  return schema
-    .validate(request.body, {
-      strict: true,
-      abortEarly: false,
-      stripUnknown: true,
-    })
-    .then((body) => {
-      return new Success(body);
-    })
-    .catch((error) => {
-      // Parse yup validation error fields
-      if (error instanceof ValidationError) {
-        return new InvalidRequestDataFailure<T>(
-          error.inner.reduce((errors, next) => {
-            return { ...errors, [next.path]: next.message };
-          }, {})
-        );
-      } else {
-        return new InvalidRequestDataFailure<T>({
-          _root: "Unknown data validation error",
-        });
-      }
-    });
+  const parsed = schema.safeParse(request.body);
+
+  if (parsed.success) {
+    return new Success(parsed.data);
+  } else {
+    return new InvalidRequestDataFailure<T>(
+      parsed.error.errors.reduce((errors, next) => {
+        const path = next.path.join(".");
+        const msg = `${next.message} <${next.code}>`;
+        return { ...errors, [path]: msg };
+      }, {} as Record<string, string>)
+    );
+  }
 }
