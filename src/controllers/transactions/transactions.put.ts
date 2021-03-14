@@ -27,7 +27,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
     // Get potentially existing transaction
     const transaction = await prisma.transaction.findUnique({
       where: { id: req.params.id },
-      include: { category: true },
+      include: { Category: true },
     });
 
     // Ensure potentially existing transaction doesn't belong to authenticated user
@@ -76,12 +76,12 @@ transactionsRouter.put("/:id", async (req, res, next) => {
         integerAmount: body.value.integerAmount,
         comment: body.value.comment,
         time: new Date(body.value.time),
-        user: {
+        User: {
           connect: {
             id: req.data.auth.user.id,
           },
         },
-        category: {
+        Category: {
           connectOrCreate: {
             where: {
               unique_uid_value: {
@@ -91,7 +91,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
             },
             create: {
               value: body.value.category,
-              user: {
+              User: {
                 connect: {
                   id: req.data.auth.user.id,
                 },
@@ -104,7 +104,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
         integerAmount: body.value.integerAmount,
         time: new Date(body.value.time),
         comment: body.value.comment === undefined ? null : body.value.comment,
-        category: {
+        Category: {
           connectOrCreate: {
             where: {
               unique_uid_value: {
@@ -114,7 +114,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
             },
             create: {
               value: body.value.category,
-              user: {
+              User: {
                 connect: {
                   id: req.data.auth.user.id,
                 },
@@ -124,18 +124,18 @@ transactionsRouter.put("/:id", async (req, res, next) => {
         },
       },
       include: {
-        category: true,
+        Category: true,
       },
     });
 
     // Update icon if updated icon given
     if (
       body.value.categoryIcon &&
-      body.value.categoryIcon !== upserted.category.icon
+      body.value.categoryIcon !== upserted.Category.icon
     ) {
       const updatedCategory = await prisma.category.update({
         where: {
-          id: upserted.category.id,
+          id: upserted.Category.id,
         },
         data: {
           icon: body.value.categoryIcon,
@@ -146,7 +146,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
       return res.json(
         TransactionService.mapTransactionToResponse({
           ...upserted,
-          category: updatedCategory,
+          Category: updatedCategory,
         })
       );
     }

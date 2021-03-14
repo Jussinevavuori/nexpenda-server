@@ -1,6 +1,5 @@
 # Prisma Migrate lockfile v1
 
-20210311094709-init-2021-03-11
-20210311095359-rename-unique-categories-constraint
-20210312102712-stripe-customer-id
-20210312102858-stripe-customer-id-type
+20210314125118-reset
+20210314125235-budgets
+20210314125503-capitalizationsfix

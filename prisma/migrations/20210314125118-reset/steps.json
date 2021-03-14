@@ -937,6 +937,38 @@
     {
       "tag": "CreateField",
       "model": "User",
+      "field": "stripeCustomerId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "stripeCustomerId"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "stripeCustomerId"
+        },
+        "directive": "map"
+      },
+      "argument": "",
+      "value": "\"stripe_customer_id\""
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
       "field": "transactions",
       "type": "Transaction",
       "arity": "List"
@@ -1253,7 +1285,7 @@
             },
             {
               "name": "name",
-              "value": "\"Category_uid_value_unique_constraint\""
+              "value": "\"unique_uid_value\""
             }
           ]
         },

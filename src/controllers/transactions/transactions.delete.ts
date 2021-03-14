@@ -22,7 +22,7 @@ transactionsRouter.delete("/:id", async (req, res, next) => {
     // Get transaction
     const transaction = await prisma.transaction.findUnique({
       where: { id: req.params.id },
-      include: { category: true },
+      include: { Category: true },
     });
 
     // Ensure transaction found and belongs to authenticated user

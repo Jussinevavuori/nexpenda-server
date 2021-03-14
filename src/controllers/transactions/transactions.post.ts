@@ -49,12 +49,12 @@ transactionsRouter.post("/", async (req, res, next) => {
     const created = await prisma.transaction.create({
       data: {
         id,
-        user: {
+        User: {
           connect: {
             id: req.data.auth.user.id,
           },
         },
-        category: {
+        Category: {
           connectOrCreate: {
             where: {
               unique_uid_value: {
@@ -64,7 +64,7 @@ transactionsRouter.post("/", async (req, res, next) => {
             },
             create: {
               value: body.value.category,
-              user: {
+              User: {
                 connect: {
                   id: req.data.auth.user.id,
                 },
@@ -77,7 +77,7 @@ transactionsRouter.post("/", async (req, res, next) => {
         time: new Date(body.value.time),
       },
       include: {
-        category: true,
+        Category: true,
       },
     });
 

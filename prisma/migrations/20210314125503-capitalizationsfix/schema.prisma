@@ -17,8 +17,8 @@ model Transaction {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
 
-  user     User     @relation(fields: [uid], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
+  User     User     @relation(fields: [uid], references: [id])
+  Category Category @relation(fields: [categoryId], references: [id])
 
   @@map(name: "transactions")
 }
@@ -37,11 +37,34 @@ model User {
   prefersColorScheme String?  @map("prefers_color_scheme")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+  stripeCustomerId   String?  @map("stripe_customer_id")
 
-  transactions Transaction[]
-  categories   Category[]
+  Transactions Transaction[]
+  Categories   Category[]
+  Budgets      Budget[]
 
   @@map(name: "users")
+}
+
+model Budget {
+  id            String     @id @default(uuid())
+  uid           String
+  label         String?
+  type          BudgetType
+  integerAmount Int        @map("integer_amount")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  Categories Category[]
+
+  User User @relation(fields: [uid], references: [id])
+
+  @@map(name: "budgets")
+}
+
+enum BudgetType {
+  INCOME
+  EXPENSE
 }
 
 model Category {
@@ -52,10 +75,11 @@ model Category {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  user User @relation(fields: [uid], references: [id])
+  Transactions Transaction[]
+  Budgets      Budget[]
 
-  Transaction Transaction[]
+  User User @relation(fields: [uid], references: [id])
 
-  @@unique([uid, value], name: "Category_uid_value_unique_constraint")
+  @@unique([uid, value], name: "unique_uid_value")
   @@map(name: "categories")
 }

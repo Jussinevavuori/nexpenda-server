@@ -55,9 +55,9 @@ model Budget {
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @default(now()) @updatedAt @map("updated_at")
 
-  User User @relation(fields: [uid], references: [id])
-
   Categories Category[]
+
+  User User @relation(fields: [uid], references: [id])
 
   @@map(name: "budgets")
 }
@@ -78,7 +78,8 @@ model Category {
   Transactions Transaction[]
   Budgets      Budget[]
 
-  user User @relation(fields: [uid], references: [id])
+  User User @relation(fields: [uid], references: [id])
+
   @@unique([uid, value], name: "unique_uid_value")
   @@map(name: "categories")
 }

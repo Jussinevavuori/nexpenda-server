@@ -26,7 +26,7 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
     // Get transaction
     const transaction = await prisma.transaction.findUnique({
       where: { id: req.params.id },
-      include: { category: true },
+      include: { Category: true },
     });
 
     // Ensure transaction found and belongs to authenticated user
@@ -67,7 +67,7 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
         comment: body.value.comment,
         time: body.value.time ? new Date(body.value.time) : undefined,
         integerAmount: body.value.integerAmount,
-        category:
+        Category:
           body.value.category === undefined
             ? undefined
             : {
@@ -80,7 +80,7 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
                   },
                   create: {
                     value: body.value.category,
-                    user: {
+                    User: {
                       connect: {
                         id: req.data.auth.user.id,
                       },
@@ -90,18 +90,18 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
               },
       },
       include: {
-        category: true,
+        Category: true,
       },
     });
 
     // Update icon if updated icon given
     if (
       body.value.categoryIcon &&
-      body.value.categoryIcon !== updated.category.icon
+      body.value.categoryIcon !== updated.Category.icon
     ) {
       const updatedCategory = await prisma.category.update({
         where: {
-          id: updated.category.id,
+          id: updated.Category.id,
         },
         data: {
           icon: body.value.categoryIcon,
@@ -112,7 +112,7 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
       return res.json(
         TransactionService.mapTransactionToResponse({
           ...updated,
-          category: updatedCategory,
+          Category: updatedCategory,
         })
       );
     }

@@ -44,7 +44,7 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
         },
       },
       include: {
-        category: true,
+        Category: true,
       },
     });
 

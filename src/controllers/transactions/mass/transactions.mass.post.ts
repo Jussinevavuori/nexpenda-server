@@ -59,7 +59,7 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
       (transaction) => !overlappingIds[transaction.id]
     );
 
-    const createdTransactions: Array<Transaction & { category: Category }> = [];
+    const createdTransactions: Array<Transaction & { Category: Category }> = [];
 
     for (const transaction of createTransactions) {
       const createdTransaction = await prisma.transaction.create({
@@ -68,12 +68,12 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
           integerAmount: transaction.integerAmount,
           comment: transaction.comment,
           time: new Date(transaction.time),
-          user: {
+          User: {
             connect: {
               id: req.data!.auth!.user!.id,
             },
           },
-          category: {
+          Category: {
             connectOrCreate: {
               where: {
                 unique_uid_value: {
@@ -83,7 +83,7 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
               },
               create: {
                 value: transaction.category,
-                user: {
+                User: {
                   connect: {
                     id: req.data!.auth!.user!.id,
                   },
@@ -93,7 +93,7 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
           },
         },
         include: {
-          category: true,
+          Category: true,
         },
       });
       createdTransactions.push(createdTransaction);

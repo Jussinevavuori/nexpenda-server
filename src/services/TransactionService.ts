@@ -1,7 +1,7 @@
 import { Category, Transaction } from "@prisma/client";
 import { DataUtils } from "../utils/DataUtils";
 
-export type TransactionResponseMappable = Transaction & { category: Category };
+export type TransactionResponseMappable = Transaction & { Category: Category };
 
 export type TransactionResponse = {
   id: string;
@@ -79,7 +79,7 @@ export class TransactionService {
    * @param transactions Transactions to compress
    */
   static compressTransactions(
-    transactions: Array<Transaction & { category: Category }>
+    transactions: Array<Transaction & { Category: Category }>
   ): CompressedDataJson {
     // Get all unique categories (unique defined by ID)
     const categories = DataUtils.unique(
