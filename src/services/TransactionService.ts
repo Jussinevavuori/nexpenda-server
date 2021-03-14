@@ -64,9 +64,9 @@ export class TransactionService {
         comment: transaction.comment ?? undefined,
         createdAt: transaction.createdAt.getTime(),
         category: {
-          id: transaction.category.id,
-          value: transaction.category.value,
-          icon: transaction.category.icon || "",
+          id: transaction.Category.id,
+          value: transaction.Category.value,
+          icon: transaction.Category.icon || "",
         },
       };
     }
@@ -83,7 +83,7 @@ export class TransactionService {
   ): CompressedDataJson {
     // Get all unique categories (unique defined by ID)
     const categories = DataUtils.unique(
-      transactions.map((t) => t.category),
+      transactions.map((t) => t.Category),
       (a, b) => a.id === b.id
     );
 

@@ -84,11 +84,11 @@ transactionsRouter.post("/", async (req, res, next) => {
     // Update icon if updated icon given
     if (
       body.value.categoryIcon &&
-      body.value.categoryIcon !== created.category.icon
+      body.value.categoryIcon !== created.Category.icon
     ) {
       const updatedCategory = await prisma.category.update({
         where: {
-          id: created.category.id,
+          id: created.Category.id,
         },
         data: {
           icon: body.value.categoryIcon,
@@ -100,7 +100,7 @@ transactionsRouter.post("/", async (req, res, next) => {
       return res.status(201).json(
         TransactionService.mapTransactionToResponse({
           ...created,
-          category: updatedCategory,
+          Category: updatedCategory,
         })
       );
     }
