@@ -2,6 +2,19 @@ import * as z from "zod";
 import { ValidationFailure } from "./Failures";
 import { Success } from "./Result";
 
+export function validateOr<T extends object>(
+  data: any,
+  schema: z.Schema<T>,
+  defaultValue: T
+) {
+  const validated = validate(data, schema);
+  if (validated.isSuccess()) {
+    return validated.value;
+  } else {
+    return defaultValue;
+  }
+}
+
 export function validate<T extends object>(data: any, schema: z.Schema<T>) {
   const parsed = schema.safeParse(data);
 

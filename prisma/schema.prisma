@@ -17,8 +17,8 @@ model Transaction {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
 
-  user     User     @relation(fields: [uid], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
+  User     User     @relation(fields: [uid], references: [id])
+  Category Category @relation(fields: [categoryId], references: [id])
 
   @@map(name: "transactions")
 }
@@ -39,10 +39,32 @@ model User {
   updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
   stripeCustomerId   String?  @map("stripe_customer_id")
 
-  transactions Transaction[]
-  categories   Category[]
+  Transactions Transaction[]
+  Categories   Category[]
+  Budgets      Budget[]
 
   @@map(name: "users")
+}
+
+model Budget {
+  id            String     @id @default(uuid())
+  uid           String
+  label         String?
+  type          BudgetType
+  integerAmount Int        @map("integer_amount")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  User User @relation(fields: [uid], references: [id])
+
+  Categories Category[]
+
+  @@map(name: "budgets")
+}
+
+enum BudgetType {
+  INCOME
+  EXPENSE
 }
 
 model Category {
@@ -53,10 +75,10 @@ model Category {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
+  Transactions Transaction[]
+  Budgets      Budget[]
+
   user User @relation(fields: [uid], references: [id])
-
-  Transaction Transaction[]
-
   @@unique([uid, value], name: "unique_uid_value")
   @@map(name: "categories")
 }
