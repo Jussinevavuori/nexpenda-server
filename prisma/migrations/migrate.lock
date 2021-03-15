@@ -3,3 +3,7 @@
 20210314125118-reset
 20210314125235-budgets
 20210314125503-capitalizationsfix
+20210315111359-remove-budget-type
+20210315114915-add_category_unique_uid_id
+20210315133832-explicit-budget-category-inclusion
+20210315134252-rename-to-budget-category-inclusions

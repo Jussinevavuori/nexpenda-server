@@ -6,12 +6,13 @@ import {
   TokenFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
+import { prisma } from "../../server";
 
 authRouter.get("/refresh_token", async (req, res, next) => {
   /**
    * Get refresh token and ensure it exists
    */
-  const refreshToken = await RefreshToken.fromRequest(req);
+  const refreshToken = await RefreshToken.fromRequest(req, prisma);
   if (!refreshToken) {
     return next(new UnauthenticatedFailure());
   }
@@ -27,7 +28,7 @@ authRouter.get("/refresh_token", async (req, res, next) => {
   /**
    * Create access token
    */
-  const accessToken = new AccessToken(refreshToken);
+  const accessToken = new AccessToken(refreshToken, prisma);
   if (!accessToken) {
     return next(new TokenFailure().withStatus(500));
   }

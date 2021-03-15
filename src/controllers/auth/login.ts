@@ -60,5 +60,5 @@ authRouter.post("/login", rateLimiters.strict(), async (req, res, next) => {
   /**
    * Send refresh token in respone if everything succeeded
    */
-  new RefreshToken(user).send(res).end();
+  new RefreshToken(user, prisma).send(res).end();
 });

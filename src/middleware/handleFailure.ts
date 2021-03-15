@@ -11,7 +11,7 @@ export function handleFailure(
   if (!res.headersSent) {
     if (failure instanceof Failure) {
       if (failure instanceof DatabaseAccessFailure) {
-        console.log(
+        console.warn(
           `[HANDLE_FAILURE]:`,
           `Caught database access failure`,
           failure.code,
@@ -20,7 +20,7 @@ export function handleFailure(
       }
 
       if (failure instanceof StripeFailure) {
-        console.log(failure);
+        console.warn(failure);
       }
 
       return res.status(failure.status).json({

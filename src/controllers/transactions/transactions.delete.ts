@@ -34,7 +34,7 @@ transactionsRouter.delete("/:id", async (req, res, next) => {
     await prisma.transaction.delete({ where: { id: transaction.id } });
 
     // Respond with 204 and deleted ID for succesful deletion
-    return res.status(204).send({ id: transaction.id });
+    return res.status(200).json({ id: transaction.id });
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

@@ -7,6 +7,8 @@ export type ServerFailureCode =
   | "request/missing-url-parameters"
   | "transaction/already-exists"
   | "transaction/not-found"
+  | "budget/already-exists"
+  | "budget/not-found"
   | "auth/missing-token"
   | "auth/invalid-token"
   | "auth/user-has-no-password"
@@ -115,6 +117,29 @@ export class TransactionNotFoundFailure<T> extends Failure<
       code: "transaction/not-found",
       status: 404,
       message: "Transaction not found",
+    });
+  }
+}
+
+export class BudgetAlreadyExistsFailure<T> extends Failure<
+  T,
+  "budget/already-exists"
+> {
+  constructor() {
+    super({
+      code: "budget/already-exists",
+      status: 400,
+      message: "budget already exists",
+    });
+  }
+}
+
+export class BudgetNotFoundFailure<T> extends Failure<T, "budget/not-found"> {
+  constructor() {
+    super({
+      code: "budget/not-found",
+      status: 404,
+      message: "budget not found",
     });
   }
 }

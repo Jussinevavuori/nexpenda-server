@@ -61,7 +61,7 @@ export class StripeUtils {
       }
       return customer;
     } catch (e) {
-      console.log("Unable to fetch customer", e.name, e.message);
+      console.error("Unable to fetch customer", e.name, e.message);
       return undefined;
     }
   }

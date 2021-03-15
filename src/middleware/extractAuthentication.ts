@@ -12,7 +12,7 @@ export function extractAuthentication() {
     /**
      * Get access token from request and verify
      */
-    const accessToken = await AccessToken.fromRequest(request);
+    const accessToken = await AccessToken.fromRequest(request, prisma);
 
     if (accessToken) {
       request.data.auth.accessTokenFound = true;
@@ -29,7 +29,7 @@ export function extractAuthentication() {
     /**
      * Get refresh token from request and verify
      */
-    const refreshToken = await RefreshToken.fromRequest(request);
+    const refreshToken = await RefreshToken.fromRequest(request, prisma);
 
     if (refreshToken) {
       request.data.auth.refreshTokenFound = true;

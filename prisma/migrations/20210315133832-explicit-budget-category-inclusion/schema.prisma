@@ -4,7 +4,7 @@ generator client {
 
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model Transaction {
@@ -54,7 +54,7 @@ model Budget {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
 
-  BudgetCategoryInclusions BudgetCategoryInclusion[]
+  BudgetCategoryInclusion BudgetCategoryInclusion[]
 
   User User @relation(fields: [uid], references: [id])
 
@@ -79,8 +79,8 @@ model Category {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  Transactions             Transaction[]
-  BudgetCategoryInclusions BudgetCategoryInclusion[]
+  Transactions            Transaction[]
+  BudgetCategoryInclusion BudgetCategoryInclusion[]
 
   User User @relation(fields: [uid], references: [id])
 

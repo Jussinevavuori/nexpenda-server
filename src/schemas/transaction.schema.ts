@@ -10,11 +10,17 @@ export const transactionSchema = z.object({
   categoryIcon: z.string().optional(),
 });
 
-export const postTransactionSchema = transactionSchema;
-export const putTransactionSchema = transactionSchema;
+export const postTransactionSchema = transactionSchema.omit({
+  uid: true,
+  id: true,
+});
+export const putTransactionSchema = transactionSchema.omit({
+  uid: true,
+  id: true,
+});
 export const patchTransactionSchema = transactionSchema
   .partial()
-  .omit({ comment: true })
+  .omit({ comment: true, uid: true, id: true })
   .merge(
     z.object({
       comment: z.string().optional().nullable(),

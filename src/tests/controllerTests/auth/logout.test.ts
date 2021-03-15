@@ -1,6 +1,6 @@
 import { TestClient } from "../../TestClient";
 import { conf } from "../../../conf";
-import { testUtils } from "../../testUtils";
+import { TestUtils } from "../../TestUtils";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -12,7 +12,7 @@ describe("/api/auth/logout/ [POST]", () => {
   it("sends clear cookie header", async (done) => {
     const client = new TestClient();
     const response = await client.auth().logout();
-    const refreshToken = testUtils.parseCookieFromResponse(
+    const refreshToken = TestUtils.parseCookieFromResponse(
       response,
       conf.token.refreshToken.name
     );

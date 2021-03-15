@@ -4,7 +4,6 @@ import { patchTransactionSchema } from "../../schemas/transaction.schema";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
-  InvalidRequestDataFailure,
   MissingUrlParametersFailure,
   TransactionNotFoundFailure,
   UnauthenticatedFailure,
@@ -38,24 +37,6 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
     const body = await validateRequestBody(req, patchTransactionSchema);
     if (body.isFailure()) {
       return next(body);
-    }
-
-    // Ensure ID is not being changed
-    if (body.value.id && body.value.id !== transaction.id) {
-      return next(
-        new InvalidRequestDataFailure({
-          id: "Cannot update transaction ID",
-        })
-      );
-    }
-
-    // Ensure UID is not being changed
-    if (body.value.uid && body.value.uid !== transaction.uid) {
-      return next(
-        new InvalidRequestDataFailure({
-          uid: "Cannot update transaction owner",
-        })
-      );
     }
 
     // Update transaction

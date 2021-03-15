@@ -27,7 +27,7 @@ authRouter.get(
       if (id && googleId) {
         const user = await prisma.user.findUnique({ where: { id } });
         if (user && googleId === user.googleId) {
-          new RefreshToken(user).send(response);
+          new RefreshToken(user, prisma).send(response);
           return redirect(response).toFrontend("/app");
         }
       }

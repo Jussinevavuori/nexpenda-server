@@ -1,0 +1,29 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Category",
+      "field": "BudgetCategoryInclusions",
+      "type": "BudgetCategoryInclusion",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Category",
+      "field": "BudgetCategoryInclusion"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Budget",
+      "field": "BudgetCategoryInclusions",
+      "type": "BudgetCategoryInclusion",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Budget",
+      "field": "BudgetCategoryInclusion"
+    }
+  ]
+}

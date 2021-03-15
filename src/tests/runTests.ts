@@ -4,7 +4,13 @@ import { startServer, prisma } from "../server";
 async function initialize() {
   await startServer();
 
-  await prisma.$executeRaw(`TRUNCATE TABLE users CASCADE`);
+  await prisma.budgetCategoryInclusion.deleteMany({
+    where: { budgetId: { not: "_" } },
+  });
+  await prisma.budget.deleteMany({ where: { uid: { not: "_" } } });
+  await prisma.transaction.deleteMany({ where: { uid: { not: "_" } } });
+  await prisma.category.deleteMany({ where: { uid: { not: "_" } } });
+  await prisma.user.deleteMany({ where: { id: { not: "_" } } });
 }
 
 async function runTests(options?: {
@@ -57,9 +63,20 @@ async function run() {
 }
 
 function getTestNamePattern() {
-  const testNamePatternArg = process.argv.find((arg) => arg.startsWith("-t="));
+  let testNamePatternArg: undefined | string;
+
+  const indexOfSimpleFlag = process.argv.findIndex((arg) => arg === "-t");
+  if (indexOfSimpleFlag > 0) {
+    testNamePatternArg = process.argv[indexOfSimpleFlag + 1];
+  }
+
+  const complexFlag = process.argv.find((arg) => arg.startsWith("--t="));
+  if (complexFlag) {
+    testNamePatternArg = complexFlag.substring(4);
+  }
+
   if (testNamePatternArg) {
-    return testNamePatternArg.substring(3);
+    return testNamePatternArg;
   }
 }
 

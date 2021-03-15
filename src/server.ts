@@ -4,6 +4,7 @@ import * as passport from "passport";
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as nocache from "nocache";
+import * as morgan from "morgan";
 import { Firestore } from "@google-cloud/firestore";
 import { createServer, Server } from "http";
 import {
@@ -13,6 +14,7 @@ import {
   categoriesRouter,
   configurationRouter,
   stripeRouter,
+  budgetsRouter,
 } from "./controllers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -62,6 +64,9 @@ export function startServer() {
       app.use(corsMiddleware());
       app.use(initializeRequestData());
       app.use(extractAuthentication());
+      if (process.env.NODE_ENV !== "test") {
+        app.use(morgan("tiny"));
+      }
       logger("Configured middleware");
 
       // Rate limit
@@ -76,6 +81,7 @@ export function startServer() {
       app.use("/api/auth", authRouter);
       app.use("/api/categories", categoriesRouter);
       app.use("/api/transactions", transactionsRouter);
+      app.use("/api/budgets", budgetsRouter);
       app.use("/api/config", configurationRouter);
       app.use("/api/stripe", stripeRouter);
       logger("Configured endpoints");

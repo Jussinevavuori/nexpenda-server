@@ -2,7 +2,7 @@ import fetch, { Response } from "node-fetch";
 import { conf } from "../conf";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
-import { testUtils } from "./testUtils";
+import { TestUtils } from "./TestUtils";
 import { ConfirmEmailToken } from "../services/ConfirmEmailToken";
 import { User, PrismaClient } from "@prisma/client";
 import { ForgotPasswordToken } from "../services/ForgotPasswordToken";
@@ -33,7 +33,7 @@ export class TestClient {
   /**
    * Automatically generate authentication headers from tokens
    */
-  getHeaders(options?: { body?: any }) {
+  getHeaders(options: { body?: any } = {}) {
     let headers: Record<string, string> = {};
     if (this.accessToken) {
       headers["Authorization"] = `bearer ${this.accessToken}`;
@@ -42,7 +42,7 @@ export class TestClient {
       const value = `${conf.token.refreshToken.name}=${this.refreshToken};`;
       headers["Cookie"] = value;
     }
-    if (options?.body) {
+    if (options.body) {
       headers["Content-Type"] = "application/json";
     }
     return headers;
@@ -75,10 +75,13 @@ export class TestClient {
   /**
    * Fetch GET wrapper with automatic auth header and cookies
    */
-  async get(path: string, options?: { omitApiInEndpoint?: boolean }) {
+  async get(
+    path: string,
+    options: { omitApiInEndpoint?: boolean; timeout?: number } = {}
+  ) {
     const endpoint = this.endpoint(
       path,
-      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+      options.omitApiInEndpoint === true ? "__omitapi" : ""
     );
     const response = await fetch(endpoint, {
       headers: this.getHeaders(),
@@ -95,11 +98,11 @@ export class TestClient {
   async post(
     path: string,
     body?: any,
-    options?: { omitApiInEndpoint?: boolean }
+    options: { omitApiInEndpoint?: boolean; timeout?: number } = {}
   ) {
     const endpoint = this.endpoint(
       path,
-      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+      options.omitApiInEndpoint === true ? "__omitapi" : ""
     );
     const response = await fetch(endpoint, {
       headers: this.getHeaders({ body }),
@@ -118,12 +121,12 @@ export class TestClient {
     path: string,
     id: string,
     body?: any,
-    options?: { omitApiInEndpoint?: boolean }
+    options: { omitApiInEndpoint?: boolean; timeout?: number } = {}
   ) {
     const endpoint = this.endpoint(
       path,
       id,
-      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+      options.omitApiInEndpoint === true ? "__omitapi" : ""
     );
 
     const response = await fetch(endpoint, {
@@ -143,12 +146,12 @@ export class TestClient {
     path: string,
     id: string,
     body?: any,
-    options?: { omitApiInEndpoint?: boolean }
+    options: { omitApiInEndpoint?: boolean; timeout?: number } = {}
   ) {
     const endpoint = this.endpoint(
       path,
       id,
-      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+      options.omitApiInEndpoint === true ? "__omitapi" : ""
     );
     const response = await fetch(endpoint, {
       headers: this.getHeaders({ body }),
@@ -166,12 +169,12 @@ export class TestClient {
   async delete(
     path: string,
     id: string,
-    options?: { omitApiInEndpoint?: boolean }
+    options: { omitApiInEndpoint?: boolean; timeout?: number } = {}
   ) {
     const endpoint = this.endpoint(
       path,
       id,
-      options?.omitApiInEndpoint === true ? "__omitapi" : ""
+      options.omitApiInEndpoint === true ? "__omitapi" : ""
     );
     const response = await fetch(endpoint, {
       headers: this.getHeaders(),
@@ -221,8 +224,8 @@ export class TestClient {
   /**
    * Ping functions
    */
-  ping(options?: { protected?: boolean }) {
-    const path = options?.protected ? "/ping/protected" : "/ping";
+  ping(options: { protected?: boolean } = {}) {
+    const path = options.protected ? "/ping/protected" : "/ping";
     return this.get(path);
   }
 
@@ -301,6 +304,40 @@ export class TestClient {
       delete(id: any) {
         return that.delete("/transactions", id);
       },
+      massPost(data: any) {
+        return that.post("/transactions/mass/post", data, {
+          timeout: that.defaultTimeout * 5,
+        });
+      },
+      massDelete(data: any) {
+        return that.post("/transactions/mass/delete", data, {
+          timeout: that.defaultTimeout * 5,
+        });
+      },
+    };
+  }
+
+  /**
+   * All budgets endpoints
+   */
+  budgets() {
+    const that = this;
+    return {
+      get(id?: string) {
+        return that.get(id ? `/budgets/${id}` : "/budgets");
+      },
+      post(data: any) {
+        return that.post("/budgets", data);
+      },
+      put(id: any, data: any) {
+        return that.put("/budgets", id, data);
+      },
+      patch(id: any, data: any) {
+        return that.patch("/budgets", id, data);
+      },
+      delete(id: any) {
+        return that.delete("/budgets", id);
+      },
     };
   }
 
@@ -308,7 +345,7 @@ export class TestClient {
    * Helper function to update the refresh token from the response headers
    */
   updateRefreshTokenFromResponse(response: Response) {
-    const refreshToken = testUtils.parseCookieFromResponse(
+    const refreshToken = TestUtils.parseCookieFromResponse(
       response,
       conf.token.refreshToken.name
     );
@@ -332,5 +369,82 @@ export class TestClient {
 
       return response;
     }
+  }
+
+  async setup(options: {
+    transactions?: {
+      count: number;
+      properties?: {
+        integerAmount?: number | ((i: number) => number);
+        comment?: string | null | ((i: number) => string | null);
+        categoryIcon?: string | null | ((i: number) => string | null);
+        category?: string | ((i: number) => string);
+        time?: number | ((i: number) => number);
+      };
+    };
+  }) {
+    let created = {
+      transactions: [] as any[],
+    };
+
+    if (options.transactions) {
+      for (let i = 0; i < options.transactions.count; i++) {
+        const body = TestUtils.mockTransaction();
+
+        if (options.transactions.properties?.integerAmount !== undefined) {
+          const value =
+            typeof options.transactions.properties.integerAmount === "function"
+              ? options.transactions.properties.integerAmount(i)
+              : options.transactions.properties.integerAmount;
+          body.integerAmount = value;
+        }
+
+        if (options.transactions.properties?.category !== undefined) {
+          const value =
+            typeof options.transactions.properties.category === "function"
+              ? options.transactions.properties.category(i)
+              : options.transactions.properties.category;
+          body.category = value;
+        }
+
+        if (options.transactions.properties?.time !== undefined) {
+          const value =
+            typeof options.transactions.properties.time === "function"
+              ? options.transactions.properties.time(i)
+              : options.transactions.properties.time;
+          body.time = value;
+        }
+
+        if (options.transactions.properties?.categoryIcon !== undefined) {
+          const value =
+            typeof options.transactions.properties.categoryIcon === "function"
+              ? options.transactions.properties.categoryIcon(i)
+              : options.transactions.properties.categoryIcon;
+          if (value === null) {
+            body.categoryIcon = undefined;
+          } else {
+            body.categoryIcon = value;
+          }
+        }
+
+        if (options.transactions.properties?.comment !== undefined) {
+          const value =
+            typeof options.transactions.properties.comment === "function"
+              ? options.transactions.properties.comment(i)
+              : options.transactions.properties.comment;
+          if (value === null) {
+            body.comment = undefined;
+          } else {
+            body.comment = value;
+          }
+        }
+
+        const response = await this.transactions().post(body);
+        const transaction = await response.json();
+        created.transactions.push(transaction);
+      }
+    }
+
+    return created;
   }
 }

@@ -2,7 +2,6 @@ import { transactionsRouter } from "../..";
 import { validateRequestBody } from "../../../utils/validateRequestBody";
 import { postTransactionsSchema } from "../../../schemas/transaction.schema";
 import { prisma } from "../../../server";
-import { v4 as uuid } from "uuid";
 import {
   DatabaseAccessFailure,
   InvalidRequestDataFailure,
@@ -24,47 +23,11 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
       return next(body);
     }
 
-    // Ensure UIDs are same as authenticated user's if they exist
-    const hasInvalidUids = body.value.transactions.some((_) => {
-      _.uid && _.uid !== req.data.auth!.user!.id;
-    });
-    if (hasInvalidUids) {
-      return next(
-        new InvalidRequestDataFailure({
-          uid: "Cannot create transactions for another user id",
-        })
-      );
-    }
-
-    // Generate IDs or use provided IDs
-    const transactionsWithIds = body.value.transactions.map((transaction) => {
-      return { ...transaction, id: transaction.id || uuid() };
-    });
-
-    // Check no transaction already exists with IDs
-    const overlappingTransactions = await prisma.transaction.findMany({
-      where: {
-        id: {
-          in: transactionsWithIds.map((_) => _.id),
-        },
-      },
-    });
-
-    // Create lookup object of overlapping IDs for computational efficiency
-    const overlappingIds = overlappingTransactions.reduce((ids, _) => {
-      return { ...ids, [_.id]: true };
-    }, {} as Record<string, boolean>);
-
-    const createTransactions = transactionsWithIds.filter(
-      (transaction) => !overlappingIds[transaction.id]
-    );
-
     const createdTransactions: Array<Transaction & { Category: Category }> = [];
 
-    for (const transaction of createTransactions) {
+    for (const transaction of body.value.transactions) {
       const createdTransaction = await prisma.transaction.create({
         data: {
-          id: transaction.id,
           integerAmount: transaction.integerAmount,
           comment: transaction.comment,
           time: new Date(transaction.time),

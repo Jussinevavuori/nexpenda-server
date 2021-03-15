@@ -36,7 +36,7 @@ transactionsRouter.post("/mass/delete", async (req, res, next) => {
     });
 
     // Respond with 204 and number of deleted items
-    return res.status(204).send({ deletedCount: result.count });
+    return res.status(200).send({ deletedCount: result.count });
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

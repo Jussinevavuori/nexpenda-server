@@ -4,13 +4,12 @@ import { putTransactionSchema } from "../../schemas/transaction.schema";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
-  InvalidRequestDataFailure,
   MissingUrlParametersFailure,
   TransactionNotFoundFailure,
   UnauthenticatedFailure,
-  UnauthorizedFailure,
 } from "../../utils/Failures";
 import { TransactionService } from "../../services/TransactionService";
+import { anyNonNil as isUuid } from "is-uuid";
 
 transactionsRouter.put("/:id", async (req, res, next) => {
   try {
@@ -20,7 +19,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
     }
 
     // Ensure query parameter ID provided
-    if (!req.params.id) {
+    if (!req.params.id && isUuid(req.params.id)) {
       return next(new MissingUrlParametersFailure(["id"]));
     }
 
@@ -39,33 +38,6 @@ transactionsRouter.put("/:id", async (req, res, next) => {
     const body = await validateRequestBody(req, putTransactionSchema);
     if (body.isFailure()) {
       return next(body);
-    }
-
-    // Ensure not updating UID
-    if (body.value.uid && body.value.uid !== req.data.auth.user.id) {
-      return next(
-        new InvalidRequestDataFailure({
-          uid: "Cannot create transaction for another user id",
-        })
-      );
-    }
-
-    // Ensure ID is not changed if updating transaction
-    if (transaction && body.value.id && body.value.id !== transaction.id) {
-      return next(
-        new InvalidRequestDataFailure({
-          id: "Cannot update transaction ID",
-        })
-      );
-    }
-
-    // Ensure UID is not changed if updating transaction
-    if (transaction && body.value.uid && body.value.uid !== transaction.uid) {
-      return next(
-        new InvalidRequestDataFailure({
-          uid: "Cannot update transaction owner",
-        })
-      );
     }
 
     // Upsert transaction

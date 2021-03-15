@@ -3,7 +3,7 @@ import { conf } from "../conf";
 import * as z from "zod";
 import { RefreshToken } from "./RefreshToken";
 import { AbstractToken } from "./AbstractToken";
-import { prisma } from "../server";
+import { PrismaClient } from "@prisma/client";
 
 type IAccessToken = z.TypeOf<typeof AccessToken["schema"]>;
 export class AccessToken
@@ -23,7 +23,7 @@ export class AccessToken
   /**
    * Construct a token from a JWT string
    */
-  constructor(arg: RefreshToken | string) {
+  constructor(arg: RefreshToken | string, prisma: PrismaClient) {
     super(typeof arg === "string" ? arg : { uid: arg.uid, vrs: arg.vrs }, {
       schema: (_) => _.merge(AccessToken.schema),
       tkt: "access",
@@ -51,16 +51,16 @@ export class AccessToken
   });
 
   /**
-   * Get access token from request cookies. Only returns a access token if
-   * the access token is valid and verified.
+   * Get access token from request bearer authorization. Only returns a access
+   * token if the access token is valid and verified.
    */
-  static async fromRequest(request: Request) {
+  static async fromRequest(request: Request, prisma: PrismaClient) {
     const authorizationHeader = request.headers.authorization;
     if (!authorizationHeader) return;
     if (!authorizationHeader.toLowerCase().startsWith("bearer ")) return;
     const token = authorizationHeader.split(" ")[1];
     try {
-      const accessToken = new AccessToken(token);
+      const accessToken = new AccessToken(token, prisma);
       const isVerified = await accessToken.verify();
       if (isVerified) {
         return accessToken;

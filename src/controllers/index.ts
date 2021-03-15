@@ -6,6 +6,7 @@ export const transactionsRouter = Router();
 export const categoriesRouter = Router();
 export const configurationRouter = Router();
 export const stripeRouter = Router();
+export const budgetsRouter = Router();
 
 import "./ping/ping";
 
@@ -40,3 +41,10 @@ import "./configuration/configuration.patch";
 import "./stripe/products.get";
 import "./stripe/create_checkout_session.post";
 import "./stripe/create_billing_portal_session.post";
+
+import "./budgets/budgets.get";
+import "./budgets/budgets.[id].get";
+import "./budgets/budgets.post";
+import "./budgets/budgets.delete";
+import "./budgets/budgets.patch";
+import "./budgets/budgets.put";

@@ -1,8 +1,7 @@
 import * as z from "zod";
 import { Request, Response } from "express";
-import { User } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import { conf } from "../conf";
-import { prisma } from "../server";
 import { AbstractToken } from "./AbstractToken";
 
 type IRefreshToken = z.TypeOf<typeof RefreshToken["schema"]>;
@@ -24,7 +23,7 @@ export class RefreshToken
   /**
    * Construct a token from a JWT string or for a user
    */
-  constructor(arg: User | string) {
+  constructor(arg: User | string, prisma: PrismaClient) {
     super(
       typeof arg === "string" ? arg : { uid: arg.id, vrs: arg.tokenVersion },
       {
@@ -71,12 +70,12 @@ export class RefreshToken
    * Get refresh token from request cookies. Only returns a refresh token if
    * the refresh token is valid and verified.
    */
-  static async fromRequest(request: Request) {
+  static async fromRequest(request: Request, prisma: PrismaClient) {
     if (!request.cookies) return;
     const token = request.cookies[conf.token.refreshToken.name];
     if (typeof token === "string") {
       try {
-        const refreshToken = new RefreshToken(token);
+        const refreshToken = new RefreshToken(token, prisma);
         const isVerified = await refreshToken.verify();
         if (isVerified) {
           return refreshToken;
