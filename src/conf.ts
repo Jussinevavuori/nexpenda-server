@@ -1,17 +1,21 @@
-export function configureEnvironmentVariables() {
+// import { createLogger } from "./utils/createLogger";
+
+// const logger = createLogger({ name: "Conf" });
+
+// logger("Configuring environment");
+if (process.env.NODE_ENV !== "production") {
   try {
     const dotenv = require("dotenv");
-    const env = process.env.NODE_ENV || "development";
-    const path =
-      env === "production" ? `.env` : `.env${env ? "." : ""}${env || ""}`;
-    dotenv.config({ path });
+    const envPath =
+      process.env.NODE_ENV === "production"
+        ? `.env`
+        : `.env${process.env.NODE_ENV ? "." : ""}${process.env.NODE_ENV || ""}`;
+    dotenv.config({
+      path: envPath,
+    });
   } catch (e) {
     console.warn("An error occured while configuring environment", e);
   }
-}
-
-if (process.env.NODE_ENV !== "production") {
-  configureEnvironmentVariables();
 }
 
 export const conf = {
