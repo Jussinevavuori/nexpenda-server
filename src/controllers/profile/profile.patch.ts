@@ -1,4 +1,4 @@
-import { authRouter } from "..";
+import { profileRouter } from "..";
 import { patchProfileSchema } from "../../schemas/profile.schema";
 import { prisma } from "../../server";
 import { StripeUtils } from "../../services/Stripe";
@@ -6,7 +6,7 @@ import { UserService } from "../../services/UserService";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 
-authRouter.patch("/profile", async (req, res, next) => {
+profileRouter.patch("/", async (req, res, next) => {
   // Get user from request, ensure one exists
   const user = req.data.auth.user;
   if (!user) {
@@ -23,6 +23,7 @@ authRouter.patch("/profile", async (req, res, next) => {
   const updatedUser = await prisma.user.update({
     where: { id: user.id },
     data: {
+      photoUrl: body.value.photoUrl,
       displayName: body.value.displayName,
       prefersColorScheme: body.value.prefersColorScheme,
     },

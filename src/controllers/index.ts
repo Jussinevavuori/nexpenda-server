@@ -2,6 +2,7 @@ import { Router } from "express";
 
 export const pingRouter = Router();
 export const authRouter = Router();
+export const profileRouter = Router();
 export const transactionsRouter = Router();
 export const categoriesRouter = Router();
 export const configurationRouter = Router();
@@ -14,14 +15,15 @@ import "./auth/login";
 import "./auth/logout";
 import "./auth/register";
 import "./auth/googleOauth";
-import "./auth/profile.get";
-import "./auth/profile.patch";
 import "./auth/confirm_email";
 import "./auth/refresh_token";
 import "./auth/forgot_password";
 import "./auth/change_password.get";
 import "./auth/change_password.post";
 import "./auth/request_confirm_email";
+
+import "./profile/profile.get";
+import "./profile/profile.patch";
 
 import "./categories/categories.get";
 

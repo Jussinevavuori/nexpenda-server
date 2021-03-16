@@ -1,9 +1,9 @@
-import { authRouter } from "..";
+import { profileRouter } from "..";
 import { StripeUtils } from "../../services/Stripe";
 import { UserService } from "../../services/UserService";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 
-authRouter.get("/profile", async (req, res, next) => {
+profileRouter.get("/", async (req, res, next) => {
   if (!req.data.auth.user) {
     return next(new UnauthenticatedFailure());
   }

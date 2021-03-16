@@ -17,9 +17,7 @@ categoriesRouter.get("/", compression(), async (req, res, next) => {
      */
     const categories = await prisma.category.findMany({
       where: {
-        uid: {
-          equals: req.data.auth.user.id,
-        },
+        uid: req.data.auth.user.id,
       },
     });
 

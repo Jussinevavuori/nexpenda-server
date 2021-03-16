@@ -15,6 +15,7 @@ import {
   configurationRouter,
   stripeRouter,
   budgetsRouter,
+  profileRouter,
 } from "./controllers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -79,6 +80,7 @@ export function startServer() {
       // Api endpoints
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
+      app.use("/api/profile", profileRouter);
       app.use("/api/categories", categoriesRouter);
       app.use("/api/transactions", transactionsRouter);
       app.use("/api/budgets", budgetsRouter);

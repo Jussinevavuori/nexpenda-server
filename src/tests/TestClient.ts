@@ -229,6 +229,18 @@ export class TestClient {
     return this.get(path);
   }
 
+  profile() {
+    const that = this;
+    return {
+      get() {
+        return that.get("/profile");
+      },
+      patch(data: any) {
+        return that.patch("/profile", "", data);
+      },
+    };
+  }
+
   /**
    * All authentication endpoints
    */
@@ -243,9 +255,6 @@ export class TestClient {
       },
       logout() {
         return that.post("/auth/logout");
-      },
-      profile() {
-        return that.get("/auth/profile");
       },
       forgotPassword(data: any) {
         return that.post("/auth/forgot_password", data);
@@ -337,6 +346,18 @@ export class TestClient {
       },
       delete(id: any) {
         return that.delete("/budgets", id);
+      },
+    };
+  }
+
+  /**
+   * All categories endpoints
+   */
+  categories() {
+    const that = this;
+    return {
+      get() {
+        return that.get("/categories");
       },
     };
   }
