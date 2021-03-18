@@ -1,6 +1,7 @@
 import * as compression from "compression";
 import * as z from "zod";
 import { transactionsRouter } from "..";
+import { TimestampMsString } from "../../schemas/utils.schema";
 import { prisma } from "../../server";
 import { TransactionService } from "../../services/TransactionService";
 import {
@@ -10,8 +11,8 @@ import {
 import { validateOr } from "../../utils/validate";
 
 export const getTransactionsQueryParametersSchema = z.object({
-  after: z.number().optional(),
-  before: z.number().optional(),
+  after: TimestampMsString.optional(),
+  before: TimestampMsString.optional(),
 });
 
 transactionsRouter.get("/", compression(), async (req, res, next) => {
@@ -26,8 +27,8 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
     });
 
     const parsedParams = {
-      after: params.after ? new Date(params.after) : undefined,
-      before: params.before ? new Date(params.before) : undefined,
+      after: params.after ? new Date(Number(params.after)) : undefined,
+      before: params.before ? new Date(Number(params.before)) : undefined,
     };
 
     /**
