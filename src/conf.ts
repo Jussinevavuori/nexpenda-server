@@ -64,6 +64,7 @@ export const conf = {
       host: ENV("EMAIL_MAILGUN_HOST"),
     },
     defaultSender: ENV("EMAIL_DEFAULT_SENDER"),
+    developerEmails: ENV_ARRAY("EMAIL_DEVELOPER_EMAILS"),
   },
 
   stripe: {
@@ -92,4 +93,8 @@ function ENV_NUM(variable: string) {
 
 function ENV(variable: string) {
   return process.env[variable] || "";
+}
+
+function ENV_ARRAY(variable: string) {
+  return (process.env[variable] || "").split(";");
 }

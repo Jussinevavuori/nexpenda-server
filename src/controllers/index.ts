@@ -8,6 +8,7 @@ export const categoriesRouter = Router();
 export const configurationRouter = Router();
 export const stripeRouter = Router();
 export const budgetsRouter = Router();
+export const feedbackRouter = Router();
 
 import "./ping/ping";
 
@@ -50,3 +51,5 @@ import "./budgets/budgets.post";
 import "./budgets/budgets.delete";
 import "./budgets/budgets.patch";
 import "./budgets/budgets.put";
+
+import "./feedback/feedback.post";
