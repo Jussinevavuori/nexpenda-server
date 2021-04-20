@@ -4,7 +4,7 @@ generator client {
 
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model Transaction {
@@ -101,7 +101,7 @@ model Feedback {
 
 model Log {
   id         String   @id @default(uuid())
-  uid        String?
+  uid        String
   type       String
   message    String
   data       String
@@ -112,5 +112,5 @@ model Log {
   createdAt  DateTime @default(now()) @map("created_at")
   href       String
 
-  User User? @relation(fields: [uid], references: [id])
+  User User @relation(fields: [uid], references: [id])
 }

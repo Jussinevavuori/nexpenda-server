@@ -17,6 +17,7 @@ import {
   budgetsRouter,
   profileRouter,
   feedbackRouter,
+  logsRouter,
 } from "./controllers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -88,6 +89,7 @@ export function startServer() {
       app.use("/api/config", configurationRouter);
       app.use("/api/stripe", stripeRouter);
       app.use("/api/feedback", feedbackRouter);
+      app.use("/api/logs", logsRouter);
       logger("Configured endpoints");
 
       // Redirect users who navigate to backend URl
