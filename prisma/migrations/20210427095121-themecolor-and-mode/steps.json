@@ -1,0 +1,74 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "themeColor",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "themeColor"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "themeColor"
+        },
+        "directive": "map"
+      },
+      "argument": "",
+      "value": "\"theme_color\""
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "themeMode",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "themeMode"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "themeMode"
+        },
+        "directive": "map"
+      },
+      "argument": "",
+      "value": "\"theme_mode\""
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "prefersColorScheme"
+    }
+  ]
+}

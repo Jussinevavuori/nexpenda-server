@@ -25,7 +25,8 @@ profileRouter.patch("/", async (req, res, next) => {
     data: {
       photoUrl: body.value.photoUrl,
       displayName: body.value.displayName,
-      prefersColorScheme: body.value.prefersColorScheme,
+      themeColor: body.value.themeColor,
+      themeMode: body.value.themeMode,
     },
   });
 

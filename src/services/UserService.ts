@@ -15,7 +15,8 @@ export class UserService {
       photoUrl: user.photoUrl ?? undefined,
       email: user.email ?? undefined,
       googleId: user.googleId ?? undefined,
-      prefersColorScheme: user.prefersColorScheme ?? undefined,
+      themeColor: user.themeColor ?? undefined,
+      themeMode: user.themeMode ?? undefined,
       isAdmin: user.isAdmin,
       isPremium: stripe.subscriptions?.some((sub) => sub.status === "active"),
 
