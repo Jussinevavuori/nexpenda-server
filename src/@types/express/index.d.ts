@@ -19,7 +19,9 @@ declare namespace Express {
          *
          * Undefined means no attempt was made to parse the user.
          */
-        user?: import("@prisma/client").User;
+        user?: Omit<import("@prisma/client").User, "Profile"> & {
+          profile: import("@prisma/client").Profile;
+        };
 
         /**
          * Was an access token found in the request?

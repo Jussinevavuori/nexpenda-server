@@ -1,9 +1,57 @@
-import { User } from "@prisma/client";
+import { Profile, User } from ".prisma/client";
 import Stripe from "stripe";
 
 export class UserService {
+  /**
+   * Creates an empty details. Defaults some of the
+   * fields according to the given user's details.
+   *
+   * @param user 			User to create empty profile for
+   * @param defaults	Overrides for properties
+   */
+  static getEmptyProfile(
+    user: User & { Profile?: Profile | null },
+    defaults: Partial<Omit<Profile, "uid">> = {}
+  ): Profile {
+    return {
+      uid: user.id,
+      displayName: user?.email ?? null,
+      photoUrl: null,
+      themeColor: null,
+      themeMode: null,
+      ...defaults,
+    };
+  }
+
+  /**
+   * Convert a user and a profile into a request user object. If a
+   * profile is provided, that is always used. Else the user's included
+   * profile will be used if it exists. If no profile provided or included
+   * in user object, an empty profile for that user is created.
+   *
+   * @param user		User, with or without profile.
+   * @param profile Given profile to override user's profile.
+   */
+  static createRequestUser(
+    user: User & { Profile?: Profile | null },
+    profile?: Profile
+  ): RequestUser {
+    const { Profile: userProfile, ...userWithoutProfile } = user;
+    const _profile: Profile =
+      profile ?? userProfile ?? UserService.getEmptyProfile(user);
+    return { ...userWithoutProfile, profile: _profile };
+  }
+
+  /**
+   * Return publicly available data of a user, their profile and
+   * stripe account. This data can be sent to an authenticated
+   * requester.
+   *
+   * @param user		User and profile
+   * @param stripe 	Stripe details
+   */
   static getPublicProfileDetails(
-    user: User,
+    user: RequestUser,
     stripe: {
       customer?: Stripe.Customer;
       subscriptions?: Stripe.Subscription[];
@@ -11,12 +59,12 @@ export class UserService {
   ) {
     return {
       id: user.id,
-      displayName: user.displayName ?? undefined,
-      photoUrl: user.photoUrl ?? undefined,
+      displayName: user.profile.displayName ?? undefined,
+      photoUrl: user.profile.photoUrl ?? undefined,
       email: user.email ?? undefined,
       googleId: user.googleId ?? undefined,
-      themeColor: user.themeColor ?? undefined,
-      themeMode: user.themeMode ?? undefined,
+      themeColor: user.profile.themeColor ?? undefined,
+      themeMode: user.profile.themeMode ?? undefined,
       isAdmin: user.isAdmin,
       isPremium: stripe.subscriptions?.some((sub) => sub.status === "active"),
 

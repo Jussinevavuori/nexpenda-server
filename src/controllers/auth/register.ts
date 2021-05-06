@@ -31,13 +31,20 @@ authRouter.post("/register", rateLimiters.strict(), async (req, res, next) => {
     // Hash password
     const hashedPassword = await Password.hash(body.value.password);
 
-    // Create user
+    // Create user and profile
     const user = await prisma.user.create({
       data: {
-        displayName: body.value.email,
         email: body.value.email,
         password: hashedPassword,
+        tokenVersion: 1,
+        emailVerified: false,
+        Profile: {
+          create: {
+            displayName: body.value.email,
+          },
+        },
       },
+      include: { Profile: true },
     });
 
     // Generate confirm email token for user

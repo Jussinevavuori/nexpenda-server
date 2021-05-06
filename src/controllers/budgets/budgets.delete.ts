@@ -31,9 +31,7 @@ budgetsRouter.delete("/:id", async (req, res, next) => {
 
     // Delete all budget category inclusions
     await prisma.budgetCategoryInclusion.deleteMany({
-      where: {
-        budgetId: budget.id,
-      },
+      where: { budgetId: budget.id },
     });
 
     // Delete budget

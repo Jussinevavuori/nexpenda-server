@@ -3,7 +3,6 @@ import { prisma } from "../../server";
 import {
   BudgetNotFoundFailure,
   DatabaseAccessFailure,
-  InvalidRequestDataFailure,
   MissingUrlParametersFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
@@ -27,9 +26,7 @@ budgetsRouter.patch("/:id", async (req, res, next) => {
 
     // Get budget
     const budget = await prisma.budget.findUnique({
-      where: {
-        id: req.params.id,
-      },
+      where: { id: req.params.id },
       select: {
         uid: true,
         id: true,
@@ -64,23 +61,13 @@ budgetsRouter.patch("/:id", async (req, res, next) => {
     // If specified, manually update category IDs
     if (body.value.categoryIds) {
       await prisma.budgetCategoryInclusion.deleteMany({
-        where: {
-          budgetId: budget.id,
-        },
+        where: { budgetId: budget.id },
       });
       for (const categoryId of body.value.categoryIds) {
         await prisma.budgetCategoryInclusion.create({
           data: {
-            Budget: {
-              connect: {
-                id: budget.id,
-              },
-            },
-            Category: {
-              connect: {
-                id: categoryId,
-              },
-            },
+            Budget: { connect: { id: budget.id } },
+            Category: { connect: { id: categoryId } },
           },
         });
       }
@@ -88,16 +75,13 @@ budgetsRouter.patch("/:id", async (req, res, next) => {
 
     // Update budget
     const updated = await prisma.budget.update({
-      where: {
-        id: budget.id,
-      },
+      where: { id: budget.id },
       data: {
         integerAmount: body.value.integerAmount,
         label: body.value.label,
+        periodMonths: body.value.periodMonths,
       },
-      include: {
-        BudgetCategoryInclusions: true,
-      },
+      include: { BudgetCategoryInclusions: true },
     });
 
     // Send updated budget to user

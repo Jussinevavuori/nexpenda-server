@@ -17,12 +17,8 @@ budgetsRouter.get("/", compression(), async (req, res, next) => {
      * Get all budgets for user
      */
     const budgets = await prisma.budget.findMany({
-      where: {
-        uid: req.data.auth.user.id,
-      },
-      include: {
-        BudgetCategoryInclusions: true,
-      },
+      where: { uid: req.data.auth.user.id },
+      include: { BudgetCategoryInclusions: true },
     });
 
     /**

@@ -25,17 +25,13 @@ model Transaction {
 
 model User {
   id               String   @id @default(uuid())
-  displayName      String?  @map("display_name")
   email            String?  @unique
   emailVerified    Boolean  @default(false) @map("email_verified")
   password         String?
   googleId         String?  @unique @map("google_id")
-  photoUrl         String?  @map("photo_url")
   tokenVersion     Int      @default(1) @map("token_version")
   disabled         Boolean  @default(false)
   isAdmin          Boolean  @default(false) @map("is_admin")
-  themeColor       String?  @map("theme_color")
-  themeMode        String?  @map("theme_mode")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
   stripeCustomerId String?  @map("stripe_customer_id")
@@ -44,9 +40,21 @@ model User {
   Categories   Category[]
   Budgets      Budget[]
   Feedback     Feedback[]
+  Profile      Profile?
 
   Log Log[]
   @@map(name: "users")
+}
+
+model Profile {
+  uid         String  @id
+  displayName String? @map("display_name")
+  photoUrl    String? @map("photo_url")
+  themeColor  String? @map("theme_color")
+  themeMode   String? @map("theme_mode")
+
+  User User @relation(fields: [uid], references: [id])
+  @@map(name: "profiles")
 }
 
 model Budget {
@@ -56,6 +64,7 @@ model Budget {
   integerAmount Int      @map("integer_amount")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  periodMonths  Int      @default(1) @map("period_months")
 
   BudgetCategoryInclusions BudgetCategoryInclusion[]
 

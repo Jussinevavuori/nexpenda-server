@@ -1,3 +1,5 @@
-import { startServer } from "./server";
+import { configureEnvironment } from "./conf";
+configureEnvironment({ skipInProduction: true });
 
-startServer();
+// Start server
+import("./server").then((_) => _.startServer());

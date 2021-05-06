@@ -1,7 +1,9 @@
 import * as jest from "jest-cli";
-import { startServer, prisma } from "../server";
+import { configureEnvironment } from "../conf";
+import { prisma, startServer } from "../server";
 
 async function initialize() {
+  await configureEnvironment();
   await startServer();
 
   await prisma.budgetCategoryInclusion.deleteMany({
@@ -10,6 +12,7 @@ async function initialize() {
   await prisma.budget.deleteMany({ where: { uid: { not: "_" } } });
   await prisma.transaction.deleteMany({ where: { uid: { not: "_" } } });
   await prisma.category.deleteMany({ where: { uid: { not: "_" } } });
+  await prisma.profile.deleteMany({ where: { uid: { not: "_" } } });
   await prisma.user.deleteMany({ where: { id: { not: "_" } } });
 }
 

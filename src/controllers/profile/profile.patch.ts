@@ -20,8 +20,8 @@ profileRouter.patch("/", async (req, res, next) => {
   }
 
   // Update profile record
-  const updatedUser = await prisma.user.update({
-    where: { id: user.id },
+  const updatedProfile = await prisma.profile.update({
+    where: { uid: user.id },
     data: {
       photoUrl: body.value.photoUrl,
       displayName: body.value.displayName,
@@ -30,7 +30,14 @@ profileRouter.patch("/", async (req, res, next) => {
     },
   });
 
-  const customer = await StripeUtils.getUserCustomer(updatedUser);
+  // Updated user
+  const updatedUser = UserService.createRequestUser(user, updatedProfile);
+
+  const customer = await StripeUtils.getUserCustomer({
+    ...user,
+    profile: updatedProfile,
+  });
+
   const subscriptions = customer
     ? await StripeUtils.getSubscriptionsForCustomer(customer.id)
     : undefined;

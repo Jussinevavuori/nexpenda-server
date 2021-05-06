@@ -15,6 +15,7 @@ export type BudgetResponse = {
   createdAt: number;
   integerAmount: number;
   categoryIds: string[];
+  periodMonths: number;
 };
 
 export class BudgetService {
@@ -70,6 +71,7 @@ export class BudgetService {
         createdAt: budget.createdAt.getTime(),
         integerAmount: budget.integerAmount,
         label: budget.label ?? undefined,
+        periodMonths: budget.periodMonths,
       };
     }
   }

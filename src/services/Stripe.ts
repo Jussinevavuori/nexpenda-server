@@ -1,4 +1,4 @@
-import { User } from ".prisma/client";
+import { Profile, User } from ".prisma/client";
 import { Stripe } from "stripe";
 import { conf } from "../conf";
 import { prisma } from "../server";
@@ -15,7 +15,7 @@ export class StripeUtils {
    * @param user User to create or update Stripe customer for
    * @returns Updated customer
    */
-  static async createOrUpdateCustomer(user: User) {
+  static async createOrUpdateCustomer(user: RequestUser) {
     // Check for existing user
     const existing = await StripeUtils.getUserCustomer(user);
 
@@ -23,14 +23,14 @@ export class StripeUtils {
     const customer =
       existing && !existing.deleted
         ? await stripe.customers.update(existing.id, {
-            name: user.displayName ?? undefined,
+            name: user.profile.displayName ?? undefined,
             metadata: {
               nexpenda_uid: user.id,
             },
           })
         : await stripe.customers.create({
             email: user.email ?? undefined,
-            name: user.displayName ?? undefined,
+            name: user.profile.displayName ?? undefined,
             metadata: {
               nexpenda_uid: user.id,
             },
@@ -52,7 +52,7 @@ export class StripeUtils {
    *
    * @param user The user for which to fetch the
    */
-  static async getUserCustomer(user: User) {
+  static async getUserCustomer(user: RequestUser) {
     try {
       if (!user.stripeCustomerId) return undefined;
       const customer = await stripe.customers.retrieve(user.stripeCustomerId);

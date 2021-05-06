@@ -22,12 +22,8 @@ budgetsRouter.get("/:id", async (req, res, next) => {
 
     // Get budget
     const budget = await prisma.budget.findUnique({
-      where: {
-        id: req.params.id,
-      },
-      include: {
-        BudgetCategoryInclusions: true,
-      },
+      where: { id: req.params.id },
+      include: { BudgetCategoryInclusions: true },
     });
 
     // Ensure budget found and belongs to authenticated user

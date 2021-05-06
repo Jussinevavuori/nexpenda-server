@@ -1,11 +1,18 @@
 import { configurationRouter } from "..";
 import { configSchema, patchConfigSchema } from "../../schemas/config.schema";
 import { firestore } from "../../server";
-import { UnauthenticatedFailure } from "../../utils/Failures";
+import {
+  ServerInitializationFailure,
+  UnauthenticatedFailure,
+} from "../../utils/Failures";
 import { validate } from "../../utils/validate";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 
 configurationRouter.patch("/", async (req, res, next) => {
+  if (!firestore) {
+    return next(new ServerInitializationFailure("Firestore not initialized"));
+  }
+
   if (!req.data.auth.user || !req.data.auth.user.isAdmin) {
     return next(new UnauthenticatedFailure());
   }

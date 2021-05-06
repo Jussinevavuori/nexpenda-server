@@ -36,7 +36,7 @@ feedbackRouter.post("/", async (req, res, next) => {
 
     const passwordChangedTemplate = new FeedbackReceivedTempate({
       email: req.data.auth.user.email ?? "No email",
-      displayName: req.data.auth.user.displayName ?? "No display name",
+      displayName: req.data.auth.user.profile.displayName ?? "No display name",
       message: body.value.message ?? "(No message)",
     });
 

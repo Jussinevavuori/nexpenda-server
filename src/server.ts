@@ -36,10 +36,7 @@ export const app: express.Application = express();
 export const http = createServer(app);
 export const io = socketIO(http);
 export let prisma = new PrismaClient();
-export let firestore = new Firestore({
-  projectId: conf.google.projectId,
-  keyFilename: conf.google.applicationCredentials,
-});
+export let firestore: undefined | Firestore;
 export let server: undefined | Server;
 
 export function startServer() {
@@ -54,8 +51,12 @@ export function startServer() {
       await require("./passport");
       logger("Passport configured");
 
-      // Connect to DB
+      // Connect to DBs
       await prisma.$connect();
+      firestore = new Firestore({
+        projectId: conf.google.projectId,
+        keyFilename: conf.google.applicationCredentials,
+      });
       logger("Connected to database");
 
       // Middleware

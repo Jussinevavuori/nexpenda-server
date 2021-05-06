@@ -38,26 +38,15 @@ budgetsRouter.post("/", async (req, res, next) => {
       data: {
         integerAmount: body.value.integerAmount,
         label: body.value.label,
-        User: {
-          connect: {
-            id: uid,
-          },
-        },
+        periodMonths: body.value.periodMonths,
+        User: { connect: { id: uid } },
         BudgetCategoryInclusions: {
-          create: body.value.categoryIds.map((id) => {
-            return {
-              Category: {
-                connect: {
-                  id,
-                },
-              },
-            };
-          }),
+          create: body.value.categoryIds.map((id) => ({
+            Category: { connect: { id } },
+          })),
         },
       },
-      include: {
-        BudgetCategoryInclusions: true,
-      },
+      include: { BudgetCategoryInclusions: true },
     });
 
     /**

@@ -25,12 +25,12 @@ budgetsRouter.put("/:id", async (req, res, next) => {
     }
 
     // Get potentially existing transaction
-    const budget = await prisma.budget.findUnique({
+    const existingBudget = await prisma.budget.findUnique({
       where: { id: req.params.id },
     });
 
     // Ensure budget belongs to authenticated user
-    if (budget && budget.uid !== req.data.auth.user.id) {
+    if (existingBudget && existingBudget.uid !== req.data.auth.user.id) {
       return next(new BudgetNotFoundFailure());
     }
 
@@ -52,16 +52,12 @@ budgetsRouter.put("/:id", async (req, res, next) => {
     }
 
     // If budget exists, delete it
-    if (budget) {
+    if (existingBudget) {
       await prisma.budgetCategoryInclusion.deleteMany({
-        where: {
-          budgetId: budget.id,
-        },
+        where: { budgetId: existingBudget.id },
       });
       await prisma.budget.delete({
-        where: {
-          id: budget.id,
-        },
+        where: { id: existingBudget.id },
       });
     }
 
@@ -71,26 +67,15 @@ budgetsRouter.put("/:id", async (req, res, next) => {
         id: req.params.id,
         integerAmount: body.value.integerAmount,
         label: body.value.label,
-        User: {
-          connect: {
-            id: uid,
-          },
-        },
+        periodMonths: body.value.periodMonths,
+        User: { connect: { id: uid } },
         BudgetCategoryInclusions: {
-          create: body.value.categoryIds.map((id) => {
-            return {
-              Category: {
-                connect: {
-                  id,
-                },
-              },
-            };
-          }),
+          create: body.value.categoryIds.map((id) => ({
+            Category: { connect: { id } },
+          })),
         },
       },
-      include: {
-        BudgetCategoryInclusions: true,
-      },
+      include: { BudgetCategoryInclusions: true },
     });
 
     // Send upserted budget to user

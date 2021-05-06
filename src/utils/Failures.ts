@@ -1,6 +1,7 @@
 import { Failure } from "./Result";
 
 export type ServerFailureCode =
+  | "server/initialization-failure"
   | "request/invalid-request-data"
   | "request/too-many-requests"
   | "request/missing-query-parameters"
@@ -27,6 +28,19 @@ export type ServerFailureCode =
   | "failure/error"
   | "failure/unknown"
   | "failure/cors";
+
+export class ServerInitializationFailure<T> extends Failure<
+  T,
+  "server/initialization-failure"
+> {
+  constructor(message: string = "Failed to properly initialize server") {
+    super({
+      code: "server/initialization-failure",
+      message,
+      status: 500,
+    });
+  }
+}
 
 export class InvalidRequestDataFailure<T> extends Failure<
   T,

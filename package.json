@@ -22,7 +22,11 @@
     "studio:prod": "cd ../nexpenda-prismastudio/prod && node update-schema && npx prisma studio --experimental",
     "studio:test": "cd ../nexpenda-prismastudio/test && node update-schema && npx prisma studio --experimental",
     "psql:dev": "psql expencedev postgres",
-    "deploy": "gcloud builds submit"
+    "psql:test": "psql expencetest postgres",
+    "deploy": "gcloud builds submit",
+    "run-prod": "cross-env NODE_ENV=production ts-node --files ./src/run.ts",
+    "run-dev": "cross-env NODE_ENV=development ts-node --files ./src/run.ts",
+    "run-test": "cross-env NODE_ENV=test ts-node --files ./src/run.ts"
   },
   "engines": {
     "node": "12.x",

@@ -111,9 +111,9 @@ describe("/api/auth/register/ [POST]", () => {
       password: faker.internet.password(),
     });
     expect(response.status).toBe(200);
-    const userInDb = await prisma.user.findUnique({ where: { email } });
+    const userInDb = await prisma.user.findUnique({ where: { email },include:{Profile:true} });
     expect(userInDb).toBeDefined();
-    expect(userInDb?.displayName).toBe(email);
+    expect(userInDb?.Profile?.displayName).toBe(email);
     done();
   });
 

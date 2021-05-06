@@ -56,7 +56,8 @@ describe("/api/categories", () => {
     let profile = await getProfile();
     expect(profile.displayName).not.toBe("new_name");
     expect(profile.photoUrl).not.toBe("new_photo");
-    expect(profile.preferesColorScheme).not.toBe("new_color");
+    expect(profile.themeColor).not.toBe("new_color");
+    expect(profile.themeMode).not.toBe("new_mode");
 
     // Patch display name
     const patchResponse_1 = await client
@@ -74,13 +75,21 @@ describe("/api/categories", () => {
     expect(patchResponse_2.status).toBe(200);
     expect(profile.photoUrl).toBe("new_photo");
 
-    // Patch prefersColorScheme
+    // Patch themeColor
     const patchResponse_3 = await client
       .profile()
-      .patch({ prefersColorScheme: "new_color" });
+      .patch({ themeColor: "new_color" });
     profile = await getProfile();
     expect(patchResponse_3.status).toBe(200);
-    expect(profile.prefersColorScheme).toBe("new_color");
+    expect(profile.themeColor).toBe("new_color");
+
+    // Patch themeMode
+    const patchResponse_4 = await client
+      .profile()
+      .patch({ themeMode: "new_mode" });
+    profile = await getProfile();
+    expect(patchResponse_4.status).toBe(200);
+    expect(profile.themeMode).toBe("new_mode");
 
     // Attempt patching other details
     const newEmail = "new@gmail.com";

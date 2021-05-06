@@ -27,17 +27,17 @@ passport.use(
       clientSecret: conf.google.clientSecret,
       callbackURL: `${conf.hosts.server}/api/auth/google/callback`,
     },
-    async (_accessToken, _refreshToken, profile, done) => {
+    async (_accessToken, _refreshToken, googleProfile, done) => {
       try {
         // Extract profile details
-        const googleId = profile.id;
+        const googleId = googleProfile.id;
         const email =
-          profile.emails && profile.emails[0]
-            ? profile.emails[0].value
+          googleProfile.emails && googleProfile.emails[0]
+            ? googleProfile.emails[0].value
             : undefined;
         const photoUrl =
-          profile.photos && profile.photos[0]
-            ? profile.photos[0].value
+          googleProfile.photos && googleProfile.photos[0]
+            ? googleProfile.photos[0].value
             : undefined;
 
         if (!email) {
@@ -45,50 +45,73 @@ passport.use(
         }
 
         // Seek existing user by email
-        const existingUser = await prisma.user.findUnique({ where: { email } });
+        const existingUser = await prisma.user.findUnique({
+          where: { email },
+          include: { Profile: true },
+        });
 
         // Existing user found: update missing fields and return
         if (existingUser) {
           let user = existingUser;
+          let profile = existingUser.Profile;
 
           // Update Google ID if none set
           if (!user.googleId) {
             user = await prisma.user.update({
               where: { id: user.id },
               data: { googleId },
+              include: { Profile: true },
+            });
+          }
+
+          // Create profile if missing
+          if (!profile) {
+            profile = await prisma.profile.create({
+              data: {
+                displayName: googleProfile.displayName,
+                photoUrl,
+                User: { connect: { id: user.id } },
+              },
             });
           }
 
           // Update photo URL if none set
-          if (!user.photoUrl) {
-            user = await prisma.user.update({
-              where: { id: user.id },
+          if (!user.Profile?.photoUrl) {
+            profile = await prisma.profile.update({
+              where: { uid: user.id },
               data: { photoUrl },
             });
           }
 
           // Update display name if none or default set
-          if (!user.displayName || user.displayName === email) {
-            user = await prisma.user.update({
-              where: { id: user.id },
-              data: { displayName: profile.displayName },
+          if (!profile.displayName || profile.displayName === email) {
+            profile = await prisma.profile.update({
+              where: { uid: user.id },
+              data: { photoUrl },
             });
           }
 
           // Return existing user
-          done(null, user);
+          done(null, { ...user, Profile: profile });
         } else {
-          // Create user if existing user not found.
+          // Create user and profile if existing user not found.
           const createdUser = await prisma.user.create({
             data: {
-              displayName: profile.displayName,
-              googleId: profile.id,
+              googleId: googleProfile.id,
               email,
-              photoUrl,
               emailVerified: true,
               tokenVersion: 1,
+              Profile: {
+                create: {
+                  displayName: googleProfile.displayName,
+                  photoUrl,
+                },
+              },
             },
+            include: { Profile: true },
           });
+
+          // Return created user
           done(null, createdUser);
         }
       } catch (error) {

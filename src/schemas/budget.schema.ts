@@ -5,18 +5,15 @@ export const budgetSchema = z.object({
   label: z.string().optional(),
   integerAmount: z.number().int(),
   categoryIds: z.array(z.string()),
+  periodMonths: z.number().positive().int().min(1).max(12).optional(),
 });
 
 export const postBudgetSchema = budgetSchema.omit({ id: true });
 export const putBudgetSchema = budgetSchema.omit({ id: true });
 export const patchBudgetSchema = budgetSchema
   .partial()
-  .omit({ label: true, id: true })
-  .merge(
-    z.object({
-      label: z.string().optional().nullable(),
-    })
-  );
+  .omit({ id: true })
+  .extend({ label: z.string().optional().nullable() });
 
 export type BudgetSchema = z.TypeOf<typeof budgetSchema>;
 export type PostBudgetSchema = z.TypeOf<typeof postBudgetSchema>;

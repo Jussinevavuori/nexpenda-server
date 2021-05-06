@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { prisma } from "../server";
 import { AccessToken } from "../services/AccessToken";
 import { RefreshToken } from "../services/RefreshToken";
+import { UserService } from "../services/UserService";
 
 export function extractAuthentication() {
   return async function extractAuthenticationMiddleware(
@@ -57,6 +58,7 @@ export function extractAuthentication() {
      */
     const user = await prisma.user.findUnique({
       where: { id: request.data.auth.accessToken.uid },
+      include: { Profile: true },
     });
 
     /**
@@ -86,9 +88,31 @@ export function extractAuthentication() {
     }
 
     /**
-     * Apply found user to request and continue
+     * Default profile if none found
      */
-    request.data.auth.user = user;
+    if (!user.Profile) {
+      user.Profile = {
+        uid: user.id,
+        displayName: null,
+        photoUrl: null,
+        themeColor: null,
+        themeMode: null,
+      };
+    }
+
+    /**
+     * If no profile found, create empty one for user.
+     */
+    const profile =
+      user.Profile ??
+      (await prisma.profile.create({
+        data: { User: { connect: { id: user.id } }, displayName: user.email },
+      }));
+
+    /**
+     * Apply found user to request and continue.
+     */
+    request.data.auth.user = UserService.createRequestUser(user, profile);
 
     next();
   };
