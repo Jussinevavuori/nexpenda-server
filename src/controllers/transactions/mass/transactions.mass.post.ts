@@ -4,7 +4,6 @@ import { postTransactionsSchema } from "../../../schemas/transaction.schema";
 import { prisma } from "../../../server";
 import {
   DatabaseAccessFailure,
-  InvalidRequestDataFailure,
   UnauthenticatedFailure,
 } from "../../../utils/Failures";
 import { TransactionService } from "../../../services/TransactionService";
@@ -21,6 +20,15 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
     const body = await validateRequestBody(req, postTransactionsSchema);
     if (body.isFailure()) {
       return next(body);
+    }
+
+    // Ensure the user is allowed to create the requested transactions
+    const createPermission = await TransactionService.ensureCreatePermission(
+      req.data.auth.user,
+      body.value.transactions.length
+    );
+    if (createPermission.isFailure()) {
+      return next(createPermission);
     }
 
     const createdTransactions: Array<Transaction & { Category: Category }> = [];

@@ -1,5 +1,5 @@
 import { profileRouter } from "..";
-import { StripeUtils } from "../../services/Stripe";
+import { StripeService } from "../../services/StripeService";
 import { UserService } from "../../services/UserService";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 
@@ -8,9 +8,9 @@ profileRouter.get("/", async (req, res, next) => {
     return next(new UnauthenticatedFailure());
   }
 
-  const customer = await StripeUtils.getUserCustomer(req.data.auth.user);
+  const customer = await StripeService.getUserCustomer(req.data.auth.user);
   const subscriptions = customer
-    ? await StripeUtils.getSubscriptionsForCustomer(customer.id)
+    ? await StripeService.getSubscriptionsForCustomer(customer.id)
     : undefined;
 
   return res.json(

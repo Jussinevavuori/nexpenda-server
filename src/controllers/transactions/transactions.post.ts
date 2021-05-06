@@ -21,6 +21,14 @@ transactionsRouter.post("/", async (req, res, next) => {
       return next(body);
     }
 
+    // Ensure the user is allowed to create the requested transactions
+    const createPermission = await TransactionService.ensureCreatePermission(
+      req.data.auth.user
+    );
+    if (createPermission.isFailure()) {
+      return next(createPermission);
+    }
+
     // Create new transaction from body
     const created = await prisma.transaction.create({
       data: {

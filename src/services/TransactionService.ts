@@ -1,5 +1,10 @@
 import { Category, Transaction } from "@prisma/client";
+import { prisma } from "../server";
 import { DataUtils } from "../utils/DataUtils";
+import { TransactionLimitExceededFailure } from "../utils/Failures";
+import { Success } from "../utils/Result";
+import { ConfigurationService } from "./ConfigurationService";
+import { StripeService } from "./StripeService";
 
 export type TransactionResponseMappable = Transaction & { Category: Category };
 
@@ -103,5 +108,44 @@ export class TransactionService {
         i: c.icon || "",
       })),
     };
+  }
+
+  /**
+   * Ensure the user is allowed to create transactions. The user is allowed to
+   * create unlimited transactions as a premium member, else they have a limit.
+   * If this limit is exceeded by creating the given amount of transactions,
+   * return a failure.
+   *
+   * @param user				The user
+   * @param createCount	The number of transactions that are being created.
+   * 										Defaults to one.
+   */
+  static async ensureCreatePermission(
+    user: RequestUser,
+    createCount: number = 1
+  ) {
+    // Premium users are always permitted
+    const isPremium = await StripeService.isPremium(user.stripeCustomerId);
+    if (isPremium) {
+      return Success.Empty();
+    }
+
+    // Fetch current configuration
+    const configuration = await ConfigurationService.getConfiguration();
+    const limit = configuration.isSuccess()
+      ? configuration.value.freeTransactionsLimit
+      : Infinity; // No limit when configuration fails
+
+    // Count user's current transactions
+    const currentCount = await prisma.transaction.count({
+      where: { uid: user.id },
+    });
+
+    // If too many transactions, return failure
+    if (currentCount + createCount > limit) {
+      return new TransactionLimitExceededFailure();
+    }
+
+    return Success.Empty();
   }
 }

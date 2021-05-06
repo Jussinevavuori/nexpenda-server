@@ -1,4 +1,3 @@
-import { Profile, User } from ".prisma/client";
 import { Stripe } from "stripe";
 import { conf } from "../conf";
 import { prisma } from "../server";
@@ -7,7 +6,7 @@ export const stripe = new Stripe(conf.stripe.secretKey, {
   apiVersion: "2020-08-27",
 });
 
-export class StripeUtils {
+export class StripeService {
   /**
    * Creates or updates a customer to the Stripe database. The customer
    * is linked to the user.
@@ -17,7 +16,7 @@ export class StripeUtils {
    */
   static async createOrUpdateCustomer(user: RequestUser) {
     // Check for existing user
-    const existing = await StripeUtils.getUserCustomer(user);
+    const existing = await StripeService.getUserCustomer(user);
 
     // Create or update user
     const customer =
@@ -71,15 +70,43 @@ export class StripeUtils {
    *
    * @param customerId Stripe customer's id
    */
-  static async getSubscriptionsForCustomer(customerId: string) {
+  static async getSubscriptionsForCustomer(customerId?: string | null) {
+    if (!customerId) {
+      return [];
+    }
+
     const response = await stripe.subscriptions.list({ customer: customerId });
     return response?.data;
   }
 
+  /**
+   * Check if a user is actively subscribed
+   *
+   * @param customerId Customer ID to check for
+   */
+  static async isPremium(customerId?: string | null): Promise<boolean> {
+    if (!customerId) {
+      return false;
+    }
+
+    const subscriptions = await StripeService.getSubscriptionsForCustomer(
+      customerId
+    );
+    return subscriptions.some((_) => _.status === "active");
+  }
+
+  /**
+   * Combines products and prices into an easier-to-user format
+   * @param products 	List of products
+   * @param prices 	 	List of prices
+   * @returns        	List of products with each product containing
+   * 									a prices field which contains all prices for
+   * 									that product.
+   */
   static combineProductsAndPrices(
     products: Stripe.Product[],
     prices: Stripe.Price[]
-  ) {
+  ): Array<Stripe.Product & { prices: Stripe.Price[] }> {
     return products.map((product) => {
       return {
         ...product,

@@ -1,5 +1,5 @@
 import { stripeRouter } from "..";
-import { stripe, StripeUtils } from "../../services/Stripe";
+import { stripe, StripeService } from "../../services/StripeService";
 import { StripeFailure } from "../../utils/Failures";
 
 stripeRouter.get("/products", async (req, res, next) => {
@@ -7,7 +7,7 @@ stripeRouter.get("/products", async (req, res, next) => {
     const productsResponse = await stripe.products.list();
     const pricesResponse = await stripe.prices.list();
 
-    const products = StripeUtils.combineProductsAndPrices(
+    const products = StripeService.combineProductsAndPrices(
       productsResponse.data,
       pricesResponse.data
     );

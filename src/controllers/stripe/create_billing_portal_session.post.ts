@@ -1,5 +1,5 @@
 import { stripeRouter } from "..";
-import { stripe, StripeUtils } from "../../services/Stripe";
+import { stripe, StripeService } from "../../services/StripeService";
 import { StripeFailure, UnauthenticatedFailure } from "../../utils/Failures";
 import { getUrl } from "../../utils/getUrl";
 
@@ -11,7 +11,7 @@ stripeRouter.post("/create-billing-portal-session", async (req, res, next) => {
   }
 
   // Create or update stripe customer for user
-  const customer = await StripeUtils.createOrUpdateCustomer(user);
+  const customer = await StripeService.createOrUpdateCustomer(user);
 
   try {
     // Create a stripe checkout session

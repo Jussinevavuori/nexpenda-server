@@ -8,6 +8,7 @@ export type ServerFailureCode =
   | "request/missing-url-parameters"
   | "transaction/already-exists"
   | "transaction/not-found"
+  | "transaction/limit-exceeded"
   | "budget/already-exists"
   | "budget/not-found"
   | "auth/missing-token"
@@ -22,6 +23,7 @@ export type ServerFailureCode =
   | "auth/email-already-confirmed"
   | "mail/error"
   | "database/access-failure"
+  | "firestore/access-failure"
   | "stripe/failure"
   | "failure/validation"
   | "failure/unimplemented"
@@ -131,6 +133,19 @@ export class TransactionNotFoundFailure<T> extends Failure<
       code: "transaction/not-found",
       status: 404,
       message: "Transaction not found",
+    });
+  }
+}
+
+export class TransactionLimitExceededFailure<T> extends Failure<
+  T,
+  "transaction/limit-exceeded"
+> {
+  constructor() {
+    super({
+      code: "transaction/limit-exceeded",
+      status: 400,
+      message: "Too many transactions",
     });
   }
 }
@@ -302,6 +317,21 @@ export class DatabaseAccessFailure<T> extends Failure<
       code: "database/access-failure",
       status: 500,
       message: "Database access failure",
+    });
+    this.error = error;
+  }
+}
+
+export class FirestoreAccessFailure<T> extends Failure<
+  T,
+  "firestore/access-failure"
+> {
+  public readonly error?: Error;
+  constructor(error?: Error) {
+    super({
+      code: "firestore/access-failure",
+      status: 500,
+      message: "Firestore access failure",
     });
     this.error = error;
   }

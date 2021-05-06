@@ -1,7 +1,7 @@
 import { profileRouter } from "..";
 import { patchProfileSchema } from "../../schemas/profile.schema";
 import { prisma } from "../../server";
-import { StripeUtils } from "../../services/Stripe";
+import { StripeService } from "../../services/StripeService";
 import { UserService } from "../../services/UserService";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 import { validateRequestBody } from "../../utils/validateRequestBody";
@@ -33,13 +33,13 @@ profileRouter.patch("/", async (req, res, next) => {
   // Updated user
   const updatedUser = UserService.createRequestUser(user, updatedProfile);
 
-  const customer = await StripeUtils.getUserCustomer({
+  const customer = await StripeService.getUserCustomer({
     ...user,
     profile: updatedProfile,
   });
 
   const subscriptions = customer
-    ? await StripeUtils.getSubscriptionsForCustomer(customer.id)
+    ? await StripeService.getSubscriptionsForCustomer(customer.id)
     : undefined;
 
   // Respond with updated profile record

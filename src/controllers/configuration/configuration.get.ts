@@ -1,20 +1,11 @@
 import { configurationRouter } from "..";
-import { firestore } from "../../server";
-import { validate } from "../../utils/validate";
-import { configSchema } from "../../schemas/config.schema";
-import { ServerInitializationFailure } from "../../utils/Failures";
+import { ConfigurationService } from "../../services/ConfigurationService";
 
 configurationRouter.get("/", async (req, res, next) => {
-  if (!firestore) {
-    return next(new ServerInitializationFailure("Firestore not initialized"));
+  const configuration = await ConfigurationService.getConfiguration();
+  if (configuration.isFailure()) {
+    return next(configuration);
   }
 
-  const configDoc = await firestore.doc("configuration/configuration").get();
-
-  const validated = await validate(configDoc.data(), configSchema);
-  if (validated.isFailure()) {
-    return next(validated);
-  }
-
-  return res.send(validated.value);
+  return res.send(configuration.value);
 });

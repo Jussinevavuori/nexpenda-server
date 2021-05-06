@@ -1,6 +1,7 @@
 import * as z from "zod";
 
 export const configSchema = z.object({
+  freeTransactionsLimit: z.number().int().positive(),
   status: z.enum(["online", "offline"]),
 });
 

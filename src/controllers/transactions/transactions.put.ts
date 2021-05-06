@@ -34,6 +34,16 @@ transactionsRouter.put("/:id", async (req, res, next) => {
       return next(new TransactionNotFoundFailure());
     }
 
+    // If creating, ensure the user is allowed to create the requested transactions
+    if (!transaction) {
+      const createPermission = await TransactionService.ensureCreatePermission(
+        req.data.auth.user
+      );
+      if (createPermission.isFailure()) {
+        return next(createPermission);
+      }
+    }
+
     // Validate request body
     const body = await validateRequestBody(req, putTransactionSchema);
     if (body.isFailure()) {

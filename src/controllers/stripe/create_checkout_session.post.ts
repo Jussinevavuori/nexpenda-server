@@ -1,5 +1,5 @@
 import { stripeRouter } from "..";
-import { stripe, StripeUtils } from "../../services/Stripe";
+import { stripe, StripeService } from "../../services/StripeService";
 import {
   InvalidRequestDataFailure,
   StripeFailure,
@@ -15,7 +15,7 @@ stripeRouter.post("/create-checkout-session", async (req, res, next) => {
   }
 
   // Create or update stripe customer for user
-  const customer = await StripeUtils.createOrUpdateCustomer(user);
+  const customer = await StripeService.createOrUpdateCustomer(user);
 
   // Get price id from request and validate it is a string
   const priceId = req.body.priceId;
