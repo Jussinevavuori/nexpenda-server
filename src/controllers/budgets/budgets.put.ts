@@ -34,6 +34,16 @@ budgetsRouter.put("/:id", async (req, res, next) => {
       return next(new BudgetNotFoundFailure());
     }
 
+    // If creating, ensure the user is allowed to create the requested budget
+    if (!existingBudget) {
+      const createPermission = await BudgetService.ensureCreatePermission(
+        req.data.auth.user
+      );
+      if (createPermission.isFailure()) {
+        return next(createPermission);
+      }
+    }
+
     // Validate request body
     const body = await validateRequestBody(req, putBudgetSchema);
     if (body.isFailure()) {

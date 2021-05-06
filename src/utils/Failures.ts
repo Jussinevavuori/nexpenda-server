@@ -11,6 +11,7 @@ export type ServerFailureCode =
   | "transaction/limit-exceeded"
   | "budget/already-exists"
   | "budget/not-found"
+  | "budget/limit-exceeded"
   | "auth/missing-token"
   | "auth/invalid-token"
   | "auth/user-has-no-password"
@@ -169,6 +170,19 @@ export class BudgetNotFoundFailure<T> extends Failure<T, "budget/not-found"> {
       code: "budget/not-found",
       status: 404,
       message: "budget not found",
+    });
+  }
+}
+
+export class BudgetLimitExceededFailure<T> extends Failure<
+  T,
+  "budget/limit-exceeded"
+> {
+  constructor() {
+    super({
+      code: "budget/limit-exceeded",
+      status: 400,
+      message: "Too many budgets",
     });
   }
 }

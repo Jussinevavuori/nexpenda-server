@@ -22,6 +22,14 @@ budgetsRouter.post("/", async (req, res, next) => {
       return next(body);
     }
 
+    // Ensure the user is allowed to create the requested transactions
+    const createPermission = await BudgetService.ensureCreatePermission(
+      req.data.auth.user
+    );
+    if (createPermission.isFailure()) {
+      return next(createPermission);
+    }
+
     // Ensure all specified categories exist and are owned by authenticated user
     const categoriesValidityCheck = await BudgetService.ensureValidCategoryIds(
       req.data.auth.user,

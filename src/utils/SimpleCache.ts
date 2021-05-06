@@ -35,7 +35,7 @@ export class SimpleCache<T> {
       return false;
     }
 
-    return this.getValueBecomesStaleAt() > Date.now();
+    return this.getValueBecomesStaleAt() < Date.now();
   }
 
   /**
