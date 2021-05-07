@@ -2,7 +2,9 @@ import { configurationRouter } from "..";
 import { ConfigurationService } from "../../services/ConfigurationService";
 
 configurationRouter.get("/", async (req, res, next) => {
-  const configuration = await ConfigurationService.getConfiguration();
+  const configuration = await ConfigurationService.getConfiguration({
+    forceRefetch: true,
+  });
   if (configuration.isFailure()) {
     return next(configuration);
   }

@@ -24,8 +24,8 @@ export type ServerFailureCode =
   | "auth/email-already-confirmed"
   | "mail/error"
   | "database/access-failure"
-  | "firestore/access-failure"
   | "stripe/failure"
+  | "config/update-failure"
   | "failure/validation"
   | "failure/unimplemented"
   | "failure/error"
@@ -336,21 +336,6 @@ export class DatabaseAccessFailure<T> extends Failure<
   }
 }
 
-export class FirestoreAccessFailure<T> extends Failure<
-  T,
-  "firestore/access-failure"
-> {
-  public readonly error?: Error;
-  constructor(error?: Error) {
-    super({
-      code: "firestore/access-failure",
-      status: 500,
-      message: "Firestore access failure",
-    });
-    this.error = error;
-  }
-}
-
 export class ValidationFailure<T> extends Failure<T, "failure/validation"> {
   constructor(errors: Failure<T, "invalid-request-data">["errors"]) {
     super({
@@ -407,5 +392,22 @@ export class StripeFailure<T> extends Failure<T, "stripe/failure"> {
       message: error.message,
     });
     this.errorName = error.name;
+  }
+}
+
+export class ConfigUpdateFailure<T> extends Failure<
+  T,
+  "config/update-failure"
+> {
+  key: string;
+  updatedValue: any;
+  constructor(key: string, updatedValue: any) {
+    super({
+      code: "config/update-failure",
+      message: `Failed to update ${key} to ${updatedValue}`,
+      status: 500,
+    });
+    this.key = key;
+    this.updatedValue = updatedValue;
   }
 }

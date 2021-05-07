@@ -6,7 +6,7 @@ COPY package*.json ./
 
 RUN npm i
 
-COPY .env ./
+COPY .env.production ./.env
 
 COPY ./prisma ./prisma
 
