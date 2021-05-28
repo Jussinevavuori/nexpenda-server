@@ -3,6 +3,7 @@ import { Router } from "express";
 export const pingRouter = Router();
 export const authRouter = Router();
 export const profileRouter = Router();
+export const avatarRouter = Router();
 export const transactionsRouter = Router();
 export const categoriesRouter = Router();
 export const configurationRouter = Router();
@@ -26,6 +27,9 @@ import "./auth/request_confirm_email";
 
 import "./profile/profile.get";
 import "./profile/profile.patch";
+
+import "./avatar/avatar.post";
+import "./avatar/avatar.delete";
 
 import "./categories/categories.get";
 

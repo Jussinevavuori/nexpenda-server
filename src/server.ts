@@ -1,7 +1,7 @@
+import * as path from "path";
 import * as express from "express";
 import * as socketIO from "socket.io";
 import * as passport from "passport";
-import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as nocache from "nocache";
 import * as morgan from "morgan";
@@ -17,6 +17,7 @@ import {
   profileRouter,
   feedbackRouter,
   logsRouter,
+  avatarRouter,
 } from "./controllers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -28,6 +29,7 @@ import { redirect } from "./utils/redirect";
 import { createLogger } from "./utils/createLogger";
 import { corsMiddleware } from "./middleware/corsMiddleware";
 import { rateLimiters } from "./middleware/rateLimiters";
+import { Storage } from "@google-cloud/storage";
 
 const logger = createLogger();
 
@@ -36,6 +38,11 @@ export const http = createServer(app);
 export const io = socketIO(http);
 export let prisma = new PrismaClient();
 export let server: undefined | Server;
+export const storage = new Storage({
+  keyFilename: path.join(__dirname, "..", conf.google.applicationCredentials),
+  projectId: conf.google.projectId,
+});
+export const bucket = storage.bucket(conf.google.storage.bucketName);
 
 export function startServer() {
   return new Promise<void>(async (resolve, reject) => {
@@ -58,7 +65,7 @@ export function startServer() {
       app.options("*", corsMiddleware());
       app.use(passport.initialize());
       app.use(cookieParser());
-      app.use(bodyParser.json({ limit: "10mb" }));
+      app.use(express.json({ limit: "10mb" }));
       app.use(corsMiddleware());
       app.use(initializeRequestData());
       app.use(extractAuthentication());
@@ -77,6 +84,7 @@ export function startServer() {
       // Api endpoints
       app.use("/api/ping", pingRouter);
       app.use("/api/auth", authRouter);
+      app.use("/api/avatar", avatarRouter);
       app.use("/api/profile", profileRouter);
       app.use("/api/categories", categoriesRouter);
       app.use("/api/transactions", transactionsRouter);

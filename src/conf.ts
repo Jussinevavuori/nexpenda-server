@@ -37,6 +37,11 @@ export const conf = {
     get projectId() {
       return ENV("GOOGLE_PROJECTID");
     },
+    storage: {
+      get bucketName() {
+        return ENV("GOOGLE_STORAGE_BUCKETNAME");
+      },
+    },
   },
 
   token: {

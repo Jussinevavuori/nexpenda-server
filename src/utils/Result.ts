@@ -10,7 +10,7 @@ export interface IResult<T, R = string> {
 /**
  * Success implementation
  */
-export class Success<T, C = string> implements IResult<T, C> {
+export class Success<T, C = any> implements IResult<T, C> {
   public readonly resultType: "success" = "success";
   public readonly value: T;
 

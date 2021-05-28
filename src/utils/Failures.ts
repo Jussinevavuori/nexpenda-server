@@ -411,3 +411,13 @@ export class ConfigUpdateFailure<T> extends Failure<
     this.updatedValue = updatedValue;
   }
 }
+
+export class ImageFailure<T> extends Failure<T, "image/failure"> {
+  constructor(error?: Error) {
+    super({
+      code: "image/failure",
+      message: error?.message ?? "An error occured while handling images",
+      status: 500,
+    });
+  }
+}
