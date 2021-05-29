@@ -29,7 +29,8 @@ import { redirect } from "./utils/redirect";
 import { createLogger } from "./utils/createLogger";
 import { corsMiddleware } from "./middleware/corsMiddleware";
 import { rateLimiters } from "./middleware/rateLimiters";
-import { Storage } from "@google-cloud/storage";
+import { Bucket, Storage } from "@google-cloud/storage";
+import { handleMulterErrors } from "./middleware/handleMulterErrors";
 
 const logger = createLogger();
 
@@ -38,11 +39,8 @@ export const http = createServer(app);
 export const io = socketIO(http);
 export let prisma = new PrismaClient();
 export let server: undefined | Server;
-export const storage = new Storage({
-  keyFilename: path.join(__dirname, "..", conf.google.applicationCredentials),
-  projectId: conf.google.projectId,
-});
-export const bucket = storage.bucket(conf.google.storage.bucketName);
+export let storage: Storage;
+export let bucket: Bucket;
 
 export function startServer() {
   return new Promise<void>(async (resolve, reject) => {
@@ -59,6 +57,18 @@ export function startServer() {
       // Connect to DBs
       await prisma.$connect();
       logger("Connected to database");
+
+      // Connect to storage
+      storage = new Storage({
+        keyFilename: path.join(
+          __dirname,
+          "..",
+          conf.google.applicationCredentials
+        ),
+        projectId: conf.google.projectId,
+      });
+      bucket = storage.bucket(conf.google.storage.bucketName);
+      logger("Connected to storage");
 
       // Middleware
       // app.use(requireHttps({ ignoreHosts: [/localhost/] }));
@@ -101,6 +111,7 @@ export function startServer() {
       });
 
       // Error handler middlewares
+      app.use(handleMulterErrors);
       app.use(handleErrors);
       app.use(handleFailure);
 

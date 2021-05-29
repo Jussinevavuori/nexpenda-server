@@ -1,48 +1,59 @@
 import * as express from "express";
 import * as multer from "multer";
 import { avatarRouter } from "..";
+import { rateLimiters } from "../../middleware/rateLimiters";
+import { prisma } from "../../server";
 import { AvatarService } from "../../services/AvatarService";
-import { InvalidRequestDataFailure } from "../../utils/Failures";
-// import { bucket } from "../../server";
-// import { UnauthenticatedFailure } from "../../utils/Failures";
+import { UserService } from "../../services/UserService";
+import {
+  InvalidRequestDataFailure,
+  UnknownFailure,
+} from "../../utils/Failures";
+import { UnauthenticatedFailure } from "../../utils/Failures";
 
 const multerMemoryStorage = multer({
   storage: multer.memoryStorage(),
   limits: {
-    // 5 Mb
-    fileSize: 5 * 1024 * 1024,
+    // 10 Mb
+    fileSize: 10 * 1024 * 1024,
   },
 });
 
 avatarRouter.post(
   "/",
+  rateLimiters.strict(),
   multerMemoryStorage.single("file"),
   express.urlencoded({ extended: false }),
   async (req, res, next) => {
     // Ensure user is authenticated
-    // const user = req.data.auth.user;
-    // if (!user) {
-    //   next(new UnauthenticatedFailure());
-    // }
+    const user = req.data.auth.user;
+    if (!user) {
+      return next(new UnauthenticatedFailure());
+    }
 
-    // Get and validate file
+    // Get file and ensure it exists
     const file = req.file;
     if (!file) {
       return next(new InvalidRequestDataFailure({ _file: "No file provided" }));
     }
 
-    try {
-      const result = await AvatarService.uploadProfilePicture({ file });
+    // Upload image to bucket
+    const result = await AvatarService.uploadProfilePicture({ file });
 
-      if (result.isSuccess()) {
-        console.log(`Image available at: ${result.value}`);
-      } else {
-        console.warn(result);
-      }
-    } catch (e) {
-      console.log(e);
-    } finally {
-      return res.end();
+    // Get public URL from result or throw error
+    const publicUrl = result.getOr("");
+    if (!publicUrl) {
+      return next(new UnknownFailure());
     }
+
+    // Update photo URL to user's profile
+    const updatedProfile = await prisma.profile.update({
+      where: { uid: user.id },
+      data: { photoUrl: publicUrl },
+    });
+
+    // Respond with updated auth
+    const response = await UserService.createResponse(user, updatedProfile);
+    res.json(response);
   }
 );

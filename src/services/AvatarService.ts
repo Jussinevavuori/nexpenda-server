@@ -17,6 +17,7 @@ export class AvatarService {
       folder: AvatarService.folder,
       filename: `avatar__${uuid()}`,
       public: true,
+      processImage: (image) => image.resize(200),
     });
   }
 }

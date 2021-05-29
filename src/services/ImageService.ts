@@ -1,3 +1,4 @@
+import * as sharp from "sharp";
 import { Request } from "express";
 import { bucket } from "../server";
 import { ImageFailure, UnknownFailure } from "../utils/Failures";
@@ -48,6 +49,7 @@ export class ImageService {
     folder: string;
     filename?: string;
     public?: boolean;
+    processImage?: (b: sharp.Sharp) => sharp.Sharp;
   }): Promise<Success<string> | UnknownFailure<string>> {
     return new Promise(async (resolve, reject) => {
       const file = args.file;
@@ -66,6 +68,11 @@ export class ImageService {
       // Create blob and blob stream
       const bucketFile = bucket.file(ImageService.getFileName(folder, file));
       const blobStream = bucketFile.createWriteStream({ resumable: false });
+
+      // Get image buffer
+      const defaultProcessImage = (_: sharp.Sharp) => _;
+      const processImage = args.processImage ?? defaultProcessImage;
+      const buffer = await processImage(sharp(file.buffer)).toBuffer();
 
       // Read file to blob stream
       blobStream
@@ -86,7 +93,7 @@ export class ImageService {
             )
           );
         })
-        .end(args.file.buffer);
+        .end(buffer);
     });
   }
 }

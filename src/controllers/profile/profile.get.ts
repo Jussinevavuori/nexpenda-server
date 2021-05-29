@@ -1,22 +1,19 @@
 import { profileRouter } from "..";
-import { StripeService } from "../../services/StripeService";
+import { prisma } from "../../server";
 import { UserService } from "../../services/UserService";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 
 profileRouter.get("/", async (req, res, next) => {
-  if (!req.data.auth.user) {
+  const user = req.data.auth.user;
+  if (!user) {
     return next(new UnauthenticatedFailure());
   }
 
-  const customer = await StripeService.getUserCustomer(req.data.auth.user);
-  const subscriptions = customer
-    ? await StripeService.getSubscriptionsForCustomer(customer.id)
-    : undefined;
+  const profile = await prisma.profile.findUnique({
+    where: { uid: user.id },
+  });
 
-  return res.json(
-    UserService.getPublicProfileDetails(req.data.auth.user, {
-      customer,
-      subscriptions,
-    })
-  );
+  // Respond with auth
+  const response = await UserService.createResponse(user, profile);
+  res.json(response);
 });

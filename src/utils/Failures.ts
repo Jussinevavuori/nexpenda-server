@@ -421,3 +421,23 @@ export class ImageFailure<T> extends Failure<T, "image/failure"> {
     });
   }
 }
+
+export class FileFailure<T> extends Failure<T, "file/failure"> {
+  constructor(error?: Error) {
+    super({
+      code: "file/failure",
+      message: error?.message ?? "An error occured while handling files",
+      status: 500,
+    });
+  }
+}
+
+export class FileTooLargeFailure<T> extends Failure<T, "file/too-large"> {
+  constructor() {
+    super({
+      code: "file/too-large",
+      message: "The provided file is too large",
+      status: 400,
+    });
+  }
+}

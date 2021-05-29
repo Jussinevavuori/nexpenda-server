@@ -1,5 +1,6 @@
 import { Profile, User } from ".prisma/client";
 import Stripe from "stripe";
+import { StripeService } from "./StripeService";
 
 export class UserService {
   /**
@@ -34,7 +35,7 @@ export class UserService {
    */
   static createRequestUser(
     user: User & { Profile?: Profile | null },
-    profile?: Profile
+    profile?: Profile | undefined | null
   ): RequestUser {
     const { Profile: userProfile, ...userWithoutProfile } = user;
     const _profile: Profile =
@@ -95,5 +96,38 @@ export class UserService {
         };
       }),
     };
+  }
+
+  /**
+   * Creates a response user of the provided user and profile objects
+   * that can be sent directly to a user in the response object.
+   *
+   * @param user    User account from request.
+   * @param profile Profile, either user's existing profile or updated profile.
+   * @returns       Object to return directly to user.
+   */
+  static async createResponse(
+    user: User,
+    profile?: Profile | undefined | null
+  ) {
+    // Ensure request user format with provided profile details.
+    const requestUser = UserService.createRequestUser(user, profile);
+
+    // Fetch stripe customer if any
+    const customer = await StripeService.getUserCustomer({
+      ...user,
+      profile: requestUser.profile,
+    });
+
+    // Fetch customer's subscriptions
+    const subscriptions = customer
+      ? await StripeService.getSubscriptionsForCustomer(customer.id)
+      : undefined;
+
+    // Return public profile details
+    return UserService.getPublicProfileDetails(requestUser, {
+      customer,
+      subscriptions,
+    });
   }
 }
