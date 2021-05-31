@@ -39,11 +39,15 @@ avatarRouter.post(
 
     // Upload image to bucket
     const result = await AvatarService.uploadProfilePicture({ file });
+    if (result.isFailure()) {
+      return next(result);
+    }
 
-    // Get public URL from result or throw error
+    // Get public URL from result
     const publicUrl = result.getOr("");
     if (!publicUrl) {
-      return next(new UnknownFailure());
+      const msg = `Could not receive public URL for avatar.`;
+      return next(new UnknownFailure().withMessage(msg));
     }
 
     // Update photo URL to user's profile

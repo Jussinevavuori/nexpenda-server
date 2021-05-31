@@ -13,9 +13,9 @@ export class AvatarService {
    */
   static uploadProfilePicture(args: { file: Request["file"] }) {
     return ImageService.uploadImage({
-      file: args.file,
+      buffer: args.file.buffer,
       folder: AvatarService.folder,
-      filename: `avatar__${uuid()}`,
+      name: `avatar__${uuid()}`,
       public: true,
       processImage: (image) => image.resize(200),
     });

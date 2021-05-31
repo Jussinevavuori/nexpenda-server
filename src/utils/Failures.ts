@@ -426,7 +426,9 @@ export class FileFailure<T> extends Failure<T, "file/failure"> {
   constructor(error?: Error) {
     super({
       code: "file/failure",
-      message: error?.message ?? "An error occured while handling files",
+      message: error
+        ? `${error.name}: ${error.message}`
+        : "An error occured while handling files",
       status: 500,
     });
   }

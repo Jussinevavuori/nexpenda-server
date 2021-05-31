@@ -17,13 +17,14 @@ export function handleMulterErrors(
   if (error instanceof multer.MulterError) {
     switch (error.code) {
       case "LIMIT_FILE_SIZE":
-        next(new FileTooLargeFailure<void>());
-        return;
+        return next(new FileTooLargeFailure<void>());
       default:
-        next(new FileFailure<void>());
-        return;
+        return next(new FileFailure<void>(error));
     }
   }
 
-  next(error);
+  /**
+   * By default move error or failure to next error handler.
+   */
+  return next(error);
 }

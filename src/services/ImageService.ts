@@ -1,7 +1,7 @@
 import * as sharp from "sharp";
 import { Request } from "express";
 import { bucket } from "../server";
-import { ImageFailure, UnknownFailure } from "../utils/Failures";
+import { ImageFailure } from "../utils/Failures";
 import { Success } from "../utils/Result";
 
 /**
@@ -22,77 +22,63 @@ export class ImageService {
   }
 
   /**
-   * Update a files filename. Preserve original file ending.
+   * Construct a filename from the file's own name and the folder. Replaces
+   * all whitespaces with an underscore.
    */
-  static updateFilename(file: Request["file"], filename: string) {
-    const [, extension] = file.originalname.split(".");
-    if (extension) {
-      file.originalname = `${filename}.${extension}`;
-    } else {
-      file.originalname = filename;
-    }
-  }
-
-  /**
-   * Get file name
-   */
-  static getFileName(folder: string, file: Request["file"]) {
-    const fileName = file.originalname.replace(/\s+/g, "_");
+  static getFilename(folder: string, name: string) {
+    const fileName = name.replace(/\s+/g, "_");
     return `images/${folder}/${fileName}`;
   }
 
   /**
-   * Upload a profile picture.
+   * Upload a picture buffer to Google Cloud Storage. Requires a folder and a
+   * name for the file in order to save to GCS. Optionally the file can be made
+   * public to all users and processed with a sharp function.
    */
   static uploadImage(args: {
-    file: Request["file"];
+    buffer: Buffer;
     folder: string;
-    filename?: string;
+    name: string;
     public?: boolean;
     processImage?: (b: sharp.Sharp) => sharp.Sharp;
-  }): Promise<Success<string> | UnknownFailure<string>> {
+  }): Promise<Success<string> | ImageFailure<string>> {
     return new Promise(async (resolve, reject) => {
-      const file = args.file;
-      const folder = args.folder;
+      // Combine folder and filename into full name
+      const filename = ImageService.getFilename(args.folder, args.name);
 
-      // Change filename when specified
-      if (args.filename) {
-        ImageService.updateFilename(file, args.filename);
+      // Create bucket and get its write stream
+      const bucketFile = bucket.file(filename);
+      const writeStream = bucketFile.createWriteStream({ resumable: false });
+
+      // Get image buffer with optional sharp processing applied.
+      // If no sharp processing specified, use emtpy processing function
+      // which returns raw sharp object as is.
+      const processImage = args.processImage ?? ((_: sharp.Sharp) => _);
+      const buffer = await processImage(sharp(args.buffer)).toBuffer();
+
+      // When finished, return new success to the user containing the bucket
+      // file's public URL.
+      function handleWriteStreamFinished() {
+        resolve(new Success<string>(bucketFile.publicUrl()));
+
+        // Make the file public if specified in options.
+        if (args.public) {
+          bucketFile.makePublic().catch(() => {
+            console.error(`Failed to make file ${bucketFile.name} public`);
+          });
+        }
       }
 
-      // Validate mime type
-      if (!ImageService.isValidMimeType(file)) {
-        reject(new ImageFailure().withMessage(""));
+      // On error resolve with ImageFailure with message derived from the error
+      function handleWriteStreamError(e: Error) {
+        const msg = `Failure while uploading image: ${e.message} (${e.name})`;
+        resolve(new ImageFailure<string>().withMessage(msg));
       }
-
-      // Create blob and blob stream
-      const bucketFile = bucket.file(ImageService.getFileName(folder, file));
-      const blobStream = bucketFile.createWriteStream({ resumable: false });
-
-      // Get image buffer
-      const defaultProcessImage = (_: sharp.Sharp) => _;
-      const processImage = args.processImage ?? defaultProcessImage;
-      const buffer = await processImage(sharp(file.buffer)).toBuffer();
 
       // Read file to blob stream
-      blobStream
-        .on("finish", () => {
-          resolve(new Success<string>(bucketFile.publicUrl()));
-
-          // Make the file public if specified
-          if (args.public) {
-            bucketFile.makePublic().catch(() => {
-              console.error(`Failed to make file ${bucketFile.name} public`);
-            });
-          }
-        })
-        .on("error", (e) => {
-          reject(
-            new UnknownFailure().withMessage(
-              `Failure while uploading image: ${e.message} (${e.name})`
-            )
-          );
-        })
+      writeStream
+        .on("finish", handleWriteStreamFinished)
+        .on("error", handleWriteStreamError)
         .end(buffer);
     });
   }
