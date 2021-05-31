@@ -55,7 +55,6 @@ describe("/api/categories", () => {
     // Initial profile
     let profile = await getProfile();
     expect(profile.displayName).not.toBe("new_name");
-    expect(profile.photoUrl).not.toBe("new_photo");
     expect(profile.themeColor).not.toBe("new_color");
     expect(profile.themeMode).not.toBe("new_mode");
 
@@ -67,62 +66,51 @@ describe("/api/categories", () => {
     expect(patchResponse_1.status).toBe(200);
     expect(profile.displayName).toBe("new_name");
 
-    // Patch photo URL
-    const patchResponse_2 = await client
-      .profile()
-      .patch({ photoUrl: "new_photo" });
-    profile = await getProfile();
-    expect(patchResponse_2.status).toBe(200);
-    expect(profile.photoUrl).toBe("new_photo");
-
     // Patch themeColor
-    const patchResponse_3 = await client
+    const patchResponse_2 = await client
       .profile()
       .patch({ themeColor: "new_color" });
     profile = await getProfile();
-    expect(patchResponse_3.status).toBe(200);
+    expect(patchResponse_2.status).toBe(200);
     expect(profile.themeColor).toBe("new_color");
 
     // Patch themeMode
-    const patchResponse_4 = await client
+    const patchResponse_3 = await client
       .profile()
       .patch({ themeMode: "new_mode" });
     profile = await getProfile();
-    expect(patchResponse_4.status).toBe(200);
+    expect(patchResponse_3.status).toBe(200);
     expect(profile.themeMode).toBe("new_mode");
 
     // Attempt patching other details
-    const newEmail = "new@gmail.com";
-    const failedPatchResponse_1 = await client.profile().patch({
-      email: newEmail,
-    });
+    const fakeId = uuid();
+    const fakeUrl = "https://nexpenda.com/fakeimage.png";
+    const failedPatchResponses = await Promise.all(
+      [
+        { email: "fake@gmail.com" },
+        { id: fakeId },
+        { googleId: fakeId },
+        { unknownProperty: "unknownProperty" },
+        { photoUrl: fakeUrl },
+        { googlePhotoUrl: fakeUrl },
+      ].map((update) => client.profile().patch(update))
+    );
 
-    const newId = uuid();
-    const failedPatchResponse_2 = await client.profile().patch({
-      id: newId,
-    });
-
-    const newGoogleId = uuid();
-    const failedPatchResponse_3 = await client.profile().patch({
-      googleId: newGoogleId,
-    });
-
-    const unknownProperty = "unknownProperty";
-    const failedPatchResponse_4 = await client.profile().patch({
-      unknownProperty,
-    });
-
-    expect(failedPatchResponse_1.status).toBe(400);
-    expect(failedPatchResponse_2.status).toBe(400);
-    expect(failedPatchResponse_3.status).toBe(400);
-    expect(failedPatchResponse_4.status).toBe(400);
+    expect(failedPatchResponses[0].status).toBe(400);
+    expect(failedPatchResponses[1].status).toBe(400);
+    expect(failedPatchResponses[2].status).toBe(400);
+    expect(failedPatchResponses[3].status).toBe(400);
+    expect(failedPatchResponses[4].status).toBe(400);
+    expect(failedPatchResponses[5].status).toBe(400);
 
     profile = await getProfile();
 
-    expect(profile.email).not.toBe(newEmail);
-    expect(profile.id).not.toBe(newId);
-    expect(profile.googleId).not.toBe(newGoogleId);
+    expect(profile.email).not.toBe("fake@gmail.com");
+    expect(profile.id).not.toBe(fakeId);
+    expect(profile.googleId).not.toBe(fakeId);
     expect(profile.unknownProperty).toBeUndefined();
+    expect(profile.photoUrl).not.toBe(fakeUrl);
+    expect(profile.googlePhotoUrl).not.toBe(fakeUrl);
 
     done();
   });

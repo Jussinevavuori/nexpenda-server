@@ -241,6 +241,15 @@ export class TestClient {
     };
   }
 
+  avatar() {
+    const that = this;
+    return {
+      put(data: any) {
+        return that.put("/avatar", "", data);
+      },
+    };
+  }
+
   /**
    * All authentication endpoints
    */
