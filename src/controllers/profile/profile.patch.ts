@@ -22,7 +22,6 @@ profileRouter.patch("/", async (req, res, next) => {
   const updatedProfile = await prisma.profile.update({
     where: { uid: user.id },
     data: {
-      photoUrl: body.value.photoUrl,
       displayName: body.value.displayName,
       themeColor: body.value.themeColor,
       themeMode: body.value.themeMode,
