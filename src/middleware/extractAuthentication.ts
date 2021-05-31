@@ -88,19 +88,6 @@ export function extractAuthentication() {
     }
 
     /**
-     * Default profile if none found
-     */
-    if (!user.Profile) {
-      user.Profile = {
-        uid: user.id,
-        displayName: null,
-        photoUrl: null,
-        themeColor: null,
-        themeMode: null,
-      };
-    }
-
-    /**
      * If no profile found, create empty one for user.
      */
     const profile =

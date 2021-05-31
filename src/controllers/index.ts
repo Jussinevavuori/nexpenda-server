@@ -30,6 +30,7 @@ import "./profile/profile.patch";
 
 import "./avatar/avatar.post";
 import "./avatar/avatar.delete";
+import "./avatar/avatar.put";
 
 import "./categories/categories.get";
 

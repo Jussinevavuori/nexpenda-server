@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { DatabaseAccessFailure, StripeFailure } from "../utils/Failures";
+import {
+  DatabaseAccessFailure,
+  InvalidRequestDataFailure,
+  StripeFailure,
+} from "../utils/Failures";
 import { Failure } from "../utils/Result";
 
 export function handleFailure(
@@ -10,6 +14,7 @@ export function handleFailure(
 ) {
   if (!res.headersSent) {
     if (failure instanceof Failure) {
+      // Warn on database access failures
       if (failure instanceof DatabaseAccessFailure) {
         console.warn(
           `[HANDLE_FAILURE]:`,
@@ -19,8 +24,9 @@ export function handleFailure(
         );
       }
 
+      // Warn on stripe failures
       if (failure instanceof StripeFailure) {
-        console.warn(failure);
+        console.warn(`[HANDLE_FAILURE]:`, `Caught stripe failure`, failure);
       }
 
       return res.status(failure.status).json({

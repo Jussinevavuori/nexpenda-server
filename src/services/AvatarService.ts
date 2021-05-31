@@ -4,6 +4,20 @@ import { ImageService } from "./ImageService";
 
 export class AvatarService {
   /**
+   * Regex for checking which urls are allowed to directly
+   * be set as the allowed photo URL.
+   */
+  static allowedDirectPhotoUrlRegex =
+    /^https:\/\/lh\d+.googleusercontent.com\//;
+
+  /**
+   * Check whether an URL is an allowed direct photo URL.
+   */
+  static isAllowedDirectPhotoUrl(url: string) {
+    return AvatarService.allowedDirectPhotoUrlRegex.test(url);
+  }
+
+  /**
    * Default folder for all avatars
    */
   static folder = "avatars";
