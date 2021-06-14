@@ -70,6 +70,7 @@ export class UserService {
       themeMode: user.profile.themeMode ?? undefined,
       isAdmin: user.isAdmin,
       isPremium: stripe.subscriptions?.some((sub) => sub.status === "active"),
+      hasPassword: !!user.password,
 
       customer: stripe.customer
         ? {
