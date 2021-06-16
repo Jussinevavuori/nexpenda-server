@@ -50,7 +50,7 @@ stripeRouter.post("/create-checkout-session", async (req, res, next) => {
       success_url: getUrl.toFrontend("/subscribe/success", {
         session_id: `{CHECKOUT_SESSION_ID}`,
       }),
-      cancel_url: getUrl.toFrontend("/subscribe?canceled=true&"),
+      cancel_url: getUrl.toFrontend("/subscribe/cancel"),
     });
 
     return res.send({ sessionId: session.id });
