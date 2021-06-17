@@ -8,7 +8,6 @@ type ScheduleConstructorArgument = {
   intervalStr: string;
   firstOccurence: Date;
   lastOccurence?: Date;
-	lastOccurenceSpecification: 
 };
 
 export class Schedule {
@@ -26,11 +25,11 @@ export class Schedule {
   /**
    * Last occurence.
    */
-  public readonly lastOccurence: Date;
+  public readonly lastOccurence?: Date;
 
-	/**
-	 * Type
-	 */
+  /**
+   * Type
+   */
 
   /**
    * Do not use the constructor directly as the constructor may throw errors.
