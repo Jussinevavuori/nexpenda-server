@@ -4,7 +4,7 @@ generator client {
 
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model User {
@@ -20,13 +20,13 @@ model User {
   updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
   stripeCustomerId String?  @map("stripe_customer_id")
 
-  Transactions           Transaction[]
-  Categories             Category[]
-  Budgets                Budget[]
-  Feedback               Feedback[]
-  Profile                Profile?
-  Log                    Log[]
-  TransactionRecurrences TransactionRecurrence[]
+  Transactions          Transaction[]
+  Categories            Category[]
+  Budgets               Budget[]
+  Feedback              Feedback[]
+  Profile               Profile?
+  Log                   Log[]
+  TransactionRecurrence TransactionRecurrence[]
 
   @@map(name: "users")
 }
@@ -40,7 +40,6 @@ model Profile {
   themeMode      String? @map("theme_mode")
 
   User User @relation(fields: [uid], references: [id])
-
   @@map(name: "profiles")
 }
 
@@ -53,40 +52,26 @@ model Transaction {
   time          DateTime
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
-  recurrenceId  String?  @map("recurrence_id")
 
-  User       User                   @relation(fields: [uid], references: [id])
-  Category   Category               @relation(fields: [categoryId], references: [id])
-  Recurrence TransactionRecurrence? @relation(fields: [recurrenceId], references: [id])
+  User     User     @relation(fields: [uid], references: [id])
+  Category Category @relation(fields: [categoryId], references: [id])
 
   @@map(name: "transactions")
 }
 
 model TransactionRecurrence {
-  id             String       @id @default(uuid())
-  uid            String
-  categoryId     String       @map("category_id")
-  comment        String?
-  integerAmount  Int          @map("integer_amount")
-  intervalType   IntervalType @map("interval_type")
-  intervalLength Int          @map("interval_length")
-  firstOccurence DateTime     @map("first_occurence")
-  lastOccurence  DateTime?    @map("last_occurence")
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @default(now()) @updatedAt @map("updated_at")
+  id            String   @id @default(uuid())
+  uid           String
+  categoryId    String   @map("category_id")
+  comment       String?
+  integerAmount Int      @map("integer_amount")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
 
-  User        User          @relation(fields: [uid], references: [id])
-  Category    Category      @relation(fields: [categoryId], references: [id])
-  Transaction Transaction[]
+  User     User     @relation(fields: [uid], references: [id])
+  Category Category @relation(fields: [categoryId], references: [id])
 
   @@map(name: "transaction_recurrences")
-}
-
-enum IntervalType {
-  DAY
-  WEEK
-  MONTH
-  YEAR
 }
 
 model Budget {
