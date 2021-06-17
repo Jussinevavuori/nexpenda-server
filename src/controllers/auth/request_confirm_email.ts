@@ -1,8 +1,7 @@
 import { authRouter } from "..";
-import { ConfirmEmailToken } from "../../services/ConfirmEmailToken";
+import { ConfirmEmailToken } from "../../tokens/ConfirmEmailToken";
 import { prisma } from "../../server";
 import { validateRequestBody } from "../../utils/validateRequestBody";
-import { emailOnlyAuthSchema } from "../../schemas/auth.schema";
 import { Mailer } from "../../services/Mailer";
 import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
 import {
@@ -11,25 +10,32 @@ import {
   UserNotFoundFailure,
 } from "../../utils/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
+import { Schemas } from "../../schemas/Schemas";
 
+/**
+ * If a user has not confirmed their email address and has lost the
+ * confirmation email, they can request a new one by posting their email
+ * address to this endpoint.
+ */
 authRouter.post(
   "/request_confirm_email",
   rateLimiters.strict(),
   async (req, res, next) => {
-    const body = await validateRequestBody(req, emailOnlyAuthSchema);
+    /**
+     * Validate request body
+     */
+    const body = await validateRequestBody(req, Schemas.Auth.emailOnly);
+    if (body.isFailure()) return next(body);
 
-    if (body.isFailure()) {
-      return next(body);
-    }
-
+    /**
+     * Get user and ensure they have a valid, verified email
+     */
     const user = await prisma.user.findUnique({
       where: { email: body.value.email },
     });
-
     if (!user || !user.email || user.disabled) {
       return next(new UserNotFoundFailure());
     }
-
     if (user.emailVerified) {
       return next(new EmailAlreadyConfirmedFailure());
     }
@@ -38,9 +44,7 @@ authRouter.post(
      * Create and verify token
      */
     const token = new ConfirmEmailToken(user);
-
     const tokenVerified = await token.verify();
-
     if (!tokenVerified) {
       return next(new InvalidTokenFailure());
     }
@@ -49,14 +53,15 @@ authRouter.post(
      * Send confirm email to user
      */
     const mailer = new Mailer();
-
     const template = new ConfirmEmailTemplate({
       email: user.email,
       url: token.generateURL(),
     });
-
     await mailer.sendTemplate(user.email, template);
 
+    /**
+     * End with empty response
+     */
     return res.end();
   }
 );

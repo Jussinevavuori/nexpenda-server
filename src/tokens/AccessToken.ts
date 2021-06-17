@@ -1,14 +1,31 @@
 import { Request } from "express";
 import { conf } from "../conf";
-import * as z from "zod";
+import { z } from "zod";
 import { RefreshToken } from "./RefreshToken";
 import { AbstractToken } from "./AbstractToken";
 import { PrismaClient } from "@prisma/client";
 
 type IAccessToken = z.TypeOf<typeof AccessToken["schema"]>;
+
+/**
+ * Access tokens are used together with refresh tokens for authentication.
+ *
+ * The access token is a short-lived cookie which can be periodically fetched
+ * from the server with a valid, long-lived refresh token (stored as a cookie).
+ *
+ * The access token can be parsed from the request with the
+ * `AccessToken.fromRequest()` method.
+ *
+ * In order to authenticate, the access token should be sent in the request
+ * headers together with the refresh token as a cookie.
+ *
+ * An access token contain's metadata along with the authenticated user's
+ * uid and the token version for token invalidation.
+ */
 export class AccessToken
   extends AbstractToken<IAccessToken>
-  implements IAccessToken {
+  implements IAccessToken
+{
   /**
    * Uid of user which this access token is authenticating
    */

@@ -1,6 +1,5 @@
 import { budgetsRouter } from "..";
 import { validateRequestBody } from "../../utils/validateRequestBody";
-import { putBudgetSchema } from "../../schemas/budget.schema";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
@@ -8,60 +7,73 @@ import {
   BudgetNotFoundFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
-import { BudgetService } from "../../services/BudgetService";
+import { BudgetMapper } from "../../services/BudgetMapper";
 import { anyNonNil as isUuid } from "is-uuid";
+import { Permissions } from "../../services/Permissions";
+import { BudgetCategoryValidator } from "../../services/BudgetCategoryValidator";
+import { Schemas } from "../../schemas/Schemas";
 
+/**
+ * Upsert a single budget for the user.
+ */
 budgetsRouter.put("/:id", async (req, res, next) => {
   try {
-    // Ensure authenticated
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authenticated
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
     const uid = req.data.auth.user.id;
 
-    // Ensure query parameter ID provided and is an UUID
+    /**
+     * Ensure query parameter provided and is an UUID
+     */
     if (!req.params.id && isUuid(req.params.id)) {
       return next(new MissingUrlParametersFailure(["id"]));
     }
 
-    // Get potentially existing transaction
+    /**
+     * Get potential existing budget for user
+     */
     const existingBudget = await prisma.budget.findUnique({
       where: { id: req.params.id },
     });
 
-    // Ensure budget belongs to authenticated user
+    /**
+     * Ensure potential existing budget belongs to caller
+     */
     if (existingBudget && existingBudget.uid !== req.data.auth.user.id) {
       return next(new BudgetNotFoundFailure());
     }
 
-    // If creating, ensure the user is allowed to create the requested budget
+    /**
+     * If creating a new budget, ensure the user is allowed to do so
+     */
     if (!existingBudget) {
-      const createPermission = await BudgetService.ensureCreatePermission(
+      const permission = await Permissions.getCreateBudgetPermission(
         req.data.auth.user
       );
-      if (createPermission.isFailure()) {
-        return next(createPermission);
-      }
+      if (permission.isFailure()) return next(permission);
     }
 
-    // Validate request body
-    const body = await validateRequestBody(req, putBudgetSchema);
-    if (body.isFailure()) {
-      return next(body);
-    }
+    /**
+     * Validate request body
+     */
+    const body = await validateRequestBody(req, Schemas.Budget.put);
+    if (body.isFailure()) return next(body);
 
-    // Ensure all specified categories exist and are owned by authenticated user
-    const categoriesValidityCheck = await BudgetService.ensureValidCategoryIds(
+    /**
+     * Ensure all categories are valid and belong to user
+     */
+    const categoryCheck = await BudgetCategoryValidator.validateCategoryIds(
       req.data.auth.user,
       body.value.categoryIds,
       prisma
     );
+    if (categoryCheck.isFailure()) return next(categoryCheck);
 
-    if (categoriesValidityCheck.isFailure()) {
-      return next(categoriesValidityCheck);
-    }
-
-    // If budget exists, delete it
+    /**
+     * If a budget already exists, delete all its data
+     */
     if (existingBudget) {
       await prisma.budgetCategoryInclusion.deleteMany({
         where: { budgetId: existingBudget.id },
@@ -71,8 +83,10 @@ budgetsRouter.put("/:id", async (req, res, next) => {
       });
     }
 
-    // Create new budget from body (ensure same id)
-    const upserted = await prisma.budget.create({
+    /**
+     * Create new budget from body, ensure same ID
+     */
+    const created = await prisma.budget.create({
       data: {
         id: req.params.id,
         integerAmount: body.value.integerAmount,
@@ -88,8 +102,10 @@ budgetsRouter.put("/:id", async (req, res, next) => {
       include: { BudgetCategoryInclusions: true },
     });
 
-    // Send upserted budget to user
-    return res.json(BudgetService.mapBudgetToResponse(upserted));
+    /**
+     * Send created budget to caller
+     */
+    return res.json(BudgetMapper.mapBudgetToResponse(created));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

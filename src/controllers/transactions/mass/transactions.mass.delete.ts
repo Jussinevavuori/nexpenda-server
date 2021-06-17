@@ -1,6 +1,6 @@
 import { transactionsRouter } from "../..";
 import { corsMiddleware } from "../../../middleware/corsMiddleware";
-import { deleteTransactionsSchema } from "../../../schemas/transaction.schema";
+import { Schemas } from "../../../schemas/Schemas";
 import { prisma } from "../../../server";
 import {
   DatabaseAccessFailure,
@@ -8,22 +8,30 @@ import {
 } from "../../../utils/Failures";
 import { validateRequestBody } from "../../../utils/validateRequestBody";
 
+/**
+ * Preflight options for the mass deletion endpoint
+ */
 transactionsRouter.options("/mass/delete", corsMiddleware());
 
+/**
+ * Delete multiple user's transactions
+ */
 transactionsRouter.post("/mass/delete", async (req, res, next) => {
   try {
-    // Ensure authenticated
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authentication
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
-    // Validate request body
-    const body = await validateRequestBody(req, deleteTransactionsSchema);
-    if (body.isFailure()) {
-      return next(body);
-    }
+    /**
+     * Validate request body
+     */
+    const body = await validateRequestBody(req, Schemas.Transaction.deleteMany);
+    if (body.isFailure()) return next(body);
 
-    // Delete transactions
+    /**
+     * Delete transactions
+     */
     const result = await prisma.transaction.deleteMany({
       where: {
         id: {
@@ -35,7 +43,9 @@ transactionsRouter.post("/mass/delete", async (req, res, next) => {
       },
     });
 
-    // Respond with 204 and number of deleted items
+    /**
+     * Respond with 200 and number of deleted items
+     */
     return res.status(200).send({ deletedCount: result.count });
   } catch (error) {
     return next(new DatabaseAccessFailure(error));

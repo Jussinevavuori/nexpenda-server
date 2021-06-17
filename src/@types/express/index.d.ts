@@ -1,4 +1,4 @@
-declare type EjsTemplateName = "forgot_password";
+declare type EjsTemplateName = "reset_password";
 
 declare namespace Express {
   export interface Request {
@@ -52,12 +52,12 @@ declare namespace Express {
         /**
          * The refresh token that was found in the request if valid.
          */
-        refreshToken?: import("../../services/RefreshToken").RefreshToken;
+        refreshToken?: import("../../tokens/RefreshToken").RefreshToken;
 
         /**
          * The access token that was found in the request if valid.
          */
-        accessToken?: import("../../services/AccessToken").AccessToken;
+        accessToken?: import("../../tokens/AccessToken").AccessToken;
       };
     };
   }

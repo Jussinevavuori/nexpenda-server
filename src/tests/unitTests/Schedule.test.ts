@@ -10,36 +10,36 @@ describe("Schedule", () => {
   };
 
   it("Correctly calculates last occurences", () => {
-    const t1 = Schedule.getLastOccurence({
-      firstOccurence: new Date("2021-01-01"),
-      occurences: 4,
+    const t1 = Schedule.getLastOccurrence({
+      firstOccurrence: new Date("2021-01-01"),
+      occurrences: 4,
       interval: { type: "DAY", every: 4 },
     });
 
     expect(formatDate(t1)).toBe("2021-01-13");
     expect(isStartOfDay(t1)).toBe(true);
 
-    const t2 = Schedule.getLastOccurence({
-      firstOccurence: new Date("2021-01-01"),
-      occurences: 3,
+    const t2 = Schedule.getLastOccurrence({
+      firstOccurrence: new Date("2021-01-01"),
+      occurrences: 3,
       interval: { type: "WEEK", every: 2 },
     });
 
     expect(formatDate(t2)).toBe("2021-01-29");
     expect(isStartOfDay(t2)).toBe(true);
 
-    const t3 = Schedule.getLastOccurence({
-      firstOccurence: new Date("2021-01-01"),
-      occurences: 4,
+    const t3 = Schedule.getLastOccurrence({
+      firstOccurrence: new Date("2021-01-01"),
+      occurrences: 4,
       interval: { type: "MONTH", every: 2 },
     });
 
     expect(formatDate(t3)).toBe("2021-07-01");
     expect(isStartOfDay(t3)).toBe(true);
 
-    const t4 = Schedule.getLastOccurence({
-      firstOccurence: new Date("2021-01-01"),
-      occurences: 10,
+    const t4 = Schedule.getLastOccurrence({
+      firstOccurrence: new Date("2021-01-01"),
+      occurrences: 10,
       interval: { type: "YEAR", every: 1 },
     });
 

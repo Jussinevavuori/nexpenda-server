@@ -2,10 +2,16 @@ import { Stripe } from "stripe";
 import { conf } from "../conf";
 import { prisma } from "../server";
 
+/**
+ * The global stripe instance.
+ */
 export const stripe = new Stripe(conf.stripe.secretKey, {
   apiVersion: "2020-08-27",
 });
 
+/**
+ * The stripe service provides required methods for working with Stripe.
+ */
 export class StripeService {
   /**
    * Creates or updates a customer to the Stripe database. The customer

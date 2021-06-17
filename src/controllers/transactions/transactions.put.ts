@@ -1,6 +1,5 @@
 import { transactionsRouter } from "..";
 import { validateRequestBody } from "../../utils/validateRequestBody";
-import { putTransactionSchema } from "../../schemas/transaction.schema";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
@@ -8,9 +7,15 @@ import {
   TransactionNotFoundFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
-import { TransactionService } from "../../services/TransactionService";
+import { TransactionMapper } from "../../services/TransactionMapper";
 import { anyNonNil as isUuid } from "is-uuid";
+import { Category } from "@prisma/client";
+import { Permissions } from "../../services/Permissions";
+import { Schemas } from "../../schemas/Schemas";
 
+/**
+ * Upsert a transaction for the user.
+ */
 transactionsRouter.put("/:id", async (req, res, next) => {
   try {
     // Ensure authenticated
@@ -36,7 +41,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
 
     // If creating, ensure the user is allowed to create the requested transaction
     if (!transaction) {
-      const createPermission = await TransactionService.ensureCreatePermission(
+      const createPermission = await Permissions.getCreateTransactionPermission(
         req.data.auth.user
       );
       if (createPermission.isFailure()) {
@@ -45,7 +50,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
     }
 
     // Validate request body
-    const body = await validateRequestBody(req, putTransactionSchema);
+    const body = await validateRequestBody(req, Schemas.Transaction.put);
     if (body.isFailure()) {
       return next(body);
     }
@@ -111,30 +116,25 @@ transactionsRouter.put("/:id", async (req, res, next) => {
     });
 
     // Update icon if updated icon given
+    let updatedCategory: Category | undefined;
     if (
       body.value.categoryIcon &&
       body.value.categoryIcon !== upserted.Category.icon
     ) {
-      const updatedCategory = await prisma.category.update({
-        where: {
-          id: upserted.Category.id,
-        },
-        data: {
-          icon: body.value.categoryIcon,
-        },
+      updatedCategory = await prisma.category.update({
+        where: { id: upserted.Category.id },
+        data: { icon: body.value.categoryIcon },
       });
-
-      // Short-circuit and send transaction and updatedcategory to user
-      return res.json(
-        TransactionService.mapTransactionToResponse({
-          ...upserted,
-          Category: updatedCategory,
-        })
-      );
     }
 
-    // Send upserted transaction to user
-    return res.json(TransactionService.mapTransactionToResponse(upserted));
+    // Send upserted transaction to user, use updated values if any exist
+    // after upserting
+    return res.json(
+      TransactionMapper.mapTransactionToResponse({
+        ...upserted,
+        Category: updatedCategory ?? upserted.Category,
+      })
+    );
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

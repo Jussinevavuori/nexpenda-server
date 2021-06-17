@@ -3,18 +3,25 @@ import { stripe, StripeService } from "../../services/StripeService";
 import { StripeFailure, UnauthenticatedFailure } from "../../utils/Failures";
 import { getUrl } from "../../utils/getUrl";
 
+/**
+ * Create a stripe billing portal session for managing the user's billing.
+ */
 stripeRouter.post("/create-billing-portal-session", async (req, res, next) => {
-  // Require auth
+  /**
+   * Require authenticated user
+   */
   const user = req.data.auth.user;
-  if (!user) {
-    return next(new UnauthenticatedFailure());
-  }
+  if (!user) return next(new UnauthenticatedFailure());
 
-  // Create or update stripe customer for user
+  /**
+   * Create or update stripe customer for user
+   */
   const customer = await StripeService.createOrUpdateCustomer(user);
 
   try {
-    // Create a stripe checkout session
+    /**
+     * Create stripe checkout session and return its URL to user
+     */
     const session = await stripe.billingPortal.sessions.create({
       customer: customer.id,
       return_url: getUrl.toFrontend("/app/settings"),

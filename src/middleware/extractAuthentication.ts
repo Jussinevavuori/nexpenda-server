@@ -1,9 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../server";
-import { AccessToken } from "../services/AccessToken";
-import { RefreshToken } from "../services/RefreshToken";
+import { AccessToken } from "../tokens/AccessToken";
+import { RefreshToken } from "../tokens/RefreshToken";
 import { UserService } from "../services/UserService";
 
+/**
+ * Middleware that runs before any controllers. This middleware gets the
+ * authenticated user from the request based the tokens and updates it to the
+ * `request.data.auth` property in the object.
+ */
 export function extractAuthentication() {
   return async function extractAuthenticationMiddleware(
     request: Request,

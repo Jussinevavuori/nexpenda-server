@@ -23,7 +23,13 @@ export function configureEnvironment(
   }
 }
 
+/**
+ * Object which contains all configuration values.
+ */
 export const conf = {
+  /**
+   * All google API and OAuth variables.
+   */
   google: {
     get clientId() {
       return ENV("GOOGLE_CLIENTID");
@@ -37,6 +43,9 @@ export const conf = {
     get projectId() {
       return ENV("GOOGLE_PROJECTID");
     },
+    /**
+     * Google storage API variables.
+     */
     storage: {
       get bucketName() {
         return ENV("GOOGLE_STORAGE_BUCKETNAME");
@@ -44,6 +53,9 @@ export const conf = {
     },
   },
 
+  /**
+   * JWT Token variables.
+   */
   token: {
     get issuer() {
       return ENV("TOKEN_ISSUER");
@@ -52,6 +64,9 @@ export const conf = {
       return ENV("TOKEN_AUDIENCE");
     },
 
+    /**
+     * Access token variables
+     */
     accessToken: {
       get secret() {
         return ENV("TOKEN_ACCESSTOKEN_SECRET");
@@ -64,6 +79,9 @@ export const conf = {
       },
     },
 
+    /**
+     * Refresh token variables
+     */
     refreshToken: {
       get name() {
         return ENV("TOKEN_REFRESHTOKEN_NAME");
@@ -79,18 +97,24 @@ export const conf = {
       },
     },
 
-    forgotPasswordToken: {
+    /**
+     * Reset password token variables
+     */
+    resetPasswordToken: {
       get secret() {
-        return ENV("TOKEN_FORGOTPASSWORDTOKEN_SECRET");
+        return ENV("TOKEN_RESETPASSWORDTOKEN_SECRET");
       },
       get expiresIn() {
-        return ENV("TOKEN_FORGOTPASSWORDTOKEN_EXPIRESIN");
+        return ENV("TOKEN_RESETPASSWORDTOKEN_EXPIRESIN");
       },
       get expiresInSeconds() {
-        return ENV_NUM("TOKEN_FORGOTPASSWORDTOKEN_EXPIRESINSECONDS");
+        return ENV_NUM("TOKEN_RESETPASSWORDTOKEN_EXPIRESINSECONDS");
       },
     },
 
+    /**
+     * Confirm email token variables
+     */
     confirmEmailToken: {
       get secret() {
         return ENV("TOKEN_CONFIRMEMAILTOKEN_SECRET");
@@ -104,7 +128,19 @@ export const conf = {
     },
   },
 
+  /**
+   * Email and mailgun variables
+   */
   email: {
+    get defaultSender() {
+      return ENV("EMAIL_DEFAULT_SENDER");
+    },
+    get developerEmails() {
+      return ENV_ARRAY("EMAIL_DEVELOPER_EMAILS");
+    },
+    /**
+     * Mailgun API variables
+     */
     mailgun: {
       get apikey() {
         return ENV("EMAIL_MAILGUN_APIKEY");
@@ -119,14 +155,11 @@ export const conf = {
         return ENV("EMAIL_MAILGUN_HOST");
       },
     },
-    get defaultSender() {
-      return ENV("EMAIL_DEFAULT_SENDER");
-    },
-    get developerEmails() {
-      return ENV_ARRAY("EMAIL_DEVELOPER_EMAILS");
-    },
   },
 
+  /**
+   * Stripe variables
+   */
   stripe: {
     get publishableKey() {
       return ENV("STRIPE_PUBLISHABLE_KEY");
@@ -136,6 +169,9 @@ export const conf = {
     },
   },
 
+  /**
+   * Host names
+   */
   hosts: {
     get client() {
       return ENV("HOSTS_CLIENT");
@@ -145,30 +181,49 @@ export const conf = {
     },
   },
 
+  /**
+   * Application port
+   */
   get port() {
     return ENV_NUM("PORT") || 8080;
   },
 
+  /**
+   * Application environment
+   */
   get env() {
     return ENV("NODE_ENV");
   },
 
+  /**
+   * Database URL
+   */
   get databaseUrl() {
     return ENV("DATABASE_URL");
   },
 };
 
 /**
- * Helper functions for fetching environment variables from process.env
+ * Helper function for fetching environment variables from process.env and
+ * parsing it as a number.
  */
 function ENV_NUM(variable: string) {
   return Number(process.env[variable] || "");
 }
 
+/**
+ * Helper function for fetching environment variables from process.env and
+ * leaving it as is as a string.
+ */
 function ENV(variable: string) {
   return process.env[variable] || "";
 }
 
-function ENV_ARRAY(variable: string) {
-  return (process.env[variable] || "").split(";");
+/**
+ * Helper function for fetching environment variables from process.env and
+ * parsing it as an array of strings, separated by the specified delimiter.
+ * The default delimiter is ";"
+ */
+function ENV_ARRAY(variable: string, delimiter: string = ";") {
+  return (process.env[variable] || "").split(delimiter);
 }

@@ -1,6 +1,6 @@
 import { authRouter } from "..";
-import { RefreshToken } from "../../services/RefreshToken";
-import { AccessToken } from "../../services/AccessToken";
+import { RefreshToken } from "../../tokens/RefreshToken";
+import { AccessToken } from "../../tokens/AccessToken";
 import {
   InvalidTokenFailure,
   TokenFailure,
@@ -8,6 +8,12 @@ import {
 } from "../../utils/Failures";
 import { prisma } from "../../server";
 
+/**
+ * When a user authenticates, they receive a refresh token in their cookies.
+ * They must then periodically request an access token from this endpoint, which
+ * should be stored in memory on the client. The refresh token and access token
+ * can together be used to authenticate. The access token is shortlived.
+ */
 authRouter.get("/refresh_token", async (req, res, next) => {
   /**
    * Get refresh token and ensure it exists

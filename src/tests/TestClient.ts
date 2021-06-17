@@ -3,9 +3,9 @@ import { conf } from "../conf";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { TestUtils } from "./TestUtils";
-import { ConfirmEmailToken } from "../services/ConfirmEmailToken";
+import { ConfirmEmailToken } from "../tokens/ConfirmEmailToken";
 import { User, PrismaClient } from "@prisma/client";
-import { ForgotPasswordToken } from "../services/ForgotPasswordToken";
+import { ResetPasswordToken } from "../tokens/ResetPasswordToken";
 
 export class TestClient {
   /**
@@ -193,16 +193,16 @@ export class TestClient {
   }
 
   /**
-   * Fabricates a forgot password token
+   * Fabricates a reset password token
    */
-  async fabricateForgotPasswordToken(id: string, prisma: PrismaClient) {
+  async fabricateResetPasswordToken(id: string, prisma: PrismaClient) {
     const userRecord = await prisma.user.findUnique({ where: { id } });
     if (!userRecord) {
       throw Error(
-        "Did not find user record for fabricating the forgot password token"
+        "Did not find user record for fabricating the reset password token"
       );
     }
-    return new ForgotPasswordToken(userRecord);
+    return new ResetPasswordToken(userRecord);
   }
 
   /**
@@ -265,8 +265,8 @@ export class TestClient {
       logout() {
         return that.post("/auth/logout");
       },
-      forgotPassword(data: any) {
-        return that.post("/auth/forgot_password", data);
+      resetPassword(data: any) {
+        return that.post("/auth/reset_password", data);
       },
       confirmEmail(token: string) {
         return that.post(`/auth/confirm_email/${token}`);

@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-describe("/api/auth/forgot_password/ [POST]", () => {
+describe("/api/auth/reset_password/ [POST]", () => {
   beforeAll((done) => prisma.$connect().then(() => done()));
   afterAll((done) => prisma.$disconnect().then(() => done()));
 
@@ -13,12 +13,12 @@ describe("/api/auth/forgot_password/ [POST]", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const res0 = await client.auth().forgotPassword(undefined);
-    const res1 = await client.auth().forgotPassword(null);
-    const res2 = await client.auth().forgotPassword({});
-    const res3 = await client.auth().forgotPassword({ username: "" });
-    const res4 = await client.auth().forgotPassword({ email: 123 });
-    const res5 = await client.auth().forgotPassword(email);
+    const res0 = await client.auth().resetPassword(undefined);
+    const res1 = await client.auth().resetPassword(null);
+    const res2 = await client.auth().resetPassword({});
+    const res3 = await client.auth().resetPassword({ username: "" });
+    const res4 = await client.auth().resetPassword({ email: 123 });
+    const res5 = await client.auth().resetPassword(email);
     expect(res0.status).toBe(400);
     expect(res1.status).toBe(400);
     expect(res2.status).toBe(400);
@@ -44,7 +44,7 @@ describe("/api/auth/forgot_password/ [POST]", () => {
     const client = new TestClient();
     const response = await client
       .auth()
-      .forgotPassword({ email: faker.internet.email() });
+      .resetPassword({ email: faker.internet.email() });
     const json = await response.json();
     expect(response.status).toBe(404);
     expect(json.code).toBe("auth/user-not-found");
@@ -56,7 +56,7 @@ describe("/api/auth/forgot_password/ [POST]", () => {
     const email = faker.internet.email();
     const password = faker.internet.password();
     await client.auth().register({ email, password });
-    const response = await client.auth().forgotPassword({ email });
+    const response = await client.auth().resetPassword({ email });
     expect(response.status).toBe(200);
     done();
   });

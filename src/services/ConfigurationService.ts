@@ -5,8 +5,8 @@ import { validate } from "../utils/validate";
 import { ConfigurationItem } from "./ConfigurationItem";
 
 /**
- * Configuraton service is used to fetch the current configuration from
- * firestore. Optimized with a simple cache.
+ * Configuraton service is used to fetch and update the current configuration in
+ * the database. Optimized with a simple cache.
  */
 export class ConfigurationService {
   /**
@@ -86,6 +86,7 @@ export class ConfigurationService {
         return null;
       },
     }),
+
     /**
      * Free budgets limit defines how many budgets non-premium users
      * are allowed to create.
@@ -107,6 +108,7 @@ export class ConfigurationService {
         return null;
       },
     }),
+
     /**
      * Status defines whether the application is currently online or offline.
      * When the status is offline, the client application displays a

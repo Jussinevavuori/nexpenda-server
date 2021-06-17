@@ -6,10 +6,18 @@ import { ScheduleIntervalSerializer } from "./ScheduleIntervalSerializer";
 
 type ScheduleConstructorArgument = {
   intervalStr: string;
-  firstOccurence: Date;
-  lastOccurence?: Date;
+  firstOccurrence: Date;
+  lastOccurrence?: Date;
 };
 
+/**
+ * A schedule is used to schedule repeating transactions. A schedule contains
+ * occurrences. A schedule must define its first occurrence which is the first
+ * date when an event or transaction is scheduled to occur. A schedule will also
+ * contain an interval, which can be used to deduce all the following
+ * occurrences. A schedule may also contain a last occurrence which is used to
+ * end a schedule.
+ */
 export class Schedule {
   /**
    * The repeat interval. Contains information about how often the schedule
@@ -18,14 +26,14 @@ export class Schedule {
   public readonly interval: ScheduleInterval;
 
   /**
-   * Date of first occurence.
+   * Date of first occurrence.
    */
-  public readonly firstOccurence: Date;
+  public readonly firstOccurrence: Date;
 
   /**
-   * Date of last occurence.
+   * Date of last occurrence.
    */
-  public readonly lastOccurence?: Date;
+  public readonly lastOccurrence?: Date;
 
   /**
    * Do not use the constructor directly as the constructor may throw errors.
@@ -40,8 +48,8 @@ export class Schedule {
       throw new Error("Could not parse schedule string");
     }
 
-    this.firstOccurence = args.firstOccurence;
-    this.lastOccurence = args.lastOccurence;
+    this.firstOccurrence = args.firstOccurrence;
+    this.lastOccurrence = args.lastOccurrence;
   }
 
   /**
@@ -64,31 +72,31 @@ export class Schedule {
   }
 
   /**
-   * Get the next occurence. If the event occurs today, returns today's
-   * occurence.
+   * Get the next occurrence. If the event occurs today, returns today's
+   * occurrence.
    */
-  nextOccurence(): Date {
+  nextOccurrence(): Date {
     throw new Error("Unimplemented");
   }
 
   /**
-   * Number of total occurences.
+   * Number of total occurrences.
    */
-  getTotalOccurences(): number {
+  getTotalOccurrences(): number {
     throw new Error("Unimplemented");
   }
 
   /**
-   * Check whether the schedule is still active (last occurence not passed).
+   * Check whether the schedule is still active (last occurrence not passed).
    */
   isActive(): boolean {
     // If no termination date, schedule will never terminate
-    if (!this.lastOccurence) {
+    if (!this.lastOccurrence) {
       return true;
     }
 
     const today = dateFns.startOfDay(new Date());
-    const last = dateFns.startOfDay(this.lastOccurence);
+    const last = dateFns.startOfDay(this.lastOccurrence);
     return !dateFns.isAfter(last, today);
   }
 
@@ -100,24 +108,24 @@ export class Schedule {
   }
 
   /**
-   * Determine the last occurence when the first occurence, number of
-   * occurences and the specified interval is known.
+   * Determine the last occurrence when the first occurrence, number of
+   * occurrences and the specified interval is known.
    */
-  static getLastOccurence(args: {
-    firstOccurence: Date;
-    occurences: number;
+  static getLastOccurrence(args: {
+    firstOccurrence: Date;
+    occurrences: number;
     interval: ScheduleInterval;
   }): Date {
-    // Shorthand to first occurence as first. Ensure first is set to start
+    // Shorthand to first occurrence as first. Ensure first is set to start
     // of day for proper calculations.
-    const first = dateFns.startOfDay(args.firstOccurence);
+    const first = dateFns.startOfDay(args.firstOccurrence);
 
-    // Number of occurences. Forced to be an integer greater than one by flooring
+    // Number of occurrences. Forced to be an integer greater than one by flooring
     // and limiting to 1 at minimum.
-    const occurences = Math.max(1, Math.floor(args.occurences));
+    const occurrences = Math.max(1, Math.floor(args.occurrences));
 
     // Duration in units of time specified by interval
-    const duration = args.interval.every * (occurences - 1);
+    const duration = args.interval.every * (occurrences - 1);
 
     // Based on type of interval, add days, weeks, months or years to
     // first date to get correct terminate after date.

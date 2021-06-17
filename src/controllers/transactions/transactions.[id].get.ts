@@ -1,6 +1,6 @@
 import { transactionsRouter } from "..";
 import { prisma } from "../../server";
-import { TransactionService } from "../../services/TransactionService";
+import { TransactionMapper } from "../../services/TransactionMapper";
 import {
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
@@ -8,31 +8,40 @@ import {
   UnauthenticatedFailure,
 } from "../../utils/Failures";
 
+/**
+ * Fetch a single transaction the user owns.
+ */
 transactionsRouter.get("/:id", async (req, res, next) => {
   try {
-    // Ensure authenticated
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authenticated
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
-    // Ensure query parameter ID provided
-    if (!req.params.id) {
-      return next(new MissingUrlParametersFailure(["id"]));
-    }
+    /**
+     * Ensure query parameter provided
+     */
+    if (!req.params.id) return next(new MissingUrlParametersFailure(["id"]));
 
-    // Get transaction
+    /**
+     * Get transaction
+     */
     const transaction = await prisma.transaction.findUnique({
       where: { id: req.params.id },
       include: { Category: true },
     });
 
-    // Ensure transaction found and belongs to authenticated user
+    /**
+     * Ensure transaction exists and belongs to caller
+     */
     if (!transaction || transaction.uid !== req.data.auth.user.id) {
       return next(new TransactionNotFoundFailure());
     }
 
-    // Send transaction to user
-    return res.json(TransactionService.mapTransactionToResponse(transaction));
+    /**
+     * Send transaction to user
+     */
+    return res.json(TransactionMapper.mapTransactionToResponse(transaction));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

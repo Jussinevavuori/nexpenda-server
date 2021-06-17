@@ -1,13 +1,19 @@
-import * as z from "zod";
+import { z } from "zod";
 import { conf } from "../conf";
 import { User } from "@prisma/client";
 import { AbstractToken } from "./AbstractToken";
 
 type IConfirmEmailToken = z.TypeOf<typeof ConfirmEmailToken["schema"]>;
 
+/**
+ * The confirm email token is sent in a link in an email to a user who has
+ * registered or is attempting to sign in without having confirmed their email.
+ * A valid confirm email token can be used to confirm the user's email address.
+ */
 export class ConfirmEmailToken
   extends AbstractToken<IConfirmEmailToken>
-  implements IConfirmEmailToken {
+  implements IConfirmEmailToken
+{
   /**
    * Uid of user who the link is for
    */

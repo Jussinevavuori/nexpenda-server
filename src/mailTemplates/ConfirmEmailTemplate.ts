@@ -1,8 +1,22 @@
 import { AbstractTemplate } from "./AbstractTemplate";
 
+/**
+ * Confirm email templates require the confirmation URL and the email of the
+ * user whose email is being confirmed.
+ */
 type ConfirmEmailTemplateVariables = { url: string; email: string };
 
+/**
+ * Confirm email template is used for sending email confirmations to users
+ * who register or are trying to log in without a confirmed email.
+ *
+ * The email contains a URL (as `this.vars.url`) which redirects the user
+ * to an endpoint which confirms the user's email.
+ */
 export class ConfirmEmailTemplate extends AbstractTemplate<ConfirmEmailTemplateVariables> {
+  /**
+   * Mailgun template name.
+   */
   static get templateName() {
     return "template.nexpenda.confirm-email";
   }

@@ -1,17 +1,21 @@
 import * as compression from "compression";
 import { budgetsRouter } from "..";
 import { prisma } from "../../server";
-import { BudgetService } from "../../services/BudgetService";
+import { BudgetMapper } from "../../services/BudgetMapper";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
 
+/**
+ * Get all budgets the user owns.
+ */
 budgetsRouter.get("/", compression(), async (req, res, next) => {
   try {
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authenticated
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
     /**
      * Get all budgets for user
@@ -24,7 +28,7 @@ budgetsRouter.get("/", compression(), async (req, res, next) => {
     /**
      * Send budgets to user
      */
-    res.json(BudgetService.mapBudgetToResponse(budgets));
+    res.json(BudgetMapper.mapBudgetToResponse(budgets));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

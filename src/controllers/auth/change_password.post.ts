@@ -1,14 +1,25 @@
 import { authRouter } from "..";
-import { ForgotPasswordToken } from "../../services/ForgotPasswordToken";
+import { ResetPasswordToken } from "../../tokens/ResetPasswordToken";
 import { prisma } from "../../server";
 import { validateRequestBody } from "../../utils/validateRequestBody";
-import { passwordOnlyAuthSchema } from "../../schemas/auth.schema";
 import { Password } from "../../services/Password";
 import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
 import { Mailer } from "../../services/Mailer";
 import { PasswordChangedTemplate } from "../../mailTemplates/PasswordChangedTemplate";
+import { Schemas } from "../../schemas/Schemas";
 
+/**
+ * Endpoint which reads a reset password token from the request parameters.
+ * When a valid password token is provided and a password is sent to this
+ * endpoint, invalidates all tokens for that user and resets the user's
+ * password with the specified one.
+ *
+ * Before accessing this endpoint, the client should access the
+ * `GET /api/auth/change_password/:token` to ensure their token is valid and
+ * to confirm they have the correct email, however this is not strictly
+ * required.
+ */
 authRouter.post(
   "/change_password/:token",
   rateLimiters.strict(),
@@ -17,20 +28,14 @@ authRouter.post(
      * Get and verify token from request
      */
     const jwt = req.params["token"];
-
-    const token = new ForgotPasswordToken(jwt);
-
+    const token = new ResetPasswordToken(jwt);
     const tokenVerified = await token.verify();
-
-    if (!tokenVerified) {
-      return next(new InvalidTokenFailure());
-    }
+    if (!tokenVerified) return next(new InvalidTokenFailure());
 
     /**
      * Attempt to get user from token, ensure user has email.
      */
     const user = await prisma.user.findUnique({ where: { id: token.uid } });
-
     if (!user || !user.email || user.disabled) {
       return next(new UserNotFoundFailure());
     }
@@ -38,11 +43,8 @@ authRouter.post(
     /**
      * Get and validate password form
      */
-    const body = await validateRequestBody(req, passwordOnlyAuthSchema);
-
-    if (body.isFailure()) {
-      return next(body);
-    }
+    const body = await validateRequestBody(req, Schemas.Auth.passwordOnly);
+    if (body.isFailure()) return next(body);
 
     /**
      * Hash password
@@ -53,14 +55,10 @@ authRouter.post(
      * Update user token version and password
      */
     await prisma.user.update({
-      where: {
-        id: user.id,
-      },
+      where: { id: user.id },
       data: {
-        tokenVersion: {
-          increment: 1,
-        },
         password,
+        tokenVersion: { increment: 1 },
       },
     });
 
@@ -68,11 +66,9 @@ authRouter.post(
      * Send password changed mail alert
      */
     const mailer = new Mailer();
-
     const passwordChangedTemplate = new PasswordChangedTemplate({
       email: user.email,
     });
-
     await mailer.sendTemplate(user.email, passwordChangedTemplate);
 
     /**

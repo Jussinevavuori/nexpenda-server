@@ -1,35 +1,28 @@
 import * as compression from "compression";
-import * as z from "zod";
 import { transactionsRouter } from "..";
-import { TimestampMsString } from "../../schemas/utils.schema";
+import { Schemas } from "../../schemas/Schemas";
 import { prisma } from "../../server";
-import { TransactionService } from "../../services/TransactionService";
+import { TransactionMapper } from "../../services/TransactionMapper";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
-import { validateOr } from "../../utils/validate";
+import { getQuery } from "../../utils/getQuery";
 
-export const getTransactionsQueryParametersSchema = z.object({
-  after: TimestampMsString.optional(),
-  before: TimestampMsString.optional(),
-});
-
+/**
+ * Fetch all transactions the user owns.
+ */
 transactionsRouter.get("/", compression(), async (req, res, next) => {
   try {
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authentication
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
-    const params = validateOr(req.query, getTransactionsQueryParametersSchema, {
-      after: undefined,
-      before: undefined,
-    });
-
-    const parsedParams = {
-      after: params.after ? new Date(Number(params.after)) : undefined,
-      before: params.before ? new Date(Number(params.before)) : undefined,
-    };
+    /**
+     * Validate query parameters
+     */
+    const query = getQuery(req, Schemas.Transaction.getQuery);
 
     /**
      * Get all transactions for user
@@ -40,8 +33,8 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
           equals: req.data.auth.user.id,
         },
         time: {
-          gte: parsedParams.after,
-          lte: parsedParams.before,
+          gte: query.after,
+          lte: query.before,
         },
       },
       include: {
@@ -52,7 +45,7 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
     /**
      * Send transactions to user
      */
-    res.json(TransactionService.compressTransactions(transactions));
+    res.json(TransactionMapper.compressTransactions(transactions));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

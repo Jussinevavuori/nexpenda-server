@@ -17,7 +17,7 @@ describe("/api/auth/change_password [GET]", () => {
     const password = faker.internet.password();
     await client.auth().register({ email, password });
     const userRecord = await prisma.user.findUnique({ where: { email } });
-    const token = await client.fabricateForgotPasswordToken(
+    const token = await client.fabricateResetPasswordToken(
       userRecord!.id,
       prisma
     );
@@ -32,11 +32,11 @@ describe("/api/auth/change_password [GET]", () => {
     const client = new TestClient();
     const email = await client.authenticate(prisma);
     const userRecord = await prisma.user.findUnique({ where: { email } });
-    const token1 = await client.fabricateForgotPasswordToken(
+    const token1 = await client.fabricateResetPasswordToken(
       userRecord!.id,
       prisma
     );
-    const token2 = await client.fabricateForgotPasswordToken(
+    const token2 = await client.fabricateResetPasswordToken(
       userRecord!.id,
       prisma
     );
@@ -87,9 +87,9 @@ describe("/api/auth/change_password [GET]", () => {
       {
         uid: record!.id,
         vrs: record!.tokenVersion,
-        tkt: "forgot_password",
+        tkt: "reset_password",
       },
-      conf.token.forgotPasswordToken.secret,
+      conf.token.resetPasswordToken.secret,
       { issuer: conf.token.issuer, audience: conf.token.audience, expiresIn: 1 }
     );
     await new Promise((res) => setTimeout(res, 1000));
@@ -110,13 +110,13 @@ describe("/api/auth/change_password [GET]", () => {
       {
         uid: record!.id,
         vrs: record!.tokenVersion,
-        tkt: "forgot_password",
+        tkt: "reset_password",
       },
       "invalid_secret",
       {
         issuer: conf.token.issuer,
         audience: conf.token.audience,
-        expiresIn: conf.token.forgotPasswordToken.expiresIn,
+        expiresIn: conf.token.resetPasswordToken.expiresIn,
       }
     );
     const response = await client.auth().changePassword(token).get();

@@ -1,6 +1,10 @@
-import * as z from "zod";
+import { z } from "zod";
 
 export const TimestampMsString = z
   .string()
   .regex(/^\d{13}$/)
-  .refine((s) => Boolean(new Date(Number(s)).getTime()));
+  .refine((s) => !Number.isNaN(new Date(parseInt(s)).valueOf()));
+
+export const TimestampMsStringAsDate = TimestampMsString.transform(
+  (string) => new Date(parseInt(string))
+);

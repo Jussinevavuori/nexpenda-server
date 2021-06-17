@@ -1,8 +1,14 @@
-import * as z from "zod";
+import { z } from "zod";
 import { Request } from "express";
 import { Success } from "./Result";
 import { InvalidRequestDataFailure } from "./Failures";
 
+/**
+ * Validates a request body against a schema and provides useful error
+ * messages that can be directly sent back to the user in an invalid request
+ * data failure. Upon a valid request body, returns the correctly-typed, valid
+ * body in a success.
+ */
 export async function validateRequestBody<T extends object>(
   request: Request,
   schema: z.Schema<T>
@@ -46,7 +52,7 @@ export async function validateRequestBody<T extends object>(
   } else {
     return new InvalidRequestDataFailure<T>(
       parsed.error.errors.reduce((errors, next) => {
-        const path = next.path.join(".");
+        const path = next.path.map((_) => _.toString()).join(".");
         const msg = `${next.message} <${next.code}>`;
         return { ...errors, [path]: msg };
       }, {} as Record<string, string>)

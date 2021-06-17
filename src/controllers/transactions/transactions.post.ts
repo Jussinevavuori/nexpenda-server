@@ -1,35 +1,42 @@
 import { transactionsRouter } from "..";
 import { validateRequestBody } from "../../utils/validateRequestBody";
-import { postTransactionSchema } from "../../schemas/transaction.schema";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
 } from "../../utils/Failures";
-import { TransactionService } from "../../services/TransactionService";
+import { TransactionMapper } from "../../services/TransactionMapper";
+import { Permissions } from "../../services/Permissions";
+import { Category } from "@prisma/client";
+import { Schemas } from "../../schemas/Schemas";
 
+/**
+ * Create a new transaction for the user.
+ */
 transactionsRouter.post("/", async (req, res, next) => {
   try {
-    // Ensure authenticated
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authentication
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
-    // Validate request body
-    const body = await validateRequestBody(req, postTransactionSchema);
-    if (body.isFailure()) {
-      return next(body);
-    }
+    /**
+     * Validate request body
+     */
+    const body = await validateRequestBody(req, Schemas.Transaction.post);
+    if (body.isFailure()) return next(body);
 
-    // Ensure the user is allowed to create the requested transactions
-    const createPermission = await TransactionService.ensureCreatePermission(
+    /**
+     * Ensure the user is allowed to create transactions
+     */
+    const permission = await Permissions.getCreateTransactionPermission(
       req.data.auth.user
     );
-    if (createPermission.isFailure()) {
-      return next(createPermission);
-    }
+    if (permission.isFailure()) return next(permission);
 
-    // Create new transaction from body
+    /**
+     * Create new transaction from body.
+     */
     const created = await prisma.transaction.create({
       data: {
         User: {
@@ -64,36 +71,29 @@ transactionsRouter.post("/", async (req, res, next) => {
       },
     });
 
-    // Update icon if updated icon given
+    /**
+     * Update category icon if new icon provided in request.
+     */
+    let updatedCategory: Category | undefined;
     if (
       body.value.categoryIcon &&
       body.value.categoryIcon !== created.Category.icon
     ) {
-      const updatedCategory = await prisma.category.update({
-        where: {
-          id: created.Category.id,
-        },
-        data: {
-          icon: body.value.categoryIcon,
-        },
+      updatedCategory = await prisma.category.update({
+        where: { id: created.Category.id },
+        data: { icon: body.value.categoryIcon },
       });
-
-      // Short-circuit and send transaction to user with 201 status
-      // and updated category
-      return res.status(201).json(
-        TransactionService.mapTransactionToResponse({
-          ...created,
-          Category: updatedCategory,
-        })
-      );
     }
 
     /**
-     * Send created transaction to user with 201 status
+     * Send created transaction to user with 201 status.
      */
-    return res
-      .status(201)
-      .json(TransactionService.mapTransactionToResponse(created));
+    return res.status(201).json(
+      TransactionMapper.mapTransactionToResponse({
+        ...created,
+        Category: updatedCategory ?? created.Category,
+      })
+    );
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

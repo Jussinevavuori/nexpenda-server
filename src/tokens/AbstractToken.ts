@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import * as z from "zod";
+import { z } from "zod";
 import { conf } from "../conf";
 
 export type IAbstractToken = {
@@ -12,6 +12,11 @@ export type IAbstractToken = {
 
 export type TokenPayload<T> = IAbstractToken & T;
 
+/**
+ * JWT tokens can be created, read and worked with safely and with a concise API
+ * by extending the AbstractToken class which wraps all JWT token properties,
+ * verification, data etc.
+ */
 export class AbstractToken<T extends {}> implements IAbstractToken {
   /**
    * Raw JWT token string data for this token
@@ -127,6 +132,9 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
     const decoded = jwt.decode(this.jwt);
     const parseResult = this.mergedSchema.safeParse(decoded);
 
+    /**
+     * Assign parse results
+     */
     if (parseResult.success) {
       this.payload = parseResult.data;
       this.valid = true;
@@ -142,6 +150,9 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
       this.valid = false;
     }
 
+    /**
+     * Assign basic properties
+     */
     this.iat = this.payload.iat;
     this.exp = this.payload.exp;
     this.aud = this.payload.aud;
@@ -198,9 +209,7 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
       /**
        * If token was invalid during construction, automatically return false
        */
-      if (!this.valid) {
-        return false;
-      }
+      if (!this.valid) return false;
 
       /**
        * Verify token. If token verification fails, an error is thrown and the
@@ -215,10 +224,8 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
        * Verify the payload of the verified token. If verification fails, an
        * error is thrown and the function automatically returns false
        */
-      const valid = this.mergedSchema.check(decoded);
-      if (!valid) {
-        return false;
-      }
+      const valid = this.mergedSchema.parse(decoded);
+      if (!valid) return false;
 
       /**
        * Run extra verification steps if specified

@@ -7,33 +7,44 @@ import {
   UnauthenticatedFailure,
 } from "../../utils/Failures";
 
+/**
+ * Delete a single transaction the user owns.
+ */
 transactionsRouter.delete("/:id", async (req, res, next) => {
   try {
-    // Ensure authenticated
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authentication
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
-    // Ensure query parameter ID provided
-    if (!req.params.id) {
-      return next(new MissingUrlParametersFailure(["id"]));
-    }
+    /**
+     * Ensure query parameters provided
+     */
+    if (!req.params.id) return next(new MissingUrlParametersFailure(["id"]));
 
-    // Get transaction
+    /**
+     * Get transaction that is being updated
+     */
     const transaction = await prisma.transaction.findUnique({
       where: { id: req.params.id },
       include: { Category: true },
     });
 
-    // Ensure transaction found and belongs to authenticated user
+    /**
+     * Ensure transaction belongs to caller
+     */
     if (!transaction || transaction.uid !== req.data.auth.user.id) {
       return next(new TransactionNotFoundFailure());
     }
 
-    // Delete transaction
+    /**
+     * Delete transaction
+     */
     await prisma.transaction.delete({ where: { id: transaction.id } });
 
-    // Respond with 204 and deleted ID for succesful deletion
+    /**
+     * Respond with 200 and ID of deleted transaction
+     */
     return res.status(200).json({ id: transaction.id });
   } catch (error) {
     return next(new DatabaseAccessFailure(error));

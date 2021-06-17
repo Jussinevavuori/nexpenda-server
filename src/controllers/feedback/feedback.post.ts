@@ -1,24 +1,30 @@
 import { feedbackRouter } from "..";
 import { conf } from "../../conf";
 import { FeedbackReceivedTempate } from "../../mailTemplates/FeedbackReceivedTemplate";
-import { postFeedbackSchema } from "../../schemas/feedback.schema";
+import { Schemas } from "../../schemas/Schemas";
 import { prisma } from "../../server";
 import { Mailer } from "../../services/Mailer";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 
+/**
+ * Post a new feedback item and send a notification email to the developer(s).
+ */
 feedbackRouter.post("/", async (req, res, next) => {
-  if (!req.data.auth.user) {
-    return next(new UnauthenticatedFailure());
-  }
+  /**
+   * Require authentication
+   */
+  if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
-  // Validate request body
-  const body = await validateRequestBody(req, postFeedbackSchema);
-  if (body.isFailure()) {
-    return next(body);
-  }
+  /**
+   * Validate request body
+   */
+  const body = await validateRequestBody(req, Schemas.Feedback.post);
+  if (body.isFailure()) return next(body);
 
-  // Upload feedback
+  /**
+   * Upload feedback
+   */
   await prisma.feedback.create({
     data: {
       message: body.value.message,
@@ -30,7 +36,9 @@ feedbackRouter.post("/", async (req, res, next) => {
     },
   });
 
-  // Send feedback alert
+  /**
+   * Send feedback alert
+   */
   try {
     const mailer = new Mailer();
 
@@ -47,6 +55,8 @@ feedbackRouter.post("/", async (req, res, next) => {
     console.error("Failed to send feedback mail");
   }
 
-  // End
+  /**
+   * Empty response
+   */
   res.end();
 });

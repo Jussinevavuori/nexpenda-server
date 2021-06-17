@@ -7,24 +7,30 @@ import {
   UnauthenticatedFailure,
 } from "../../utils/Failures";
 import { budgetsRouter } from "..";
-import { patchBudgetSchema } from "../../schemas/budget.schema";
-import { BudgetService } from "../../services/BudgetService";
+import { BudgetMapper } from "../../services/BudgetMapper";
 import { Failure } from "../../utils/Result";
+import { BudgetCategoryValidator } from "../../services/BudgetCategoryValidator";
+import { Schemas } from "../../schemas/Schemas";
 
+/**
+ * Partially update a single budget the user owns.
+ */
 budgetsRouter.patch("/:id", async (req, res, next) => {
   try {
-    // Ensure authenticated
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authenticated
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
     const uid = req.data.auth.user.id;
 
-    // Ensure query parameter ID provided
-    if (!req.params.id) {
-      return next(new MissingUrlParametersFailure(["id"]));
-    }
+    /**
+     * Ensure query parameters provided
+     */
+    if (!req.params.id) return next(new MissingUrlParametersFailure(["id"]));
 
-    // Get budget
+    /**
+     * Get budget
+     */
     const budget = await prisma.budget.findUnique({
       where: { id: req.params.id },
       select: {
@@ -34,31 +40,35 @@ budgetsRouter.patch("/:id", async (req, res, next) => {
       },
     });
 
-    // Ensure budget found and belongs to authenticated user
+    /**
+     * Ensure budget exists and belongs to caller
+     */
     if (!budget || budget.uid !== uid) {
       return next(new BudgetNotFoundFailure());
     }
 
-    // Validate request body
-    const body = await validateRequestBody(req, patchBudgetSchema);
-    if (body.isFailure()) {
-      return next(body);
-    }
+    /**
+     * Validate request body
+     */
+    const body = await validateRequestBody(req, Schemas.Budget.patch);
+    if (body.isFailure()) return next(body);
 
-    // Ensure all specified categories exist and are owned by authenticated user
+    /**
+     * Ensure all specified categories exist and are owned by authenticated user
+     */
     if (body.value.categoryIds) {
-      const categoriesValidityCheck = await BudgetService.ensureValidCategoryIds(
+      const categoryCheck = await BudgetCategoryValidator.validateCategoryIds(
         req.data.auth.user,
         body.value.categoryIds,
         prisma
       );
 
-      if (categoriesValidityCheck.isFailure()) {
-        return next(categoriesValidityCheck);
-      }
+      if (categoryCheck.isFailure()) return next(categoryCheck);
     }
 
-    // If specified, manually update category IDs
+    /**
+     * If specified, manually update category IDs
+     */
     if (body.value.categoryIds) {
       await prisma.budgetCategoryInclusion.deleteMany({
         where: { budgetId: budget.id },
@@ -73,7 +83,9 @@ budgetsRouter.patch("/:id", async (req, res, next) => {
       }
     }
 
-    // Update budget
+    /**
+     * Update budget
+     */
     const updated = await prisma.budget.update({
       where: { id: budget.id },
       data: {
@@ -85,7 +97,7 @@ budgetsRouter.patch("/:id", async (req, res, next) => {
     });
 
     // Send updated budget to user
-    return res.json(BudgetService.mapBudgetToResponse(updated));
+    return res.json(BudgetMapper.mapBudgetToResponse(updated));
   } catch (error) {
     if (error instanceof Failure) {
       return next(error);

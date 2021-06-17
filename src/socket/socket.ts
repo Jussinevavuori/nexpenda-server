@@ -1,3 +1,7 @@
+/**
+ * Sockets are currently not implemented.
+ */
+
 // import { io } from "..";
 // import "./transactions";
 

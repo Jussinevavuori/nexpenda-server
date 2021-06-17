@@ -2,6 +2,10 @@ import { Profile, User } from ".prisma/client";
 import Stripe from "stripe";
 import { StripeService } from "./StripeService";
 
+/**
+ * The user service provides multiple methods for working with users, profiles
+ * and authentication.
+ */
 export class UserService {
   /**
    * Creates an empty details. Defaults some of the

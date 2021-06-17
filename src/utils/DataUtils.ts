@@ -2,6 +2,10 @@ type ObjectIndexable = string | number | symbol;
 
 type ComparisonFunction<T> = (a: T, b: T) => boolean;
 
+/**
+ * The data utils class provides multiple utility functions for working with
+ * complex generic datasets.
+ */
 export class DataUtils {
   /**
    * Returns a copy of the array with only unique values w.r.t. the

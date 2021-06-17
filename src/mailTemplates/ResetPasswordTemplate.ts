@@ -1,15 +1,28 @@
 import { AbstractTemplate } from "./AbstractTemplate";
 
-type ForgotPasswordTemplateVariables = { url: string; email: string };
+/**
+ * Reset password emails require the user's email and the URL that redirects
+ * the user to the password reset page.
+ */
+type ResetPasswordTemplateVariables = { url: string; email: string };
 
-export class ForgotPasswordTemplate extends AbstractTemplate<ForgotPasswordTemplateVariables> {
+/**
+ * Reset password emails are used for both when the user either forgets or
+ * wants to manually reset their password. The link in the email contains a
+ * token that can be used to access the password reset page.2
+ */
+export class ResetPasswordTemplate extends AbstractTemplate<ResetPasswordTemplateVariables> {
+  /**
+   * Mailgun template name. Here the template was still called the forgot
+   * password template, however its name has been updated in other places.
+   */
   static get templateName() {
     return "template.nexpenda.forgot-password";
   }
 
-  constructor(variables: ForgotPasswordTemplateVariables) {
+  constructor(variables: ResetPasswordTemplateVariables) {
     super(variables, {
-      templateName: ForgotPasswordTemplate.templateName,
+      templateName: ResetPasswordTemplate.templateName,
       mailgunTemplateAvailable: true,
     });
   }

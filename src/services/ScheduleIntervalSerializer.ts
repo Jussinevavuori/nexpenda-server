@@ -4,7 +4,8 @@ import { scheduleIntervalSchema } from "../schemas/schedule.schema";
 import { ErrorFailure } from "../utils/Failures";
 
 /**
- * Utility class for serializing and deserializing intervals.
+ * Utility class for serializing and deserializing intervals fpor schedules.
+ * Uses a JSON.parse and JSON.stringify together with validation.
  */
 export class ScheduleIntervalSerializer {
   /**

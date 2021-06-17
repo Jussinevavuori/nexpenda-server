@@ -1,4 +1,4 @@
-import * as z from "zod";
+import { z } from "zod";
 import { Request, Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
 import { conf } from "../conf";
@@ -6,9 +6,30 @@ import { AbstractToken } from "./AbstractToken";
 
 type IRefreshToken = z.TypeOf<typeof RefreshToken["schema"]>;
 
+/**
+ * Refresh tokens are used together with access tokens for authentication.
+ *
+ * The refresh token is a persistent cookie which is provided to the user
+ * at login with `RefreshToken.sendCookie()` and cleared from the user during
+ * logout with `RefreshToken.clearCookie()`.
+ *
+ * The refresh token can be parsed from the request with the
+ * `RefreshToken.fromRequest()` method.
+ *
+ * The refresh token alone won't allow a user to access any protected APIs.
+ * The user is required to fetch and periodically update a shortlived access
+ * token from the server, which should be stored in-memory on the client.
+ *
+ * In order to authenticate, the access token should be sent in the request
+ * headers together with the refresh token as a cookie.
+ *
+ * A refresh token contain's metadata along with the authenticated user's
+ * uid and the token version for token invalidation.
+ */
 export class RefreshToken
   extends AbstractToken<IRefreshToken>
-  implements IRefreshToken {
+  implements IRefreshToken
+{
   /**
    * Uid of user which this refresh token is authenticating
    */
@@ -48,7 +69,7 @@ export class RefreshToken
   /**
    * Sends refresh token as cookie in response
    */
-  send(response: Response): Response {
+  sendCookie(response: Response): Response {
     const secure = !["development", "test"].includes(conf.env);
     return response.cookie(conf.token.refreshToken.name, this.jwt, {
       maxAge: conf.token.refreshToken.expiresInSeconds * 1000,

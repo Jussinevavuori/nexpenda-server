@@ -2,6 +2,10 @@ import { Request } from "express";
 import { v4 as uuid } from "uuid";
 import { ImageService } from "./ImageService";
 
+/**
+ * Avatar service wraps avatar specific functionalities, mainly for validating
+ * photo URLs and uploading avatars to the GC storage.
+ */
 export class AvatarService {
   /**
    * Regex for checking which urls are allowed to directly
@@ -25,7 +29,7 @@ export class AvatarService {
   /**
    * Upload a profile picture.
    */
-  static uploadProfilePicture(args: { file: Request["file"] }) {
+  static uploadAvatar(args: { file: Request["file"] }) {
     return ImageService.uploadImage({
       buffer: args.file.buffer,
       folder: AvatarService.folder,

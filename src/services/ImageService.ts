@@ -5,7 +5,8 @@ import { ImageFailure } from "../utils/Failures";
 import { Success } from "../utils/Result";
 
 /**
- * Handles images with google cloud storage.
+ * The image service provides an API for working with images in Google
+ * Cloud Storage. Most importantly, provides the `uploadImage` method.
  */
 export class ImageService {
   /**

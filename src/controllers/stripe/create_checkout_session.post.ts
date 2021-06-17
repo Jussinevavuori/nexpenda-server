@@ -1,58 +1,70 @@
 import { stripeRouter } from "..";
 import { stripe, StripeService } from "../../services/StripeService";
-import {
-  InvalidRequestDataFailure,
-  StripeFailure,
-  UnauthenticatedFailure,
-} from "../../utils/Failures";
+import { StripeFailure, UnauthenticatedFailure } from "../../utils/Failures";
 import { getUrl } from "../../utils/getUrl";
+import { validateRequestBody } from "../../utils/validateRequestBody";
+import { Schemas } from "../../schemas/Schemas";
 
+/**
+ * Create a stripe checkout session for subscribing to premium.
+ */
 stripeRouter.post("/create-checkout-session", async (req, res, next) => {
-  // Require auth
+  /**
+   * Require authenticated user
+   */
   const user = req.data.auth.user;
-  if (!user) {
-    return next(new UnauthenticatedFailure());
-  }
+  if (!user) return next(new UnauthenticatedFailure());
 
-  // Create or update stripe customer for user
+  /**
+   * Create or update stripe customer for user
+   */
   const customer = await StripeService.createOrUpdateCustomer(user);
 
-  // Get price id from request and validate it is a string
-  const priceId = req.body.priceId;
-  if (!priceId) {
-    return next(
-      new InvalidRequestDataFailure({ priceId: "no priceId provided" })
-    );
-  } else if (typeof priceId !== "string") {
-    return next(
-      new InvalidRequestDataFailure({ priceId: "priceId must be a string" })
-    );
-  }
+  /**
+   * Validate request body
+   */
+  const body = await validateRequestBody(
+    req,
+    Schemas.Stripe.createCheckoutSession
+  );
+  if (body.isFailure()) return next(body);
 
   try {
-    // Create a stripe checkout session
+    /**
+     * Create a stripe checkout session
+     */
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
       allow_promotion_codes: true,
 
-      // Use existing stripe customer ID if available
+      /**
+       * Use existing customer ID if available
+       */
       customer: customer.id ?? undefined,
 
+      /**
+       * Ordered items
+       */
       line_items: [
         {
-          price: priceId,
-          // For metered billing, do not pass quantity
+          price: body.value.priceId,
           quantity: 1,
         },
       ],
 
+      /**
+       * Redirection URLs
+       */
       success_url: getUrl.toFrontend("/subscribe/success", {
         session_id: `{CHECKOUT_SESSION_ID}`,
       }),
       cancel_url: getUrl.toFrontend("/subscribe/cancel"),
     });
 
+    /**
+     * Respond with checkout session ID
+     */
     return res.send({ sessionId: session.id });
   } catch (e) {
     return next(new StripeFailure(e));

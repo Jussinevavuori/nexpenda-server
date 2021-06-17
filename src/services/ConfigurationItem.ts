@@ -3,6 +3,11 @@ import { ConfigUpdateFailure } from "../utils/Failures";
 import { Success } from "../utils/Result";
 import { ConfigSchema } from "../schemas/config.schema";
 
+/**
+ * Wraps functionality for a configuration item which is stored in the Config
+ * table of the database as a key-value pair. Includes functionalities such
+ * as fetching, updating, validating, default values and more.
+ */
 export class ConfigurationItem<T> {
   /**
    * Key for storing this item in the database.

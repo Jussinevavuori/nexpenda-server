@@ -6,23 +6,25 @@ import {
   UnauthenticatedFailure,
 } from "../../utils/Failures";
 
+/**
+ * Fetch all categories the user owns.
+ */
 categoriesRouter.get("/", compression(), async (req, res, next) => {
   try {
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Require authentication
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
     /**
-     * Get all transactions for user
+     * Get all categories for user
      */
     const categories = await prisma.category.findMany({
-      where: {
-        uid: req.data.auth.user.id,
-      },
+      where: { uid: req.data.auth.user.id },
     });
 
     /**
-     * Send transactions to user
+     * Send categories to user
      */
     res.json(categories);
   } catch (error) {

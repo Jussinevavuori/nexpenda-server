@@ -20,7 +20,7 @@ import "./auth/register";
 import "./auth/googleOauth";
 import "./auth/confirm_email";
 import "./auth/refresh_token";
-import "./auth/forgot_password";
+import "./auth/reset_password";
 import "./auth/change_password.get";
 import "./auth/change_password.post";
 import "./auth/request_confirm_email";

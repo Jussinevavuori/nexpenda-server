@@ -1,5 +1,13 @@
 import { Failure } from "./Result";
 
+/**
+ * This file defines all different Failure types. Failures are used together
+ * with Successes (together called Results) in order to provide an error-free
+ * API. This enables easier and safer development, less try-catch blocks and
+ * easier error message communication to the client via standardized failures
+ * and a specialized failure handler.
+ */
+
 export type ServerFailureCode =
   | "server/initialization-failure"
   | "request/invalid-request-data"

@@ -2,6 +2,10 @@ import * as mailgun from "mailgun-js";
 import { conf } from "../conf";
 import { AbstractTemplate } from "../mailTemplates/AbstractTemplate";
 
+/**
+ * The mailer is a wrapper for the mailgun instance and can be used to send
+ * mail templates which extend the AbstractMailTemplate class.
+ */
 export class Mailer {
   /**
    * Mailgun instance

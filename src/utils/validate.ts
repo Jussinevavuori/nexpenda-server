@@ -1,7 +1,11 @@
-import * as z from "zod";
+import { z } from "zod";
 import { ValidationFailure } from "./Failures";
 import { Success } from "./Result";
 
+/**
+ * Validate data against a schema and upon failure return the provided
+ * default value.
+ */
 export function validateOr<T extends object>(
   data: any,
   schema: z.Schema<T>,
@@ -15,6 +19,10 @@ export function validateOr<T extends object>(
   }
 }
 
+/**
+ * Validate data against a schema and return either the parsed / validated
+ * value in a success or a validation failure.
+ */
 export function validate<T extends object>(data: any, schema: z.Schema<T>) {
   const parsed = schema.safeParse(data);
 

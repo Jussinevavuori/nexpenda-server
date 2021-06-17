@@ -1,15 +1,31 @@
 import * as passport from "passport";
 import { OAuth2Strategy as GoogleStrategy } from "passport-google-oauth";
 import { conf } from "./conf";
+import { Schemas } from "./schemas/Schemas";
 import { prisma } from "./server";
 
-passport.serializeUser(async (user, done) => {
-  done(null, (user as any).id);
+/**
+ * Passport serializer: serialize any object with a non-empty, string ID
+ * field by its ID. Assume the object to be a user. If no ID field is found,
+ * provide error.
+ */
+passport.serializeUser(async (unknownUser, done) => {
+  try {
+    const user = Schemas.Auth.id.parse(unknownUser);
+    done(null, user.id);
+  } catch (error) {
+    done(error);
+  }
 });
 
+/**
+ * Passport deserializer. Ensure the id is a valid string and attempt to find
+ * a user with that id. If found ,return them. Handle errors and situations
+ * where a user is not found or the id is not a valid string.
+ */
 passport.deserializeUser(async (id, done) => {
   try {
-    if (typeof id === "string") {
+    if (id && typeof id === "string") {
       const user = await prisma.user.findUnique({ where: { id } });
       done(null, user);
     } else {
@@ -20,6 +36,9 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+/**
+ * Google strategy
+ */
 passport.use(
   new GoogleStrategy(
     {
@@ -40,6 +59,7 @@ passport.use(
             ? googleProfile.photos[0].value
             : undefined;
 
+        // Must contain an email
         if (!email) {
           throw Error("Email not found in Google profile");
         }

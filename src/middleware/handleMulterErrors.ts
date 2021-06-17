@@ -2,6 +2,9 @@ import * as multer from "multer";
 import { Request, Response, NextFunction } from "express";
 import { FileFailure, FileTooLargeFailure } from "../utils/Failures";
 
+/**
+ * Error handler to convert multer errors into failures.
+ */
 export function handleMulterErrors(
   error: Error,
   req: Request,
@@ -11,8 +14,6 @@ export function handleMulterErrors(
   /**
    * If the error is a multer error, cast it to a failure based on its
    * code.
-   *
-   * @todo Add more codes and failures.
    */
   if (error instanceof multer.MulterError) {
     switch (error.code) {

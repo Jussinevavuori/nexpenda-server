@@ -1,22 +1,26 @@
 import { authRouter } from "..";
 import { prisma } from "../../server";
-import { RefreshToken } from "../../services/RefreshToken";
+import { RefreshToken } from "../../tokens/RefreshToken";
 
+/**
+ * Logs a user out by removing their refresh token cookie and invalidating
+ * all tokens for that user.
+ */
 authRouter.post("/logout", async (req, res) => {
-  // Update user token version to invalidate all other JWT
-  // sessions.
+  /**
+   * If user logged in, invalidate all existing tokens by incrementing
+   * token version.
+   */
   const user = req.data.auth.user;
   if (user) {
     await prisma.user.update({
       where: { id: user.id },
-      data: {
-        tokenVersion: {
-          increment: 1,
-        },
-      },
+      data: { tokenVersion: { increment: 1 } },
     });
   }
 
-  // Clear cookie
+  /**
+   * Clear cookie to log out
+   */
   RefreshToken.clearCookie(res).end();
 });

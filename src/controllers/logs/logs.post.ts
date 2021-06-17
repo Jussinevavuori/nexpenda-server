@@ -1,21 +1,27 @@
 import { logsRouter } from "..";
-import { postLogSchema } from "../../schemas/logs.schema";
+import { Schemas } from "../../schemas/Schemas";
 import { prisma } from "../../server";
 import { UnauthenticatedFailure } from "../../utils/Failures";
 import { validateRequestBody } from "../../utils/validateRequestBody";
 
+/**
+ * Post a new log item to the database.
+ */
 logsRouter.post("/", async (req, res, next) => {
-  if (!req.data.auth.user) {
-    return next(new UnauthenticatedFailure());
-  }
+  /**
+   * Require auth
+   */
+  if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
-  // Validate request body
-  const body = await validateRequestBody(req, postLogSchema);
-  if (body.isFailure()) {
-    return next(body);
-  }
+  /**
+   * Validate request body
+   */
+  const body = await validateRequestBody(req, Schemas.Log.post);
+  if (body.isFailure()) return next(body);
 
-  // Upload feedback
+  /**
+   * Upload log
+   */
   const createdLog = await prisma.log.create({
     data: {
       ...body.value,
@@ -27,6 +33,8 @@ logsRouter.post("/", async (req, res, next) => {
     },
   });
 
-  // End
+  /**
+   * Respond with log ID
+   */
   res.json({ id: createdLog.id });
 });

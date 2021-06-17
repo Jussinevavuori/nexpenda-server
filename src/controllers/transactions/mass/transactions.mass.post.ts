@@ -1,40 +1,46 @@
 import { transactionsRouter } from "../..";
 import { validateRequestBody } from "../../../utils/validateRequestBody";
-import { postTransactionsSchema } from "../../../schemas/transaction.schema";
 import { prisma } from "../../../server";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
 } from "../../../utils/Failures";
-import { TransactionService } from "../../../services/TransactionService";
+import { TransactionMapper } from "../../../services/TransactionMapper";
 import { Transaction, Category } from "@prisma/client";
+import { Permissions } from "../../../services/Permissions";
+import { Schemas } from "../../../schemas/Schemas";
 
+/**
+ * Create multiple transactions for the user
+ */
 transactionsRouter.post("/mass/post", async (req, res, next) => {
   try {
-    // Ensure authenticated
-    if (!req.data.auth.user) {
-      return next(new UnauthenticatedFailure());
-    }
+    /**
+     * Ensure authenticated
+     */
+    if (!req.data.auth.user) return next(new UnauthenticatedFailure());
 
-    // Get request body and validate it
-    const body = await validateRequestBody(req, postTransactionsSchema);
-    if (body.isFailure()) {
-      return next(body);
-    }
+    /**
+     * Validate request body
+     */
+    const body = await validateRequestBody(req, Schemas.Transaction.postMany);
+    if (body.isFailure()) return next(body);
 
-    // Ensure the user is allowed to create the requested transactions
-    const createPermission = await TransactionService.ensureCreatePermission(
+    /**
+     * Ensure the user is allowed to create transactions
+     */
+    const permission = await Permissions.getCreateTransactionPermission(
       req.data.auth.user,
       body.value.transactions.length
     );
-    if (createPermission.isFailure()) {
-      return next(createPermission);
-    }
+    if (permission.isFailure()) return next(permission);
 
+    /**
+     * Create all transactions one by one
+     */
     const createdTransactions: Array<Transaction & { Category: Category }> = [];
-
     for (const transaction of body.value.transactions) {
-      const createdTransaction = await prisma.transaction.create({
+      const created = await prisma.transaction.create({
         data: {
           integerAmount: transaction.integerAmount,
           comment: transaction.comment,
@@ -67,13 +73,36 @@ transactionsRouter.post("/mass/post", async (req, res, next) => {
           Category: true,
         },
       });
-      createdTransactions.push(createdTransaction);
+
+      /**
+       * Update category icon if new icon provided in request.
+       */
+      let updatedCategory: Category | undefined;
+      if (
+        transaction.categoryIcon &&
+        transaction.categoryIcon !== created.Category.icon
+      ) {
+        updatedCategory = await prisma.category.update({
+          where: { id: created.Category.id },
+          data: { icon: transaction.categoryIcon },
+        });
+      }
+
+      /**
+       * Add created to array to return to user with potential updated data.
+       */
+      createdTransactions.push({
+        ...created,
+        Category: updatedCategory ?? created.Category,
+      });
     }
 
-    // Send created transaction to user
+    /**
+     * Send created transactions to user
+     */
     return res
       .status(201)
-      .json(TransactionService.compressTransactions(createdTransactions));
+      .json(TransactionMapper.compressTransactions(createdTransactions));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

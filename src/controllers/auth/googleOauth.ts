@@ -2,9 +2,12 @@ import { authRouter } from "..";
 import * as passport from "passport";
 import { redirect } from "../../utils/redirect";
 import { prisma } from "../../server";
-import { RefreshToken } from "../../services/RefreshToken";
+import { RefreshToken } from "../../tokens/RefreshToken";
 import { getUrl } from "../../utils/getUrl";
 
+/**
+ * OAuth starting endpoint for Google with passport
+ */
 authRouter.get(
   "/google",
   passport.authenticate("google", {
@@ -13,6 +16,9 @@ authRouter.get(
   })
 );
 
+/**
+ * OAuth callback endpoint for Google with passport
+ */
 authRouter.get(
   "/google/callback",
   passport.authenticate("google", {
@@ -27,7 +33,7 @@ authRouter.get(
       if (id && googleId) {
         const user = await prisma.user.findUnique({ where: { id } });
         if (user && googleId === user.googleId) {
-          new RefreshToken(user, prisma).send(response);
+          new RefreshToken(user, prisma).sendCookie(response);
           return redirect(response).toFrontend("/app");
         }
       }

@@ -1,8 +1,7 @@
 import { authRouter } from "..";
 import { validateRequestBody } from "../../utils/validateRequestBody";
-import { authSchema } from "../../schemas/auth.schema";
 import { prisma } from "../../server";
-import { RefreshToken } from "../../services/RefreshToken";
+import { RefreshToken } from "../../tokens/RefreshToken";
 import { Password } from "../../services/Password";
 import {
   EmailNotConfirmedFailure,
@@ -11,48 +10,45 @@ import {
   UserNotFoundFailure,
 } from "../../utils/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
+import { Schemas } from "../../schemas/Schemas";
 
+/**
+ * Endpoint for logging a user in by providing them with the refresh token
+ * cookie on valid credentials.
+ *
+ * Requires the user to have email-password credentials and to have their email
+ * verified.
+ *
+ * After logging in and receiving the refresh token cookie, the client must
+ * still access the refresh_token endpoint to get their access token.
+ */
 authRouter.post("/login", rateLimiters.strict(), async (req, res, next) => {
   /**
    * Validate body
    */
-  const body = await validateRequestBody(req, authSchema);
-
-  if (body.isFailure()) {
-    return next(body);
-  }
+  const body = await validateRequestBody(req, Schemas.Auth.full);
+  if (body.isFailure()) return next(body);
 
   /**
-   * Get user and ensure user exists and has password
+   * Get user and ensure user exists and, has password and verified email
    */
   const user = await prisma.user.findUnique({
     where: { email: body.value.email },
   });
-
   if (!user) {
-    return next(
-      new UserNotFoundFailure().withMessage(
-        `No user found with the email ${body.value.email}`
-      )
-    );
+    const msg = `No user found with the email ${body.value.email}`;
+    return next(new UserNotFoundFailure().withMessage(msg));
   }
-
-  if (!user.emailVerified) {
-    return next(new EmailNotConfirmedFailure());
-  }
-
-  if (!user.password) {
-    return next(new UserHasNoPasswordFailure());
-  }
+  if (!user.emailVerified) return next(new EmailNotConfirmedFailure());
+  if (!user.password) return next(new UserHasNoPasswordFailure());
 
   /**
-   * Compare passwords
+   * Validate password
    */
   const passwordValid = await Password.validate(
     body.value.password,
     user.password
   );
-
   if (!passwordValid) {
     return next(new InvalidCredentialsFailure().withMessage("Wrong password"));
   }
@@ -60,5 +56,5 @@ authRouter.post("/login", rateLimiters.strict(), async (req, res, next) => {
   /**
    * Send refresh token in respone if everything succeeded
    */
-  new RefreshToken(user, prisma).send(res).end();
+  new RefreshToken(user, prisma).sendCookie(res).end();
 });
