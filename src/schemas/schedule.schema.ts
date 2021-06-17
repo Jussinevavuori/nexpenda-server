@@ -2,19 +2,19 @@ import * as z from "zod";
 
 export const scheduleIntervalSchema = z.union([
   z.object({
-    type: z.literal("day"),
+    type: z.literal("DAY"),
     every: z.number().positive().int(),
   }),
   z.object({
-    type: z.literal("week"),
+    type: z.literal("WEEK"),
     every: z.number().positive().int(),
   }),
   z.object({
-    type: z.literal("month"),
+    type: z.literal("MONTH"),
     every: z.number().positive().int(),
   }),
   z.object({
-    type: z.literal("year"),
+    type: z.literal("YEAR"),
     every: z.number().positive().int(),
   }),
 ]);

@@ -18,18 +18,14 @@ export class Schedule {
   public readonly interval: ScheduleInterval;
 
   /**
-   * The first occurence.
+   * Date of first occurence.
    */
   public readonly firstOccurence: Date;
 
   /**
-   * Last occurence.
+   * Date of last occurence.
    */
   public readonly lastOccurence?: Date;
-
-  /**
-   * Type
-   */
 
   /**
    * Do not use the constructor directly as the constructor may throw errors.
@@ -126,16 +122,16 @@ export class Schedule {
     // Based on type of interval, add days, weeks, months or years to
     // first date to get correct terminate after date.
     switch (args.interval.type) {
-      case "day": {
+      case "DAY": {
         return dateFns.addDays(first, duration);
       }
-      case "week": {
+      case "WEEK": {
         return dateFns.addWeeks(first, duration);
       }
-      case "month": {
+      case "MONTH": {
         return dateFns.addMonths(first, duration);
       }
-      case "year": {
+      case "YEAR": {
         return dateFns.addYears(first, duration);
       }
     }

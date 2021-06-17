@@ -124,5 +124,3 @@ migration 20210531152129-add_google_photo_url..20210617075338-add_transaction_re
    User User @relation(fields: [uid], references: [id])
    @@unique([uid, value], name: "unique_uid_value")
 ```
-
-
