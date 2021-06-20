@@ -28,7 +28,10 @@ transactionsRouter.get("/:id", async (req, res, next) => {
      */
     const transaction = await prisma.transaction.findUnique({
       where: { id: req.params.id },
-      include: { Category: true },
+      include: {
+        Category: true,
+        Schedule: true,
+      },
     });
 
     /**

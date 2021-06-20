@@ -7,7 +7,7 @@ import { ScheduleIntervalSerializer } from "./ScheduleIntervalSerializer";
 type ScheduleConstructorArgument = {
   intervalStr: string;
   firstOccurrence: Date;
-  lastOccurrence?: Date;
+  occurrences?: number;
 };
 
 /**
@@ -31,9 +31,9 @@ export class Schedule {
   public readonly firstOccurrence: Date;
 
   /**
-   * Date of last occurrence.
+   * Total number of occurrences.
    */
-  public readonly lastOccurrence?: Date;
+  public readonly occurrences?: number;
 
   /**
    * Do not use the constructor directly as the constructor may throw errors.
@@ -49,7 +49,7 @@ export class Schedule {
     }
 
     this.firstOccurrence = args.firstOccurrence;
-    this.lastOccurrence = args.lastOccurrence;
+    this.occurrences = args.occurrences;
   }
 
   /**
@@ -80,10 +80,15 @@ export class Schedule {
   }
 
   /**
-   * Number of total occurrences.
+   * Last occurrence. Returns undefined if there is no last occurrence.
    */
-  getTotalOccurrences(): number {
-    throw new Error("Unimplemented");
+  getLastOccurrence(): Date | undefined {
+    if (!this.occurrences) return undefined;
+    return Schedule.getLastOccurrence({
+      firstOccurrence: this.firstOccurrence,
+      occurrences: this.occurrences,
+      interval: this.interval,
+    });
   }
 
   /**
@@ -91,12 +96,13 @@ export class Schedule {
    */
   isActive(): boolean {
     // If no termination date, schedule will never terminate
-    if (!this.lastOccurrence) {
+    const lastOccurrence = this.getLastOccurrence();
+    if (!lastOccurrence) {
       return true;
     }
 
     const today = dateFns.startOfDay(new Date());
-    const last = dateFns.startOfDay(this.lastOccurrence);
+    const last = dateFns.startOfDay(lastOccurrence);
     return !dateFns.isAfter(last, today);
   }
 

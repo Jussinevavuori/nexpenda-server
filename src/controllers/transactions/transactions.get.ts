@@ -36,9 +36,11 @@ transactionsRouter.get("/", compression(), async (req, res, next) => {
           gte: query.after,
           lte: query.before,
         },
+        scheduleId: query.scheduleId,
       },
       include: {
         Category: true,
+        Schedule: true,
       },
     });
 

@@ -18,6 +18,7 @@ import {
   feedbackRouter,
   logsRouter,
   avatarRouter,
+  schedulesRouter,
 } from "./controllers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
@@ -157,6 +158,7 @@ export function startServer() {
       app.use("/api/categories", categoriesRouter);
       app.use("/api/transactions", transactionsRouter);
       app.use("/api/budgets", budgetsRouter);
+      app.use("/api/schedules", schedulesRouter);
       app.use("/api/config", configurationRouter);
       app.use("/api/stripe", stripeRouter);
       app.use("/api/feedback", feedbackRouter);

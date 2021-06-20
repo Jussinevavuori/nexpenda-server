@@ -25,6 +25,8 @@ export class UserService {
       googlePhotoUrl: null,
       themeColor: null,
       themeMode: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       ...defaults,
     };
   }

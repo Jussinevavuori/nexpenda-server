@@ -112,6 +112,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
       },
       include: {
         Category: true,
+        Schedule: true,
       },
     });
 

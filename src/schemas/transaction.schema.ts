@@ -25,14 +25,12 @@ export const putTransactionSchema = transactionSchema.omit({
 
 export const patchTransactionSchema = transactionSchema
   .partial()
-  .omit({ comment: true, uid: true, id: true })
-  .merge(
-    z
-      .object({
-        comment: z.string().optional().nullable(),
-      })
-      .strict()
-  );
+  .omit({
+    comment: true,
+    uid: true,
+    id: true,
+  })
+  .merge(z.object({ comment: z.string().optional().nullable() }).strict());
 
 export const deleteManyTransactionsSchema = z
   .object({
@@ -50,6 +48,7 @@ export const getTransactionsQuerySchema = z
   .object({
     after: TimestampMsStringAsDate,
     before: TimestampMsStringAsDate,
+    scheduleId: z.string(),
   })
   .partial();
 

@@ -11,6 +11,7 @@ export const stripeRouter = Router();
 export const budgetsRouter = Router();
 export const feedbackRouter = Router();
 export const logsRouter = Router();
+export const schedulesRouter = Router();
 
 import "./ping/ping";
 
@@ -61,3 +62,8 @@ import "./budgets/budgets.put";
 import "./feedback/feedback.post";
 
 import "./logs/logs.post";
+
+import "./schedules/schedules.get";
+import "./schedules/schedules.post";
+import "./schedules/schedules.patch";
+import "./schedules/schedules.delete";

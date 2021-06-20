@@ -15,7 +15,12 @@ import { configSchema, patchConfigSchema } from "./config.schema";
 import { feedbackSchema, postFeedbackSchema } from "./feedback.schema";
 import { logSchema, postLogSchema } from "./logs.schema";
 import { patchProfileSchema } from "./profile.schema";
-import { scheduleIntervalSchema } from "./schedule.schema";
+import {
+  postScheduleSchema,
+  patchScheduleSchema,
+  scheduleIntervalSchema,
+  deleteScheduleQuerySchema,
+} from "./schedule.schema";
 import { createCheckoutSessionBodySchema } from "./stripe.schema";
 import {
   deleteManyTransactionsSchema,
@@ -63,6 +68,9 @@ export const Schemas = {
   },
   Schedule: {
     interval: scheduleIntervalSchema,
+    post: postScheduleSchema,
+    patch: patchScheduleSchema,
+    deleteQuery: deleteScheduleQuerySchema,
   },
   Stripe: {
     createCheckoutSession: createCheckoutSessionBodySchema,

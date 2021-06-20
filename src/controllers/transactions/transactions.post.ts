@@ -68,6 +68,7 @@ transactionsRouter.post("/", async (req, res, next) => {
       },
       include: {
         Category: true,
+        Schedule: true,
       },
     });
 

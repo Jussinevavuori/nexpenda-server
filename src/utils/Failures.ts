@@ -20,6 +20,7 @@ export type ServerFailureCode =
   | "budget/already-exists"
   | "budget/not-found"
   | "budget/limit-exceeded"
+  | "schedule/not-found"
   | "auth/missing-token"
   | "auth/invalid-token"
   | "auth/user-has-no-password"
@@ -191,6 +192,19 @@ export class BudgetLimitExceededFailure<T> extends Failure<
       code: "budget/limit-exceeded",
       status: 400,
       message: "Too many budgets",
+    });
+  }
+}
+
+export class ScheduleNotFoundFailure<T> extends Failure<
+  T,
+  "schedule/not-found"
+> {
+  constructor() {
+    super({
+      code: "schedule/not-found",
+      status: 404,
+      message: "Schedule not found",
     });
   }
 }

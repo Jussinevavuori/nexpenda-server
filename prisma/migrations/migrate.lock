@@ -9,3 +9,7 @@
 20210617075338-add_transaction_recurrences
 20210617095515-update_transaction_recurrence
 20210617122528-update_to_schedule
+20210618064243-updates
+20210618064401-update_table_names
+20210618064827-update_schedule_transactions_field_name
+20210618071118-schedule_make_occurrences_optional

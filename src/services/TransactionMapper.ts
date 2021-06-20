@@ -1,7 +1,10 @@
-import { Category, Transaction } from "@prisma/client";
+import { Category, Transaction, TransactionSchedule } from "@prisma/client";
 import { DataUtils } from "../utils/DataUtils";
 
-export type TransactionResponseMappable = Transaction & { Category: Category };
+export type TransactionResponseMappable = Transaction & {
+  Category: Category;
+  Schedule?: TransactionSchedule | null;
+};
 
 export type TransactionResponse = {
   id: string;
@@ -14,18 +17,22 @@ export type TransactionResponse = {
     value: string;
     icon: string;
   };
+  scheduleId?: string;
 };
 
 export type CompressedDataJson = {
   t: {
+    // Transactions
     id: string; // ID
     t: number; // Time (epoch, seconds)
     ca: number; // Time (epoch, seconds)
     cid: string; // Category ID
+    sid?: string; // Schedule ID
     a: number; // Amount
     c?: string | undefined; // Comment
   }[];
   c: {
+    // Categories
     id: string; // ID
     v: string; // Value
     i: string; // Icon
@@ -69,6 +76,7 @@ export class TransactionMapper {
         integerAmount: transaction.integerAmount,
         comment: transaction.comment ?? undefined,
         createdAt: transaction.createdAt.getTime(),
+        scheduleId: transaction.Schedule?.id,
         category: {
           id: transaction.Category.id,
           value: transaction.Category.value,
@@ -85,7 +93,12 @@ export class TransactionMapper {
    * @param transactions Transactions to compress
    */
   static compressTransactions(
-    transactions: Array<Transaction & { Category: Category }>
+    transactions: Array<
+      Transaction & {
+        Category: Category;
+        Schedule?: TransactionSchedule | null;
+      }
+    >
   ): CompressedDataJson {
     // Get all unique categories (unique defined by ID)
     const categories = DataUtils.unique(
@@ -98,6 +111,7 @@ export class TransactionMapper {
       t: transactions.map((t) => ({
         id: t.id,
         cid: t.categoryId,
+        sid: t.scheduleId ?? undefined,
         a: t.integerAmount,
         t: Math.floor(t.time.getTime() / 1000),
         ca: Math.floor(t.createdAt.getTime() / 1000),
