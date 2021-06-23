@@ -1,14 +1,14 @@
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { schedulesRouter } from "..";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 import {
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
   ScheduleNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 import { prisma } from "../../server";
-import { TransactionScheduleMapper } from "../../services/TransactionScheduleMapper";
+import { TransactionScheduleMapper } from "../../lib/dataMappers/TransactionScheduleMapper";
 
 schedulesRouter.patch("/:id", async (req, res, next) => {
   try {
@@ -47,27 +47,29 @@ schedulesRouter.patch("/:id", async (req, res, next) => {
      * Create schedule from data
      */
     const updated = await prisma.transactionSchedule.update({
-      where: {},
+      where: {
+        id: schedule.id,
+      },
       data: {
-        firstOccurrence: body.value.firstOccurrence
-          ? new Date(body.value.firstOccurrence)
+        firstOccurrence: body.value.schedule?.firstOccurrence
+          ? new Date(body.value.schedule?.firstOccurrence)
           : undefined,
-        occurrences: body.value.occurrences,
-        intervalLength: body.value.intervalLength,
-        intervalType: body.value.intervalType,
-        integerAmount: body.value.integerAmount,
-        comment: body.value.comment,
-        Category: body.value.category
+        occurrences: body.value.schedule?.occurrences,
+        intervalType: body.value.schedule?.interval?.type,
+        intervalEvery: body.value.schedule?.interval?.every,
+        integerAmount: body.value.transactionTemplate?.integerAmount,
+        comment: body.value.transactionTemplate?.comment,
+        Category: body.value.transactionTemplate?.category
           ? {
               connectOrCreate: {
                 where: {
                   unique_uid_value: {
                     uid: req.data.auth.user.id,
-                    value: body.value.category,
+                    value: body.value.transactionTemplate?.category,
                   },
                 },
                 create: {
-                  value: body.value.category,
+                  value: body.value.transactionTemplate?.category,
                   User: {
                     connect: {
                       id: req.data.auth.user.id,
@@ -112,6 +114,16 @@ schedulesRouter.patch("/:id", async (req, res, next) => {
     }
 
     /**
+     * Update category icon if specified
+     */
+    if (body.value.transactionTemplate?.categoryIcon) {
+      await prisma.category.update({
+        where: { id: updated.categoryId },
+        data: { icon: body.value.transactionTemplate.categoryIcon },
+      });
+    }
+
+    /**
      * If so specified, update all transactions belonging to the schedule to
      * match the new template.
      *
@@ -132,12 +144,15 @@ schedulesRouter.patch("/:id", async (req, res, next) => {
           prisma.transaction.update({
             where: { id: transaction.id },
             data: {
-              integerAmount: body.value.integerAmount,
-              comment: body.value.comment,
-              Category: body.value.category
+              integerAmount: body.value.transactionTemplate?.integerAmount,
+              comment: body.value.transactionTemplate?.comment,
+              Category: body.value.transactionTemplate?.category
                 ? {
                     connect: {
-                      unique_uid_value: { uid, value: body.value.category },
+                      unique_uid_value: {
+                        uid,
+                        value: body.value.transactionTemplate?.category,
+                      },
                     },
                   }
                 : undefined,

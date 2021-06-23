@@ -1,14 +1,14 @@
 import { transactionsRouter } from "..";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
-import { TransactionMapper } from "../../services/TransactionMapper";
-import { Permissions } from "../../services/Permissions";
+} from "../../lib/result/Failures";
+import { TransactionMapper } from "../../lib/dataMappers/TransactionMapper";
+import { Permissions } from "../../lib/permission/Permissions";
 import { Category } from "@prisma/client";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Create a new transaction for the user.
@@ -90,7 +90,7 @@ transactionsRouter.post("/", async (req, res, next) => {
      * Send created transaction to user with 201 status.
      */
     return res.status(201).json(
-      TransactionMapper.mapTransactionToResponse({
+      TransactionMapper.mapTransactionsToResponse({
         ...created,
         Category: updatedCategory ?? created.Category,
       })

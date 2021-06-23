@@ -1,12 +1,15 @@
 import { authRouter } from "..";
 import { prisma } from "../../server";
-import { Mailer } from "../../services/Mailer";
-import { ResetPasswordTemplate } from "../../mailTemplates/ResetPasswordTemplate";
-import { ResetPasswordToken } from "../../tokens/ResetPasswordToken";
-import { validateRequestBody } from "../../utils/validateRequestBody";
-import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
+import { Mailer } from "../../lib/mail/Mailer";
+import { ResetPasswordTemplate } from "../../lib/mailTemplates/ResetPasswordTemplate";
+import { ResetPasswordToken } from "../../lib/tokens/ResetPasswordToken";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
+import {
+  InvalidTokenFailure,
+  UserNotFoundFailure,
+} from "../../lib/result/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * If a user wants to change their password or they have forgotten their

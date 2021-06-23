@@ -1,13 +1,13 @@
 import { schedulesRouter } from "..";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
   ScheduleNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
-import { getQuery } from "../../utils/getQuery";
+} from "../../lib/result/Failures";
+import { getQuery } from "../../lib/requests/getQuery";
 
 schedulesRouter.delete("/:id", async (req, res, next) => {
   try {

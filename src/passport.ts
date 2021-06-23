@@ -1,7 +1,7 @@
 import * as passport from "passport";
 import { OAuth2Strategy as GoogleStrategy } from "passport-google-oauth";
 import { conf } from "./conf";
-import { Schemas } from "./schemas/Schemas";
+import { Schemas } from "./lib/schemas/Schemas";
 import { prisma } from "./server";
 
 /**

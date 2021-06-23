@@ -1,11 +1,11 @@
 import { authRouter } from "..";
-import { RefreshToken } from "../../tokens/RefreshToken";
-import { AccessToken } from "../../tokens/AccessToken";
+import { RefreshToken } from "../../lib/tokens/RefreshToken";
+import { AccessToken } from "../../lib/tokens/AccessToken";
 import {
   InvalidTokenFailure,
   TokenFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 import { prisma } from "../../server";
 
 /**

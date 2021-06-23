@@ -167,6 +167,9 @@ export const conf = {
     get secretKey() {
       return ENV("STRIPE_SECRET_KEY");
     },
+    get webhookSecret() {
+      return ENV("STRIPE_WEBHOOK_SECRET");
+    },
   },
 
   /**

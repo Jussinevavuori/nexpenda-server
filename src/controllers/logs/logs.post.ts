@@ -1,8 +1,8 @@
 import { logsRouter } from "..";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
-import { UnauthenticatedFailure } from "../../utils/Failures";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { UnauthenticatedFailure } from "../../lib/result/Failures";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 
 /**
  * Post a new log item to the database.

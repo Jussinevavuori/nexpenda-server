@@ -5,7 +5,7 @@ import {
   MissingUrlParametersFailure,
   TransactionNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 
 /**
  * Delete a single transaction the user owns.

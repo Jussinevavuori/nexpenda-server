@@ -4,7 +4,7 @@ import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 
 /**
  * Fetch all categories the user owns.

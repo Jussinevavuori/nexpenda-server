@@ -1,11 +1,11 @@
 import * as compression from "compression";
 import { budgetsRouter } from "..";
 import { prisma } from "../../server";
-import { BudgetMapper } from "../../services/BudgetMapper";
+import { BudgetMapper } from "../../lib/dataMappers/BudgetMapper";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 
 /**
  * Get all budgets the user owns.

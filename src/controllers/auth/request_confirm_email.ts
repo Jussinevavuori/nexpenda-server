@@ -1,16 +1,16 @@
 import { authRouter } from "..";
-import { ConfirmEmailToken } from "../../tokens/ConfirmEmailToken";
+import { ConfirmEmailToken } from "../../lib/tokens/ConfirmEmailToken";
 import { prisma } from "../../server";
-import { validateRequestBody } from "../../utils/validateRequestBody";
-import { Mailer } from "../../services/Mailer";
-import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
+import { Mailer } from "../../lib/mail/Mailer";
+import { ConfirmEmailTemplate } from "../../lib/mailTemplates/ConfirmEmailTemplate";
 import {
   EmailAlreadyConfirmedFailure,
   InvalidTokenFailure,
   UserNotFoundFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * If a user has not confirmed their email address and has lost the

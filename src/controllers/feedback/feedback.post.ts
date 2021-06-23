@@ -1,11 +1,11 @@
 import { feedbackRouter } from "..";
 import { conf } from "../../conf";
-import { FeedbackReceivedTempate } from "../../mailTemplates/FeedbackReceivedTemplate";
-import { Schemas } from "../../schemas/Schemas";
+import { FeedbackReceivedTempate } from "../../lib/mailTemplates/FeedbackReceivedTemplate";
+import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
-import { Mailer } from "../../services/Mailer";
-import { UnauthenticatedFailure } from "../../utils/Failures";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { Mailer } from "../../lib/mail/Mailer";
+import { UnauthenticatedFailure } from "../../lib/result/Failures";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 
 /**
  * Post a new feedback item and send a notification email to the developer(s).

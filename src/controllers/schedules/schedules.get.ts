@@ -2,9 +2,9 @@ import { schedulesRouter } from "..";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 import { prisma } from "../../server";
-import { TransactionScheduleMapper } from "../../services/TransactionScheduleMapper";
+import { TransactionScheduleMapper } from "../../lib/dataMappers/TransactionScheduleMapper";
 
 schedulesRouter.get("/", async (req, res, next) => {
   try {

@@ -1,17 +1,17 @@
 import { transactionsRouter } from "..";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
   TransactionNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
-import { TransactionMapper } from "../../services/TransactionMapper";
+} from "../../lib/result/Failures";
+import { TransactionMapper } from "../../lib/dataMappers/TransactionMapper";
 import { anyNonNil as isUuid } from "is-uuid";
 import { Category } from "@prisma/client";
-import { Permissions } from "../../services/Permissions";
-import { Schemas } from "../../schemas/Schemas";
+import { Permissions } from "../../lib/permission/Permissions";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Upsert a transaction for the user.
@@ -131,7 +131,7 @@ transactionsRouter.put("/:id", async (req, res, next) => {
     // Send upserted transaction to user, use updated values if any exist
     // after upserting
     return res.json(
-      TransactionMapper.mapTransactionToResponse({
+      TransactionMapper.mapTransactionsToResponse({
         ...upserted,
         Category: updatedCategory ?? upserted.Category,
       })

@@ -1,6 +1,5 @@
 import * as path from "path";
 import * as express from "express";
-import * as socketIO from "socket.io";
 import * as passport from "passport";
 import * as cookieParser from "cookie-parser";
 import * as nocache from "nocache";
@@ -26,12 +25,13 @@ import { PrismaClient } from "@prisma/client";
 import { initializeRequestData } from "./middleware/initializeData";
 import { handleFailure } from "./middleware/handleFailure";
 import { handleErrors } from "./middleware/handleErrors";
-import { redirect } from "./utils/redirect";
-import { createLogger } from "./utils/createLogger";
+import { redirect } from "./lib/requests/redirect";
+import { createLogger } from "./lib/utils/createLogger";
 import { corsMiddleware } from "./middleware/corsMiddleware";
 import { rateLimiters } from "./middleware/rateLimiters";
 import { Bucket, Storage } from "@google-cloud/storage";
 import { handleMulterErrors } from "./middleware/handleMulterErrors";
+import { Stripe } from "stripe";
 
 /**
  * App logger
@@ -52,11 +52,6 @@ export const app: express.Application = express();
  * be started by the `startServer()` function.
  */
 export const http = createServer(app);
-
-/**
- * The global socket IO instance running on top of the HTTP server.
- */
-export const io = socketIO(http);
 
 /**
  * The global Prisma instance. Must be connected to the database by
@@ -82,6 +77,11 @@ export let storage: Storage;
 export let bucket: Bucket;
 
 /**
+ * The global stripe instance.
+ */
+export let stripe: Stripe;
+
+/**
  * The start server method starts the express application, server and all
  * other global instances such as database and storage.
  */
@@ -89,12 +89,6 @@ export function startServer() {
   return new Promise<void>(async (resolve, reject) => {
     try {
       logger("Starting server in", process.env.NODE_ENV, "mode");
-
-      /**
-       * Import sockets to configure and use then.
-       */
-      await require("./socket/socket");
-      logger("Websockets configured");
 
       /**
        * Import passport to use passport.
@@ -121,6 +115,11 @@ export function startServer() {
       });
       bucket = storage.bucket(conf.google.storage.bucketName);
       logger("Connected to storage");
+
+      /**
+       * Create stripe instance
+       */
+      stripe = new Stripe(conf.stripe.secretKey, { apiVersion: "2020-08-27" });
 
       /**
        * Apply all required middleware.

@@ -1,13 +1,16 @@
 import { authRouter } from "..";
-import { ResetPasswordToken } from "../../tokens/ResetPasswordToken";
+import { ResetPasswordToken } from "../../lib/tokens/ResetPasswordToken";
 import { prisma } from "../../server";
-import { validateRequestBody } from "../../utils/validateRequestBody";
-import { Password } from "../../services/Password";
-import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
+import { Password } from "../../lib/password/Password";
+import {
+  InvalidTokenFailure,
+  UserNotFoundFailure,
+} from "../../lib/result/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
-import { Mailer } from "../../services/Mailer";
-import { PasswordChangedTemplate } from "../../mailTemplates/PasswordChangedTemplate";
-import { Schemas } from "../../schemas/Schemas";
+import { Mailer } from "../../lib/mail/Mailer";
+import { PasswordChangedTemplate } from "../../lib/mailTemplates/PasswordChangedTemplate";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Endpoint which reads a reset password token from the request parameters.

@@ -1,9 +1,12 @@
 import { stripeRouter } from "..";
-import { stripe, StripeService } from "../../services/StripeService";
-import { StripeFailure, UnauthenticatedFailure } from "../../utils/Failures";
-import { getUrl } from "../../utils/getUrl";
-import { validateRequestBody } from "../../utils/validateRequestBody";
-import { Schemas } from "../../schemas/Schemas";
+import { stripe, StripeService } from "../../lib/stripe/StripeService";
+import {
+  StripeFailure,
+  UnauthenticatedFailure,
+} from "../../lib/result/Failures";
+import { getUrl } from "../../lib/requests/getUrl";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Create a stripe checkout session for subscribing to premium.

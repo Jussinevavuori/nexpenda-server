@@ -1,12 +1,12 @@
 import { transactionsRouter } from "../..";
 import { corsMiddleware } from "../../../middleware/corsMiddleware";
-import { Schemas } from "../../../schemas/Schemas";
+import { Schemas } from "../../../lib/schemas/Schemas";
 import { prisma } from "../../../server";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../../utils/Failures";
-import { validateRequestBody } from "../../../utils/validateRequestBody";
+} from "../../../lib/result/Failures";
+import { validateRequestBody } from "../../../lib/validation/validateRequestBody";
 
 /**
  * Preflight options for the mass deletion endpoint

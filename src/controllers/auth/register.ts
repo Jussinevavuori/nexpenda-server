@@ -1,16 +1,16 @@
 import { authRouter } from "..";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
-import { Password } from "../../services/Password";
-import { Mailer } from "../../services/Mailer";
-import { ConfirmEmailTemplate } from "../../mailTemplates/ConfirmEmailTemplate";
-import { ConfirmEmailToken } from "../../tokens/ConfirmEmailToken";
+import { Password } from "../../lib/password/Password";
+import { Mailer } from "../../lib/mail/Mailer";
+import { ConfirmEmailTemplate } from "../../lib/mailTemplates/ConfirmEmailTemplate";
+import { ConfirmEmailToken } from "../../lib/tokens/ConfirmEmailToken";
 import {
   DatabaseAccessFailure,
   UserAlreadyExistsFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Registers a user. Validates that no users already exist with the same email.

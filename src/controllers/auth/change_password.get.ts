@@ -1,7 +1,10 @@
 import { authRouter } from "..";
-import { ResetPasswordToken } from "../../tokens/ResetPasswordToken";
+import { ResetPasswordToken } from "../../lib/tokens/ResetPasswordToken";
 import { prisma } from "../../server";
-import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
+import {
+  InvalidTokenFailure,
+  UserNotFoundFailure,
+} from "../../lib/result/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
 
 /**

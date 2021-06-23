@@ -1,15 +1,15 @@
 import { transactionsRouter } from "..";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
   TransactionNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
-import { TransactionMapper } from "../../services/TransactionMapper";
+} from "../../lib/result/Failures";
+import { TransactionMapper } from "../../lib/dataMappers/TransactionMapper";
 import { Category } from "@prisma/client";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Partially update a single transaction the user owns.
@@ -108,7 +108,7 @@ transactionsRouter.patch("/:id", async (req, res, next) => {
      * Respond with updated data
      */
     return res.json(
-      TransactionMapper.mapTransactionToResponse({
+      TransactionMapper.mapTransactionsToResponse({
         ...updated,
         Category: updatedCategory ?? updated.Category,
       })

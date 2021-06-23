@@ -1,17 +1,17 @@
 import { budgetsRouter } from "..";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
   BudgetNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
-import { BudgetMapper } from "../../services/BudgetMapper";
+} from "../../lib/result/Failures";
+import { BudgetMapper } from "../../lib/dataMappers/BudgetMapper";
 import { anyNonNil as isUuid } from "is-uuid";
-import { Permissions } from "../../services/Permissions";
-import { BudgetCategoryValidator } from "../../services/BudgetCategoryValidator";
-import { Schemas } from "../../schemas/Schemas";
+import { Permissions } from "../../lib/permission/Permissions";
+import { BudgetCategoryValidator } from "../../lib/budgets/BudgetCategoryValidator";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Upsert a single budget for the user.

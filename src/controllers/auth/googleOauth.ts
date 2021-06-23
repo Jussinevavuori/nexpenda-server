@@ -1,9 +1,9 @@
 import { authRouter } from "..";
 import * as passport from "passport";
-import { redirect } from "../../utils/redirect";
+import { redirect } from "../../lib/requests/redirect";
 import { prisma } from "../../server";
-import { RefreshToken } from "../../tokens/RefreshToken";
-import { getUrl } from "../../utils/getUrl";
+import { RefreshToken } from "../../lib/tokens/RefreshToken";
+import { getUrl } from "../../lib/requests/getUrl";
 
 /**
  * OAuth starting endpoint for Google with passport

@@ -5,7 +5,7 @@ import {
   MissingUrlParametersFailure,
   BudgetNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 
 /**
  * Delete a single budget the user owns.

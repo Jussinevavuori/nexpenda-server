@@ -1,16 +1,16 @@
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
 import {
   BudgetNotFoundFailure,
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 import { budgetsRouter } from "..";
-import { BudgetMapper } from "../../services/BudgetMapper";
-import { Failure } from "../../utils/Result";
-import { BudgetCategoryValidator } from "../../services/BudgetCategoryValidator";
-import { Schemas } from "../../schemas/Schemas";
+import { BudgetMapper } from "../../lib/dataMappers/BudgetMapper";
+import { Failure } from "../../lib/result/Result";
+import { BudgetCategoryValidator } from "../../lib/budgets/BudgetCategoryValidator";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Partially update a single budget the user owns.

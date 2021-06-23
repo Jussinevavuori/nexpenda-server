@@ -1,7 +1,7 @@
 import { profileRouter } from "..";
 import { prisma } from "../../server";
-import { UserService } from "../../services/UserService";
-import { UnauthenticatedFailure } from "../../utils/Failures";
+import { UserService } from "../../lib/users/UserService";
+import { UnauthenticatedFailure } from "../../lib/result/Failures";
 
 /**
  * Get the user's profile and other user details.

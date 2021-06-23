@@ -48,6 +48,7 @@ import "./transactions/mass/transactions.mass.delete";
 import "./configuration/configuration.get";
 import "./configuration/configuration.patch";
 
+import "./stripe/webhook.post";
 import "./stripe/products.get";
 import "./stripe/create_checkout_session.post";
 import "./stripe/create_billing_portal_session.post";
@@ -67,3 +68,4 @@ import "./schedules/schedules.get";
 import "./schedules/schedules.post";
 import "./schedules/schedules.patch";
 import "./schedules/schedules.delete";
+import "./schedules/create_scheduled.post";

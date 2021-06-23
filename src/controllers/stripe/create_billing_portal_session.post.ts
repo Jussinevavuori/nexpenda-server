@@ -1,7 +1,10 @@
 import { stripeRouter } from "..";
-import { stripe, StripeService } from "../../services/StripeService";
-import { StripeFailure, UnauthenticatedFailure } from "../../utils/Failures";
-import { getUrl } from "../../utils/getUrl";
+import { stripe, StripeService } from "../../lib/stripe/StripeService";
+import {
+  StripeFailure,
+  UnauthenticatedFailure,
+} from "../../lib/result/Failures";
+import { getUrl } from "../../lib/requests/getUrl";
 
 /**
  * Create a stripe billing portal session for managing the user's billing.

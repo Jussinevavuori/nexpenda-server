@@ -3,9 +3,9 @@ import { conf } from "../conf";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { TestUtils } from "./TestUtils";
-import { ConfirmEmailToken } from "../tokens/ConfirmEmailToken";
+import { ConfirmEmailToken } from "../lib/tokens/ConfirmEmailToken";
 import { User, PrismaClient } from "@prisma/client";
-import { ResetPasswordToken } from "../tokens/ResetPasswordToken";
+import { ResetPasswordToken } from "../lib/tokens/ResetPasswordToken";
 
 export class TestClient {
   /**

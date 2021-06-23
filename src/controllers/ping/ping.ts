@@ -1,5 +1,5 @@
 import { pingRouter } from "..";
-import { UnauthenticatedFailure } from "../../utils/Failures";
+import { UnauthenticatedFailure } from "../../lib/result/Failures";
 
 /**
  * Ping route test

@@ -1,14 +1,14 @@
 import { transactionsRouter } from "../..";
-import { validateRequestBody } from "../../../utils/validateRequestBody";
+import { validateRequestBody } from "../../../lib/validation/validateRequestBody";
 import { prisma } from "../../../server";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../../utils/Failures";
-import { TransactionMapper } from "../../../services/TransactionMapper";
+} from "../../../lib/result/Failures";
+import { TransactionMapper } from "../../../lib/dataMappers/TransactionMapper";
 import { Transaction, Category } from "@prisma/client";
-import { Permissions } from "../../../services/Permissions";
-import { Schemas } from "../../../schemas/Schemas";
+import { Permissions } from "../../../lib/permission/Permissions";
+import { Schemas } from "../../../lib/schemas/Schemas";
 
 /**
  * Create multiple transactions for the user

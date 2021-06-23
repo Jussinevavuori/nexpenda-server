@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../server";
-import { AccessToken } from "../tokens/AccessToken";
-import { RefreshToken } from "../tokens/RefreshToken";
-import { UserService } from "../services/UserService";
+import { AccessToken } from "../lib/tokens/AccessToken";
+import { RefreshToken } from "../lib/tokens/RefreshToken";
+import { UserService } from "../lib/users/UserService";
 
 /**
  * Middleware that runs before any controllers. This middleware gets the

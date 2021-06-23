@@ -3,13 +3,13 @@ import * as multer from "multer";
 import { avatarRouter } from "..";
 import { rateLimiters } from "../../middleware/rateLimiters";
 import { prisma } from "../../server";
-import { AvatarService } from "../../services/AvatarService";
-import { UserService } from "../../services/UserService";
+import { AvatarService } from "../../lib/avatars/AvatarService";
+import { UserService } from "../../lib/users/UserService";
 import {
   InvalidRequestDataFailure,
   UnknownFailure,
-} from "../../utils/Failures";
-import { UnauthenticatedFailure } from "../../utils/Failures";
+} from "../../lib/result/Failures";
+import { UnauthenticatedFailure } from "../../lib/result/Failures";
 
 /**
  * Memory storage for processing images

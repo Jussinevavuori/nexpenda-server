@@ -1,16 +1,16 @@
 import { authRouter } from "..";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
-import { RefreshToken } from "../../tokens/RefreshToken";
-import { Password } from "../../services/Password";
+import { RefreshToken } from "../../lib/tokens/RefreshToken";
+import { Password } from "../../lib/password/Password";
 import {
   EmailNotConfirmedFailure,
   InvalidCredentialsFailure,
   UserHasNoPasswordFailure,
   UserNotFoundFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Endpoint for logging a user in by providing them with the refresh token

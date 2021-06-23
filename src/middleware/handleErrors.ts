@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { ErrorFailure, InvalidRequestDataFailure } from "../utils/Failures";
-import { Failure } from "../utils/Result";
+import {
+  ErrorFailure,
+  InvalidRequestDataFailure,
+} from "../lib/result/Failures";
+import { Failure } from "../lib/result/Result";
 
 /**
  * Error handler middleware which converts all errors to failures before

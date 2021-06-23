@@ -1,6 +1,6 @@
 import { Request, RequestHandler } from "express";
 import * as rateLimit from "express-rate-limit";
-import { TooManyRequestsFailure } from "../utils/Failures";
+import { TooManyRequestsFailure } from "../lib/result/Failures";
 
 /**
  * Utility function for converting minutes to milliseconds

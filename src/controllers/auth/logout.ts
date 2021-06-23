@@ -1,6 +1,6 @@
 import { authRouter } from "..";
 import { prisma } from "../../server";
-import { RefreshToken } from "../../tokens/RefreshToken";
+import { RefreshToken } from "../../lib/tokens/RefreshToken";
 
 /**
  * Logs a user out by removing their refresh token cookie and invalidating

@@ -1,9 +1,9 @@
 import { configurationRouter } from "..";
-import { Schemas } from "../../schemas/Schemas";
-import { ConfigurationService } from "../../services/ConfigurationService";
-import { UnauthenticatedFailure } from "../../utils/Failures";
-import { validate } from "../../utils/validate";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { Schemas } from "../../lib/schemas/Schemas";
+import { ConfigurationService } from "../../lib/config/ConfigurationService";
+import { UnauthenticatedFailure } from "../../lib/result/Failures";
+import { validate } from "../../lib/validation/validate";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 
 /**
  * Partially update the current application configuration as an admin user.

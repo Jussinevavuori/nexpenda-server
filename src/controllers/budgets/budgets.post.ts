@@ -1,14 +1,14 @@
 import { budgetsRouter } from "..";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
-import { BudgetMapper } from "../../services/BudgetMapper";
-import { Permissions } from "../../services/Permissions";
-import { BudgetCategoryValidator } from "../../services/BudgetCategoryValidator";
-import { Schemas } from "../../schemas/Schemas";
+} from "../../lib/result/Failures";
+import { BudgetMapper } from "../../lib/dataMappers/BudgetMapper";
+import { Permissions } from "../../lib/permission/Permissions";
+import { BudgetCategoryValidator } from "../../lib/budgets/BudgetCategoryValidator";
+import { Schemas } from "../../lib/schemas/Schemas";
 
 /**
  * Create a new budget for the user.

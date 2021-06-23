@@ -1,12 +1,12 @@
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { schedulesRouter } from "..";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 import { prisma } from "../../server";
-import { TransactionScheduleMapper } from "../../services/TransactionScheduleMapper";
+import { TransactionScheduleMapper } from "../../lib/dataMappers/TransactionScheduleMapper";
 
 schedulesRouter.post("/", async (req, res, next) => {
   try {
@@ -26,12 +26,12 @@ schedulesRouter.post("/", async (req, res, next) => {
      */
     const created = await prisma.transactionSchedule.create({
       data: {
-        firstOccurrence: new Date(body.value.firstOccurrence),
-        occurrences: body.value.occurrences,
-        intervalLength: body.value.intervalLength,
-        intervalType: body.value.intervalType,
-        integerAmount: body.value.integerAmount,
-        comment: body.value.comment,
+        firstOccurrence: new Date(body.value.schedule.firstOccurrence),
+        occurrences: body.value.schedule.occurrences || undefined,
+        intervalEvery: body.value.schedule.interval.every,
+        intervalType: body.value.schedule.interval.type,
+        integerAmount: body.value.transactionTemplate.integerAmount,
+        comment: body.value.transactionTemplate.comment,
         User: {
           connect: {
             id: req.data.auth.user.id,
@@ -42,11 +42,11 @@ schedulesRouter.post("/", async (req, res, next) => {
             where: {
               unique_uid_value: {
                 uid: req.data.auth.user.id,
-                value: body.value.category,
+                value: body.value.transactionTemplate.category,
               },
             },
             create: {
-              value: body.value.category,
+              value: body.value.transactionTemplate.category,
               User: {
                 connect: {
                   id: req.data.auth.user.id,
@@ -61,6 +61,16 @@ schedulesRouter.post("/", async (req, res, next) => {
         Category: { select: { id: true, value: true, icon: true } },
       },
     });
+
+    /**
+     * Update category icon if specified
+     */
+    if (body.value.transactionTemplate.categoryIcon) {
+      await prisma.category.update({
+        where: { id: created.categoryId },
+        data: { icon: body.value.transactionTemplate.categoryIcon },
+      });
+    }
 
     /**
      * Assign specified transactions to schedules

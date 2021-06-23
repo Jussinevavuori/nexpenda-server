@@ -52,12 +52,12 @@ declare namespace Express {
         /**
          * The refresh token that was found in the request if valid.
          */
-        refreshToken?: import("../../tokens/RefreshToken").RefreshToken;
+        refreshToken?: import("../../lib/tokens/RefreshToken").RefreshToken;
 
         /**
          * The access token that was found in the request if valid.
          */
-        accessToken?: import("../../tokens/AccessToken").AccessToken;
+        accessToken?: import("../../lib/tokens/AccessToken").AccessToken;
       };
     };
   }

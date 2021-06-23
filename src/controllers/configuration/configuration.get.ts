@@ -1,5 +1,5 @@
 import { configurationRouter } from "..";
-import { ConfigurationService } from "../../services/ConfigurationService";
+import { ConfigurationService } from "../../lib/config/ConfigurationService";
 
 /**
  * Fetch the current application configuration.

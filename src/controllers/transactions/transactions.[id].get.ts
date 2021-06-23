@@ -1,12 +1,12 @@
 import { transactionsRouter } from "..";
 import { prisma } from "../../server";
-import { TransactionMapper } from "../../services/TransactionMapper";
+import { TransactionMapper } from "../../lib/dataMappers/TransactionMapper";
 import {
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
   TransactionNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 
 /**
  * Fetch a single transaction the user owns.
@@ -44,7 +44,7 @@ transactionsRouter.get("/:id", async (req, res, next) => {
     /**
      * Send transaction to user
      */
-    return res.json(TransactionMapper.mapTransactionToResponse(transaction));
+    return res.json(TransactionMapper.mapTransactionsToResponse(transaction));
   } catch (error) {
     return next(new DatabaseAccessFailure(error));
   }

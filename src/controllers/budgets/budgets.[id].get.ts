@@ -1,12 +1,12 @@
 import { budgetsRouter } from "..";
 import { prisma } from "../../server";
-import { BudgetMapper } from "../../services/BudgetMapper";
+import { BudgetMapper } from "../../lib/dataMappers/BudgetMapper";
 import {
   DatabaseAccessFailure,
   MissingUrlParametersFailure,
   BudgetNotFoundFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
+} from "../../lib/result/Failures";
 
 /**
  * Fetch a single budget the user owns.

@@ -1,14 +1,14 @@
 import { avatarRouter } from "..";
 import { rateLimiters } from "../../middleware/rateLimiters";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
-import { AvatarService } from "../../services/AvatarService";
-import { UserService } from "../../services/UserService";
+import { AvatarService } from "../../lib/avatars/AvatarService";
+import { UserService } from "../../lib/users/UserService";
 import {
   InvalidRequestDataFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+} from "../../lib/result/Failures";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 
 /**
  * Endpoint to manually update the authenticated user's avatar URL to any valid

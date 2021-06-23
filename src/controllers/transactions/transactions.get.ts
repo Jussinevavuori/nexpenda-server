@@ -1,13 +1,13 @@
 import * as compression from "compression";
 import { transactionsRouter } from "..";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
-import { TransactionMapper } from "../../services/TransactionMapper";
+import { TransactionMapper } from "../../lib/dataMappers/TransactionMapper";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,
-} from "../../utils/Failures";
-import { getQuery } from "../../utils/getQuery";
+} from "../../lib/result/Failures";
+import { getQuery } from "../../lib/requests/getQuery";
 
 /**
  * Fetch all transactions the user owns.

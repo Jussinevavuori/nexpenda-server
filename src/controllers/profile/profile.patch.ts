@@ -1,9 +1,9 @@
 import { profileRouter } from "..";
-import { Schemas } from "../../schemas/Schemas";
+import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
-import { UserService } from "../../services/UserService";
-import { UnauthenticatedFailure } from "../../utils/Failures";
-import { validateRequestBody } from "../../utils/validateRequestBody";
+import { UserService } from "../../lib/users/UserService";
+import { UnauthenticatedFailure } from "../../lib/result/Failures";
+import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 
 /**
  * Partially update allowed properties in the user's profile.

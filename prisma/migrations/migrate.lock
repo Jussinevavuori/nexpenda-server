@@ -13,3 +13,9 @@
 20210618064401-update_table_names
 20210618064827-update_schedule_transactions_field_name
 20210618071118-schedule_make_occurrences_optional
+20210621061210
+20210621061249-update_schedule
+20210622115908-add_latest_created_occurrence
+20210623142704-add_subscriptions
+20210623142837-make_subscription_uid_unique
+20210623143037-default_subscription_id

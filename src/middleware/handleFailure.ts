@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { DatabaseAccessFailure, StripeFailure } from "../utils/Failures";
-import { Failure } from "../utils/Result";
+import { conf } from "../conf";
+import { DatabaseAccessFailure, StripeFailure } from "../lib/result/Failures";
+import { Failure } from "../lib/result/Result";
 
 /**
  * Error handler middleware which handles all failures. Assumes an error
@@ -21,6 +22,17 @@ export function handleFailure(
      * Act only on failures
      */
     if (failure instanceof Failure) {
+      /**
+       * Log failures in development
+       */
+      if (conf.env === "development") {
+        console.error(``);
+        console.error(`  > Failure: ${failure.code} (${failure.status})`);
+        console.error(`  > ${failure.message}`);
+        console.error(`  > Errors: ${JSON.stringify(failure.errors)}`);
+        console.error(``);
+      }
+
       /**
        * Warn on database access failures
        */

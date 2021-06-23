@@ -1,8 +1,8 @@
 import { avatarRouter } from "..";
 import { rateLimiters } from "../../middleware/rateLimiters";
 import { prisma } from "../../server";
-import { UserService } from "../../services/UserService";
-import { UnauthenticatedFailure } from "../../utils/Failures";
+import { UserService } from "../../lib/users/UserService";
+import { UnauthenticatedFailure } from "../../lib/result/Failures";
 
 /**
  * Endpoint to delete an authenticated user's avatar.

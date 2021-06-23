@@ -1,6 +1,6 @@
 import * as multer from "multer";
 import { Request, Response, NextFunction } from "express";
-import { FileFailure, FileTooLargeFailure } from "../utils/Failures";
+import { FileFailure, FileTooLargeFailure } from "../lib/result/Failures";
 
 /**
  * Error handler to convert multer errors into failures.

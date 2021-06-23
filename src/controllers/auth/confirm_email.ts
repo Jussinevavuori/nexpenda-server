@@ -1,7 +1,10 @@
 import { authRouter } from "..";
-import { ConfirmEmailToken } from "../../tokens/ConfirmEmailToken";
+import { ConfirmEmailToken } from "../../lib/tokens/ConfirmEmailToken";
 import { prisma } from "../../server";
-import { InvalidTokenFailure, UserNotFoundFailure } from "../../utils/Failures";
+import {
+  InvalidTokenFailure,
+  UserNotFoundFailure,
+} from "../../lib/result/Failures";
 import { rateLimiters } from "../../middleware/rateLimiters";
 
 /**
