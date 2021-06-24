@@ -1,4 +1,4 @@
-import { transactionsRouter } from "..";
+import { transactionsRouter } from "../../routers";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,

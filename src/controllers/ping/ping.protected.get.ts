@@ -1,12 +1,5 @@
-import { pingRouter } from "..";
+import { pingRouter } from "../../routers";
 import { UnauthenticatedFailure } from "../../lib/result/Failures";
-
-/**
- * Ping route test
- */
-pingRouter.get("/", async (req, res) => {
-  res.send("pong");
-});
 
 /**
  * Authenticated ping route test

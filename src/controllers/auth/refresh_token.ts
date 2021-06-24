@@ -1,4 +1,4 @@
-import { authRouter } from "..";
+import { authRouter } from "../../routers";
 import { RefreshToken } from "../../lib/tokens/RefreshToken";
 import { AccessToken } from "../../lib/tokens/AccessToken";
 import {

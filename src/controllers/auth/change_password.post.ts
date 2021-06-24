@@ -1,4 +1,4 @@
-import { authRouter } from "..";
+import { authRouter } from "../../routers";
 import { ResetPasswordToken } from "../../lib/tokens/ResetPasswordToken";
 import { prisma } from "../../server";
 import { validateRequestBody } from "../../lib/validation/validateRequestBody";

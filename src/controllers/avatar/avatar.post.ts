@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as multer from "multer";
-import { avatarRouter } from "..";
+import { avatarRouter } from "../../routers";
 import { rateLimiters } from "../../middleware/rateLimiters";
 import { prisma } from "../../server";
 import { AvatarService } from "../../lib/avatars/AvatarService";

@@ -1,5 +1,5 @@
 import { isSameDay } from "date-fns";
-import { schedulesRouter } from "..";
+import { schedulesRouter } from "../../routers";
 import { prisma } from "../../server";
 import { Schedule } from "../../lib/schedules/Schedule";
 import {

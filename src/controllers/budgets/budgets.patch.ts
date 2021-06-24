@@ -6,7 +6,7 @@ import {
   MissingUrlParametersFailure,
   UnauthenticatedFailure,
 } from "../../lib/result/Failures";
-import { budgetsRouter } from "..";
+import { budgetsRouter } from "../../routers";
 import { BudgetMapper } from "../../lib/dataMappers/BudgetMapper";
 import { Failure } from "../../lib/result/Result";
 import { BudgetCategoryValidator } from "../../lib/budgets/BudgetCategoryValidator";

@@ -1,4 +1,4 @@
-import { authRouter } from "..";
+import { authRouter } from "../../routers";
 import { prisma } from "../../server";
 import { Mailer } from "../../lib/mail/Mailer";
 import { ResetPasswordTemplate } from "../../lib/mailTemplates/ResetPasswordTemplate";

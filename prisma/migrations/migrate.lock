@@ -19,3 +19,8 @@
 20210623142704-add_subscriptions
 20210623142837-make_subscription_uid_unique
 20210623143037-default_subscription_id
+20210624120513-stripe_products_and_prices
+20210624120550-update_stripe_product
+20210624120628-rename_stripe_models
+20210624121635-update_stripe_price
+20210624122137-update_subscription_model_name

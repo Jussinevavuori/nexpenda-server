@@ -1,4 +1,4 @@
-import { avatarRouter } from "..";
+import { avatarRouter } from "../../routers";
 import { rateLimiters } from "../../middleware/rateLimiters";
 import { prisma } from "../../server";
 import { UserService } from "../../lib/users/UserService";

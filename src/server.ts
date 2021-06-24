@@ -5,20 +5,7 @@ import * as cookieParser from "cookie-parser";
 import * as nocache from "nocache";
 import * as morgan from "morgan";
 import { createServer, Server } from "http";
-import {
-  pingRouter,
-  authRouter,
-  transactionsRouter,
-  categoriesRouter,
-  configurationRouter,
-  stripeRouter,
-  budgetsRouter,
-  profileRouter,
-  feedbackRouter,
-  logsRouter,
-  avatarRouter,
-  schedulesRouter,
-} from "./controllers";
+import { rootRouter } from "./routers";
 import { conf } from "./conf";
 import { extractAuthentication } from "./middleware/extractAuthentication";
 import { PrismaClient } from "@prisma/client";
@@ -127,7 +114,14 @@ export function startServer() {
       app.options("*", corsMiddleware());
       app.use(passport.initialize());
       app.use(cookieParser());
-      app.use(express.json({ limit: "10mb" }));
+      app.use(
+        express.json({
+          limit: "10mb",
+          verify(request, _, buffer) {
+            (request as any)["rawBody"] = buffer;
+          },
+        })
+      );
       app.use(corsMiddleware());
       app.use(initializeRequestData());
       app.use(extractAuthentication());
@@ -150,18 +144,7 @@ export function startServer() {
       /**
        * Apply all api endpoints.
        */
-      app.use("/api/ping", pingRouter);
-      app.use("/api/auth", authRouter);
-      app.use("/api/avatar", avatarRouter);
-      app.use("/api/profile", profileRouter);
-      app.use("/api/categories", categoriesRouter);
-      app.use("/api/transactions", transactionsRouter);
-      app.use("/api/budgets", budgetsRouter);
-      app.use("/api/schedules", schedulesRouter);
-      app.use("/api/config", configurationRouter);
-      app.use("/api/stripe", stripeRouter);
-      app.use("/api/feedback", feedbackRouter);
-      app.use("/api/logs", logsRouter);
+      app.use("/api", rootRouter);
       logger("Configured endpoints");
 
       /**

@@ -1,4 +1,4 @@
-import { profileRouter } from "..";
+import { profileRouter } from "../../routers";
 import { prisma } from "../../server";
 import { UserService } from "../../lib/users/UserService";
 import { UnauthenticatedFailure } from "../../lib/result/Failures";

@@ -1,5 +1,5 @@
 import * as compression from "compression";
-import { categoriesRouter } from "..";
+import { categoriesRouter } from "../../routers";
 import { prisma } from "../../server";
 import {
   DatabaseAccessFailure,

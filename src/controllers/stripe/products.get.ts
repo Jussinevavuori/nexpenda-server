@@ -1,17 +1,13 @@
-import { Stripe } from "stripe";
-import { stripeRouter } from "..";
-import { stripe, StripeService } from "../../lib/stripe/StripeService";
+import { stripe } from "../../server";
+import { stripeRouter } from "../../routers";
+import { StripeService } from "../../lib/stripe/StripeService";
 import { StripeFailure } from "../../lib/result/Failures";
 import { SimpleCache } from "../../lib/utils/SimpleCache";
 
 /**
  * Cache the latest fetched products and refetch every ten minutes
  */
-const cache = new SimpleCache<
-  (Stripe.Product & {
-    prices: Stripe.Price[];
-  })[]
->(600_000);
+const cache = new SimpleCache<StripeProductWithPrices[]>(600_000);
 
 /**
  * Fetch all stripe products.

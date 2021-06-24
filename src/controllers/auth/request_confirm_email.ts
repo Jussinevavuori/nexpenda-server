@@ -1,4 +1,4 @@
-import { authRouter } from "..";
+import { authRouter } from "../../routers";
 import { ConfirmEmailToken } from "../../lib/tokens/ConfirmEmailToken";
 import { prisma } from "../../server";
 import { validateRequestBody } from "../../lib/validation/validateRequestBody";

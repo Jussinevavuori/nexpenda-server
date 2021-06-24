@@ -104,7 +104,7 @@ export class StripeService {
   static combineProductsAndPrices(
     products: Stripe.Product[],
     prices: Stripe.Price[]
-  ): Array<Stripe.Product & { prices: Stripe.Price[] }> {
+  ): StripeProductWithPrices[] {
     return products.map((product) => {
       return {
         ...product,

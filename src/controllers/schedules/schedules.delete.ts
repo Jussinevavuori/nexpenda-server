@@ -1,4 +1,4 @@
-import { schedulesRouter } from "..";
+import { schedulesRouter } from "../../routers";
 import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
 import {

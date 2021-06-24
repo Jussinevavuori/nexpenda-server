@@ -1,4 +1,4 @@
-import { configurationRouter } from "..";
+import { configurationRouter } from "../../routers";
 import { Schemas } from "../../lib/schemas/Schemas";
 import { ConfigurationService } from "../../lib/config/ConfigurationService";
 import { UnauthenticatedFailure } from "../../lib/result/Failures";

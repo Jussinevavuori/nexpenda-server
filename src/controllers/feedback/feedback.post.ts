@@ -1,4 +1,4 @@
-import { feedbackRouter } from "..";
+import { feedbackRouter } from "../../routers";
 import { conf } from "../../conf";
 import { FeedbackReceivedTempate } from "../../lib/mailTemplates/FeedbackReceivedTemplate";
 import { Schemas } from "../../lib/schemas/Schemas";

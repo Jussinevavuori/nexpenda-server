@@ -1,4 +1,4 @@
-import { schedulesRouter } from "..";
+import { schedulesRouter } from "../../routers";
 import {
   DatabaseAccessFailure,
   UnauthenticatedFailure,

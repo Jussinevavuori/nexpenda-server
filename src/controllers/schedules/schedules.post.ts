@@ -1,5 +1,5 @@
 import { validateRequestBody } from "../../lib/validation/validateRequestBody";
-import { schedulesRouter } from "..";
+import { schedulesRouter } from "../../routers";
 import { Schemas } from "../../lib/schemas/Schemas";
 import {
   DatabaseAccessFailure,

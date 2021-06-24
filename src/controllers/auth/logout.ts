@@ -1,4 +1,4 @@
-import { authRouter } from "..";
+import { authRouter } from "../../routers";
 import { prisma } from "../../server";
 import { RefreshToken } from "../../lib/tokens/RefreshToken";
 

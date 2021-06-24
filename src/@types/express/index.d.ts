@@ -3,6 +3,11 @@ declare type EjsTemplateName = "reset_password";
 declare namespace Express {
   export interface Request {
     /**
+     * Raw request body
+     */
+    rawBody: Buffer;
+
+    /**
      * Contains all application specific data that has been assigned and parsed
      * to the request by this application.
      */

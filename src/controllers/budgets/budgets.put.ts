@@ -1,4 +1,4 @@
-import { budgetsRouter } from "..";
+import { budgetsRouter } from "../../routers";
 import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
 import {

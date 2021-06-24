@@ -1,4 +1,4 @@
-import { transactionsRouter } from "..";
+import { transactionsRouter } from "../../routers";
 import { validateRequestBody } from "../../lib/validation/validateRequestBody";
 import { prisma } from "../../server";
 import {

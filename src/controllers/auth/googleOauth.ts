@@ -1,4 +1,4 @@
-import { authRouter } from "..";
+import { authRouter } from "../../routers";
 import * as passport from "passport";
 import { redirect } from "../../lib/requests/redirect";
 import { prisma } from "../../server";

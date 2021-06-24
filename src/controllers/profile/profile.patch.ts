@@ -1,4 +1,4 @@
-import { profileRouter } from "..";
+import { profileRouter } from "../../routers";
 import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
 import { UserService } from "../../lib/users/UserService";

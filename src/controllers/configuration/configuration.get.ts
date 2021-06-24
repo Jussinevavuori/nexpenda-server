@@ -1,4 +1,4 @@
-import { configurationRouter } from "..";
+import { configurationRouter } from "../../routers";
 import { ConfigurationService } from "../../lib/config/ConfigurationService";
 
 /**

@@ -1,5 +1,6 @@
-import { stripeRouter } from "..";
-import { stripe, StripeService } from "../../lib/stripe/StripeService";
+import { stripe } from "../../server";
+import { stripeRouter } from "../../routers";
+import { StripeService } from "../../lib/stripe/StripeService";
 import {
   StripeFailure,
   UnauthenticatedFailure,

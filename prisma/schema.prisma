@@ -32,7 +32,7 @@ model User {
   Profile             Profile?
   Log                 Log[]
   TransactionSchedule TransactionSchedule[]
-  Subscription        Subscription?
+  Subscription        UserSubscription?
 
   @@map(name: "users")
 }
@@ -195,7 +195,7 @@ model Config {
 }
 
 // Subscriptions
-model Subscription {
+model UserSubscription {
   id               String              @id @default(uuid())
   uid              String              @unique
   product          SubscribableProduct
@@ -211,4 +211,35 @@ model Subscription {
 // Possible subscription items
 enum SubscribableProduct {
   PREMIUM
+}
+
+// Copies of stripe products
+model StripeProduct {
+  id          String   @id
+  active      Boolean
+  description String
+  name        String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  ProductPrice StripePrice[]
+
+  @@map(name: "stripe_products")
+}
+
+// Copies of stripe prices
+model StripePrice {
+  id                String   @id
+  productId         String   @map("product_id")
+  active            Boolean
+  currency          String
+  nickname          String?
+  type              String
+  recurringInterval String?  @map("recurring_interval")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Product StripeProduct @relation(fields: [productId], references: [id])
+
+  @@map(name: "stripe_prices")
 }

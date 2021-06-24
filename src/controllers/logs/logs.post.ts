@@ -1,4 +1,4 @@
-import { logsRouter } from "..";
+import { logsRouter } from "../../routers";
 import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
 import { UnauthenticatedFailure } from "../../lib/result/Failures";

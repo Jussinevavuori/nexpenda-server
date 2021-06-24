@@ -1,5 +1,5 @@
 import * as compression from "compression";
-import { transactionsRouter } from "..";
+import { transactionsRouter } from "../../routers";
 import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
 import { TransactionMapper } from "../../lib/dataMappers/TransactionMapper";
