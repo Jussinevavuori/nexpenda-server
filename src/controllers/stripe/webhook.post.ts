@@ -38,22 +38,14 @@ stripeRouter.post("/webhook", async (req, res, next) => {
   }
 
   /**
-   * Set up response object
+   * Respond to stripe with 200
    */
-  let response: PromiseType<StripeEventHandlerResponse> | undefined;
+  res.status(200).end();
 
   /**
    * Pass event to event handlers
    */
   if (StripeInvoiceEventHandler.isEventType(event.type)) {
-    response = await StripeInvoiceEventHandler.handle(event.type, event);
+    await StripeInvoiceEventHandler.handle(event.type, event);
   }
-
-  /**
-   * Respond
-   */
-  if (!response) {
-    return res.status(400).send(`No handler configured`);
-  }
-  return res.status(response.status).send(response.message);
 });

@@ -26,15 +26,7 @@ export class StripeInvoiceEventHandler {
   /**
    * Handle any event
    */
-  static async handle(
-    eventType: StripeInvoiceEventType,
-    event: Stripe.Event
-  ): StripeEventHandlerResponse {
+  static async handle(type: StripeInvoiceEventType, event: Stripe.Event) {
     const invoice = event.data.object as Stripe.Invoice;
-
-    return {
-      status: 400,
-      message: "Unimplemented",
-    };
   }
 }

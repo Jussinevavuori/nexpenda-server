@@ -68,8 +68,3 @@ type StripeEventType =
   | StripeProductEventType
   | StripeInvoiceEventType
   | StripeCheckoutEventType;
-
-type StripeEventHandlerResponse = Promise<{
-  status: number;
-  message: string;
-}>;
