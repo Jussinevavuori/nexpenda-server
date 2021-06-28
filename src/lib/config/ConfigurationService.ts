@@ -72,19 +72,9 @@ export class ConfigurationService {
     freeTransactionsLimit: new ConfigurationItem({
       key: "freeTransactionsLimit",
       defaultValue: 999_999,
-      decode(str) {
-        return parseInt(str);
-      },
-      encode(val) {
-        return val.toFixed(0);
-      },
-      validate(val) {
-        const parsed = configSchema.shape.freeTransactionsLimit.safeParse(val);
-        if (parsed.success) {
-          return parsed.data;
-        }
-        return null;
-      },
+      decode: (str) => parseInt(str),
+      encode: (val) => val.toFixed(0),
+      schema: configSchema.shape.freeTransactionsLimit,
     }),
 
     /**
@@ -94,19 +84,9 @@ export class ConfigurationService {
     freeBudgetsLimit: new ConfigurationItem({
       key: "freeBudgetsLimit",
       defaultValue: 999_999,
-      decode(str) {
-        return parseInt(str);
-      },
-      encode(val) {
-        return val.toFixed(0);
-      },
-      validate(val) {
-        const parsed = configSchema.shape.freeBudgetsLimit.safeParse(val);
-        if (parsed.success) {
-          return parsed.data;
-        }
-        return null;
-      },
+      decode: (str) => parseInt(str),
+      encode: (val) => val.toFixed(0),
+      schema: configSchema.shape.freeBudgetsLimit,
     }),
 
     /**
@@ -117,19 +97,9 @@ export class ConfigurationService {
     status: new ConfigurationItem<"online" | "offline">({
       key: "status",
       defaultValue: "offline",
-      decode(str) {
-        return str === "online" ? "online" : "offline";
-      },
-      encode(val) {
-        return val;
-      },
-      validate(val) {
-        const parsed = configSchema.shape.status.safeParse(val);
-        if (parsed.success) {
-          return parsed.data;
-        }
-        return null;
-      },
+      decode: (str) => (str === "online" ? "online" : "offline"),
+      encode: (val) => val,
+      schema: configSchema.shape.status,
     }),
   };
 }

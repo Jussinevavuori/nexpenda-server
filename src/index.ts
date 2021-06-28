@@ -1,4 +1,4 @@
-import { configureEnvironment } from "./conf";
+import { configureEnvironment } from "./env";
 
 /**
  * Configure environment.

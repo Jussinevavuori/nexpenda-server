@@ -1,5 +1,5 @@
 import * as mailgun from "mailgun-js";
-import { conf } from "../../conf";
+import { ENV } from "../../env";
 import { AbstractTemplate } from "../mailTemplates/AbstractTemplate";
 
 /**
@@ -31,12 +31,12 @@ export class Mailer {
     this.isDisabled = process.env.NODE_ENV === "test";
 
     this.mg = mailgun({
-      apiKey: conf.email.mailgun.apikey,
-      domain: conf.email.mailgun.domain,
-      host: conf.email.mailgun.host,
+      apiKey: ENV.email.mailgun.apikey,
+      domain: ENV.email.mailgun.domain,
+      host: ENV.email.mailgun.host,
     });
 
-    this.defaultSender = `Nexpenda <${conf.email.defaultSender}>`;
+    this.defaultSender = `Nexpenda <${ENV.email.defaultSender}>`;
   }
 
   /**

@@ -1,7 +1,9 @@
+import { z } from "zod";
 import { prisma } from "../../server";
 import { ConfigUpdateFailure } from "../result/Failures";
 import { Success } from "../result/Result";
 import { ConfigSchema } from "../schemas/config.schema";
+import { PubSub, PubSubListener } from "../pubsub/PubSub";
 
 /**
  * Wraps functionality for a configuration item which is stored in the Config
@@ -30,22 +32,36 @@ export class ConfigurationItem<T> {
   decode: (value: string) => T | null;
 
   /**
-   * Validate a parsed value
+   * Validation schema
    */
-  validate: (value: T | null) => T | null;
+  schema: z.Schema<T>;
+
+  /**
+   * On update function pubsub channel
+   */
+  private updatePubsubChannel: PubSub<T>;
 
   constructor(options: {
     key: ConfigurationItem<T>["key"];
     defaultValue: ConfigurationItem<T>["defaultValue"];
     encode: ConfigurationItem<T>["encode"];
     decode: ConfigurationItem<T>["decode"];
-    validate: ConfigurationItem<T>["validate"];
+    schema: ConfigurationItem<T>["schema"];
   }) {
     this.key = options.key;
     this.defaultValue = options.defaultValue;
     this.encode = options.encode;
     this.decode = options.decode;
-    this.validate = options.validate;
+    this.schema = options.schema;
+    this.updatePubsubChannel = new PubSub<T>();
+  }
+
+  /**
+   * Validate according to the schema. Return valid value or null for invalid.
+   */
+  validate(value: T | null) {
+    const result = this.schema.safeParse(value);
+    return result.success ? result.data : null;
   }
 
   /**
@@ -81,6 +97,17 @@ export class ConfigurationItem<T> {
       where: { key: this.key },
       data: { value: encoded },
     });
+
+    // On successful run update pubsub channel
+    this.updatePubsubChannel.publish(value);
+
     return new Success(result.value);
+  }
+
+  /**
+   * On update value subscriber
+   */
+  onUpdateValue(listener: PubSubListener<T>) {
+    return this.updatePubsubChannel.subscribe(listener);
   }
 }

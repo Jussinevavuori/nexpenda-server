@@ -26,29 +26,29 @@ export function configureEnvironment(
 /**
  * Object which contains all configuration values.
  */
-export const conf = {
+export const ENV = {
   /**
    * All google API and OAuth variables.
    */
   google: {
     get clientId() {
-      return ENV("GOOGLE_CLIENTID");
+      return ENV_STR("GOOGLE_CLIENTID");
     },
     get clientSecret() {
-      return ENV("GOOGLE_CLIENTSECRET");
+      return ENV_STR("GOOGLE_CLIENTSECRET");
     },
     get applicationCredentials() {
-      return ENV("GOOGLE_APPLICATION_CREDENTIALS");
+      return ENV_STR("GOOGLE_APPLICATION_CREDENTIALS");
     },
     get projectId() {
-      return ENV("GOOGLE_PROJECTID");
+      return ENV_STR("GOOGLE_PROJECTID");
     },
     /**
      * Google storage API variables.
      */
     storage: {
       get bucketName() {
-        return ENV("GOOGLE_STORAGE_BUCKETNAME");
+        return ENV_STR("GOOGLE_STORAGE_BUCKETNAME");
       },
     },
   },
@@ -58,10 +58,10 @@ export const conf = {
    */
   token: {
     get issuer() {
-      return ENV("TOKEN_ISSUER");
+      return ENV_STR("TOKEN_ISSUER");
     },
     get audience() {
-      return ENV("TOKEN_AUDIENCE");
+      return ENV_STR("TOKEN_AUDIENCE");
     },
 
     /**
@@ -69,10 +69,10 @@ export const conf = {
      */
     accessToken: {
       get secret() {
-        return ENV("TOKEN_ACCESSTOKEN_SECRET");
+        return ENV_STR("TOKEN_ACCESSTOKEN_SECRET");
       },
       get expiresIn() {
-        return ENV("TOKEN_ACCESSTOKEN_EXPIRESIN");
+        return ENV_STR("TOKEN_ACCESSTOKEN_EXPIRESIN");
       },
       get expiresInSeconds() {
         return ENV_NUM("TOKEN_ACCESSTOKEN_EXPIRESINSECONDS");
@@ -84,13 +84,13 @@ export const conf = {
      */
     refreshToken: {
       get name() {
-        return ENV("TOKEN_REFRESHTOKEN_NAME");
+        return ENV_STR("TOKEN_REFRESHTOKEN_NAME");
       },
       get secret() {
-        return ENV("TOKEN_REFRESHTOKEN_SECRET");
+        return ENV_STR("TOKEN_REFRESHTOKEN_SECRET");
       },
       get expiresIn() {
-        return ENV("TOKEN_REFRESHTOKEN_EXPIRESIN");
+        return ENV_STR("TOKEN_REFRESHTOKEN_EXPIRESIN");
       },
       get expiresInSeconds() {
         return ENV_NUM("TOKEN_REFRESHTOKEN_EXPIRESINSECONDS");
@@ -102,10 +102,10 @@ export const conf = {
      */
     resetPasswordToken: {
       get secret() {
-        return ENV("TOKEN_RESETPASSWORDTOKEN_SECRET");
+        return ENV_STR("TOKEN_RESETPASSWORDTOKEN_SECRET");
       },
       get expiresIn() {
-        return ENV("TOKEN_RESETPASSWORDTOKEN_EXPIRESIN");
+        return ENV_STR("TOKEN_RESETPASSWORDTOKEN_EXPIRESIN");
       },
       get expiresInSeconds() {
         return ENV_NUM("TOKEN_RESETPASSWORDTOKEN_EXPIRESINSECONDS");
@@ -117,10 +117,10 @@ export const conf = {
      */
     confirmEmailToken: {
       get secret() {
-        return ENV("TOKEN_CONFIRMEMAILTOKEN_SECRET");
+        return ENV_STR("TOKEN_CONFIRMEMAILTOKEN_SECRET");
       },
       get expiresIn() {
-        return ENV("TOKEN_CONFIRMEMAILTOKEN_EXPIRESIN");
+        return ENV_STR("TOKEN_CONFIRMEMAILTOKEN_EXPIRESIN");
       },
       get expiresInSeconds() {
         return ENV_NUM("TOKEN_CONFIRMEMAILTOKEN_EXPIRESINSECONDS");
@@ -133,7 +133,7 @@ export const conf = {
    */
   email: {
     get defaultSender() {
-      return ENV("EMAIL_DEFAULT_SENDER");
+      return ENV_STR("EMAIL_DEFAULT_SENDER");
     },
     get developerEmails() {
       return ENV_ARRAY("EMAIL_DEVELOPER_EMAILS");
@@ -143,16 +143,16 @@ export const conf = {
      */
     mailgun: {
       get apikey() {
-        return ENV("EMAIL_MAILGUN_APIKEY");
+        return ENV_STR("EMAIL_MAILGUN_APIKEY");
       },
       get baseurl() {
-        return ENV("EMAIL_MAILGUN_BASEURL");
+        return ENV_STR("EMAIL_MAILGUN_BASEURL");
       },
       get domain() {
-        return ENV("EMAIL_MAILGUN_DOMAIN");
+        return ENV_STR("EMAIL_MAILGUN_DOMAIN");
       },
       get host() {
-        return ENV("EMAIL_MAILGUN_HOST");
+        return ENV_STR("EMAIL_MAILGUN_HOST");
       },
     },
   },
@@ -162,13 +162,16 @@ export const conf = {
    */
   stripe: {
     get publishableKey() {
-      return ENV("STRIPE_PUBLISHABLE_KEY");
+      return ENV_STR("STRIPE_PUBLISHABLE_KEY");
     },
     get secretKey() {
-      return ENV("STRIPE_SECRET_KEY");
+      return ENV_STR("STRIPE_SECRET_KEY");
     },
     get webhookSecret() {
-      return ENV("STRIPE_WEBHOOK_SECRET");
+      return ENV_STR("STRIPE_WEBHOOK_SECRET");
+    },
+    get premiumProductId() {
+      return ENV_STR("STRIPE_PREMIUM_PRODUCT_ID");
     },
   },
 
@@ -177,10 +180,10 @@ export const conf = {
    */
   hosts: {
     get client() {
-      return ENV("HOSTS_CLIENT");
+      return ENV_STR("HOSTS_CLIENT");
     },
     get server() {
-      return ENV("HOSTS_SERVER");
+      return ENV_STR("HOSTS_SERVER");
     },
   },
 
@@ -195,14 +198,14 @@ export const conf = {
    * Application environment
    */
   get env() {
-    return ENV("NODE_ENV");
+    return ENV_STR("NODE_ENV");
   },
 
   /**
    * Database URL
    */
   get databaseUrl() {
-    return ENV("DATABASE_URL");
+    return ENV_STR("DATABASE_URL");
   },
 };
 
@@ -218,7 +221,7 @@ function ENV_NUM(variable: string) {
  * Helper function for fetching environment variables from process.env and
  * leaving it as is as a string.
  */
-function ENV(variable: string) {
+function ENV_STR(variable: string) {
   return process.env[variable] || "";
 }
 

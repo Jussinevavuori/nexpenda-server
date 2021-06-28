@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { conf } from "../../conf";
+import { ENV } from "../../env";
 import { z } from "zod";
 import { RefreshToken } from "./RefreshToken";
 import { AbstractToken } from "./AbstractToken";
@@ -44,8 +44,8 @@ export class AccessToken
     super(typeof arg === "string" ? arg : { uid: arg.uid, vrs: arg.vrs }, {
       schema: (_) => _.merge(AccessToken.schema),
       tkt: "access",
-      secret: conf.token.accessToken.secret,
-      expiresIn: conf.token.accessToken.expiresIn,
+      secret: ENV.token.accessToken.secret,
+      expiresIn: ENV.token.accessToken.expiresIn,
       defaultUponError: { uid: "", vrs: -1 },
       verify: async (payload) => {
         const user = await prisma.user.findUnique({

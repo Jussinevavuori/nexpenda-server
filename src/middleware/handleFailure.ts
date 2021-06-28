@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { conf } from "../conf";
+import { ENV } from "../env";
 import { DatabaseAccessFailure, StripeFailure } from "../lib/result/Failures";
 import { Failure } from "../lib/result/Result";
 
@@ -25,12 +25,13 @@ export function handleFailure(
       /**
        * Log failures in development
        */
-      if (conf.env === "development") {
-        console.error(``);
-        console.error(`  > Failure: ${failure.code} (${failure.status})`);
-        console.error(`  > ${failure.message}`);
-        console.error(`  > Errors: ${JSON.stringify(failure.errors)}`);
-        console.error(``);
+      if (ENV.env === "development") {
+        req.on("end", () => {
+					console.error(`  > Failure: ${failure.code} (${failure.status})`);
+          console.error(`  > ${failure.message}`);
+          console.error(`  > Errors: ${JSON.stringify(failure.errors)}`);
+          console.error(``);
+        });
       }
 
       /**

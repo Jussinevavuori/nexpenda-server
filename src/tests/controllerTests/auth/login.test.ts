@@ -1,7 +1,7 @@
 import { TestClient } from "../../TestClient";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
-import { conf } from "../../../conf";
+import { ENV } from "../../../env";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -109,7 +109,7 @@ describe("/api/auth/login/ [POST]", () => {
       response.headers
         .raw()
         ["set-cookie"].find((_) =>
-          _.startsWith(`${conf.token.refreshToken.name}=`)
+          _.startsWith(`${ENV.token.refreshToken.name}=`)
         )
     ).toBeDefined();
     expect(client.refreshToken).toBeDefined();

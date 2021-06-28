@@ -1,6 +1,6 @@
 import { Profile, User } from ".prisma/client";
 import Stripe from "stripe";
-import { StripeService } from "../stripe/StripeService";
+import { CustomerService } from "../stripe/CustomerService";
 
 /**
  * The user service provides multiple methods for working with users, profiles
@@ -123,14 +123,14 @@ export class UserService {
     const requestUser = UserService.createRequestUser(user, profile);
 
     // Fetch stripe customer if any
-    const customer = await StripeService.getUserCustomer({
+    const customer = await CustomerService.getUserCustomer({
       ...user,
       profile: requestUser.profile,
     });
 
     // Fetch customer's subscriptions
     const subscriptions = customer
-      ? await StripeService.getSubscriptionsForCustomer(customer.id)
+      ? await CustomerService.getSubscriptionsForCustomer(customer.id)
       : undefined;
 
     // Return public profile details

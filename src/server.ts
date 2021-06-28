@@ -6,7 +6,7 @@ import * as nocache from "nocache";
 import * as morgan from "morgan";
 import { createServer, Server } from "http";
 import { rootRouter } from "./routers";
-import { conf } from "./conf";
+import { ENV } from "./env";
 import { extractAuthentication } from "./middleware/extractAuthentication";
 import { PrismaClient } from "@prisma/client";
 import { initializeRequestData } from "./middleware/initializeData";
@@ -19,6 +19,7 @@ import { rateLimiters } from "./middleware/rateLimiters";
 import { Bucket, Storage } from "@google-cloud/storage";
 import { handleMulterErrors } from "./middleware/handleMulterErrors";
 import { Stripe } from "stripe";
+import { PremiumPriceService } from "./lib/stripe/PremiumPriceService";
 
 /**
  * App logger
@@ -75,7 +76,7 @@ export let stripe: Stripe;
 export function startServer() {
   return new Promise<void>(async (resolve, reject) => {
     try {
-      logger("Starting server in", process.env.NODE_ENV, "mode");
+      logger("Starting server in", ENV.env, "mode");
 
       /**
        * Import passport to use passport.
@@ -96,17 +97,22 @@ export function startServer() {
         keyFilename: path.join(
           __dirname,
           "..",
-          conf.google.applicationCredentials
+          ENV.google.applicationCredentials
         ),
-        projectId: conf.google.projectId,
+        projectId: ENV.google.projectId,
       });
-      bucket = storage.bucket(conf.google.storage.bucketName);
+      bucket = storage.bucket(ENV.google.storage.bucketName);
       logger("Connected to storage");
 
       /**
        * Create stripe instance
        */
-      stripe = new Stripe(conf.stripe.secretKey, { apiVersion: "2020-08-27" });
+      stripe = new Stripe(ENV.stripe.secretKey, { apiVersion: "2020-08-27" });
+
+      /**
+       * Premium price initialization
+       */
+      await PremiumPriceService.initialize();
 
       /**
        * Apply all required middleware.
@@ -125,7 +131,7 @@ export function startServer() {
       app.use(corsMiddleware());
       app.use(initializeRequestData());
       app.use(extractAuthentication());
-      if (process.env.NODE_ENV !== "test") {
+      if (ENV.env !== "test") {
         app.use(morgan("tiny"));
       }
       logger("Configured middleware");
@@ -166,8 +172,8 @@ export function startServer() {
        * Start server at correct port and resolve when server is active.
        */
       logger("Starting server");
-      server = http.listen(conf.port, function () {
-        logger(`App is listening on port ${conf.port}`);
+      server = http.listen(ENV.port, function () {
+        logger(`App is listening on port ${ENV.port}`);
         resolve();
       });
     } catch (error) {

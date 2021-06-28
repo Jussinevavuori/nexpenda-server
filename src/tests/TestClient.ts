@@ -1,5 +1,5 @@
 import fetch, { Response } from "node-fetch";
-import { conf } from "../conf";
+import { ENV } from "../env";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { TestUtils } from "./TestUtils";
@@ -26,7 +26,7 @@ export class TestClient {
    * Initialize with URL
    */
   constructor() {
-    this.url = "http://localhost:" + conf.port;
+    this.url = "http://localhost:" + ENV.port;
     this.defaultTimeout = 1000;
   }
 
@@ -39,7 +39,7 @@ export class TestClient {
       headers["Authorization"] = `bearer ${this.accessToken}`;
     }
     if (this.refreshToken) {
-      const value = `${conf.token.refreshToken.name}=${this.refreshToken};`;
+      const value = `${ENV.token.refreshToken.name}=${this.refreshToken};`;
       headers["Cookie"] = value;
     }
     if (options.body) {
@@ -377,7 +377,7 @@ export class TestClient {
   updateRefreshTokenFromResponse(response: Response) {
     const refreshToken = TestUtils.parseCookieFromResponse(
       response,
-      conf.token.refreshToken.name
+      ENV.token.refreshToken.name
     );
 
     if (typeof refreshToken === "string") {

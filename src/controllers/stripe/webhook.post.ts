@@ -1,12 +1,7 @@
 import { Stripe } from "stripe";
 import { stripeRouter } from "../../routers";
 import { stripe } from "../../server";
-import { conf } from "../../conf";
-import {
-  handleStripeProductCreatedEvent,
-  handleStripeProductDeletedEvent,
-  handleStripeProductUpdatedEvent,
-} from "../../lib/stripeEventHandlers/handleStripeProductEvents";
+import { ENV } from "../../env";
 import {
   handleStripePriceCreatedEvent,
   handleStripePriceDeletedEvent,
@@ -30,7 +25,7 @@ stripeRouter.post("/webhook", async (req, res, next) => {
     event = stripe.webhooks.constructEvent(
       req.rawBody,
       signature,
-      conf.stripe.webhookSecret
+      ENV.stripe.webhookSecret
     );
   } catch (e) {
     console.log(e);
@@ -49,12 +44,6 @@ stripeRouter.post("/webhook", async (req, res, next) => {
    */
   try {
     switch (event.type) {
-      case "product.created":
-        return handleStripeProductCreatedEvent(event);
-      case "product.updated":
-        return handleStripeProductUpdatedEvent(event);
-      case "product.deleted":
-        return handleStripeProductDeletedEvent(event);
       case "price.created":
         return handleStripePriceCreatedEvent(event);
       case "price.updated":

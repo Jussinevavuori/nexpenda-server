@@ -1,5 +1,5 @@
 import * as jest from "jest-cli";
-import { configureEnvironment } from "../conf";
+import { configureEnvironment } from "../env";
 import { prisma, startServer } from "../server";
 
 async function initialize() {

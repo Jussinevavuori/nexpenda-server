@@ -4,7 +4,7 @@ import { prisma, stripe } from "../../server";
 /**
  * The stripe service provides required methods for working with Stripe.
  */
-export class StripeService {
+export class CustomerService {
   /**
    * Creates or updates a customer to the Stripe database. The customer
    * is linked to the user.
@@ -14,7 +14,7 @@ export class StripeService {
    */
   static async createOrUpdateCustomer(user: RequestUser) {
     // Check for existing user
-    const existing = await StripeService.getUserCustomer(user);
+    const existing = await CustomerService.getUserCustomer(user);
 
     // Create or update user
     const customer =
@@ -87,33 +87,9 @@ export class StripeService {
       return false;
     }
 
-    const subscriptions = await StripeService.getSubscriptionsForCustomer(
+    const subscriptions = await CustomerService.getSubscriptionsForCustomer(
       customerId
     );
     return subscriptions.some((_) => _.status === "active");
-  }
-
-  /**
-   * Combines products and prices into an easier-to-user format
-   * @param products 	List of products
-   * @param prices 	 	List of prices
-   * @returns        	List of products with each product containing
-   * 									a prices field which contains all prices for
-   * 									that product.
-   */
-  static combineProductsAndPrices(
-    products: Stripe.Product[],
-    prices: Stripe.Price[]
-  ): StripeProductWithPrices[] {
-    return products.map((product) => {
-      return {
-        ...product,
-        prices: prices.filter((price) => {
-          return (
-            typeof price.product === "string" && price.product === product.id
-          );
-        }),
-      };
-    });
   }
 }

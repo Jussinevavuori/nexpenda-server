@@ -1,6 +1,6 @@
 import * as chalk from "chalk";
 import { PrismaClient } from "@prisma/client";
-import { configureEnvironment } from "./conf";
+import { configureEnvironment } from "./env";
 
 configureEnvironment();
 

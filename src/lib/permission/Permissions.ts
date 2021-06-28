@@ -5,7 +5,7 @@ import {
 } from "../result/Failures";
 import { Success } from "../result/Result";
 import { ConfigurationService } from "../config/ConfigurationService";
-import { StripeService } from "../stripe/StripeService";
+import { CustomerService } from "../stripe/CustomerService";
 
 /**
  * The permissions class provides methods for validating that users have
@@ -28,7 +28,7 @@ export class Permissions {
     createCount: number = 1
   ) {
     // Premium users are always permitted
-    const isPremium = await StripeService.isPremium(user.stripeCustomerId);
+    const isPremium = await CustomerService.isPremium(user.stripeCustomerId);
     if (isPremium) return Success.Empty();
 
     // Fetch current configuration
@@ -65,7 +65,7 @@ export class Permissions {
     createCount: number = 1
   ) {
     // Premium users are always permitted
-    const isPremium = await StripeService.isPremium(user.stripeCustomerId);
+    const isPremium = await CustomerService.isPremium(user.stripeCustomerId);
     if (isPremium) return Success.Empty();
 
     // Fetch current configuration

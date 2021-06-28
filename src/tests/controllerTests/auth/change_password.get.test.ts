@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
-import { conf } from "../../../conf";
+import { ENV } from "../../../env";
 
 const prisma = new PrismaClient();
 
@@ -89,8 +89,8 @@ describe("/api/auth/change_password [GET]", () => {
         vrs: record!.tokenVersion,
         tkt: "reset_password",
       },
-      conf.token.resetPasswordToken.secret,
-      { issuer: conf.token.issuer, audience: conf.token.audience, expiresIn: 1 }
+      ENV.token.resetPasswordToken.secret,
+      { issuer: ENV.token.issuer, audience: ENV.token.audience, expiresIn: 1 }
     );
     await new Promise((res) => setTimeout(res, 1000));
     const response = await client.auth().changePassword(token).get();
@@ -114,9 +114,9 @@ describe("/api/auth/change_password [GET]", () => {
       },
       "invalid_secret",
       {
-        issuer: conf.token.issuer,
-        audience: conf.token.audience,
-        expiresIn: conf.token.resetPasswordToken.expiresIn,
+        issuer: ENV.token.issuer,
+        audience: ENV.token.audience,
+        expiresIn: ENV.token.resetPasswordToken.expiresIn,
       }
     );
     const response = await client.auth().changePassword(token).get();

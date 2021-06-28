@@ -104,6 +104,7 @@ rootRouter.use("/schedules", schedulesRouter);
 export const stripeRouter = Router();
 import "./controllers/stripe/webhook.post";
 import "./controllers/stripe/products.get";
+import "./controllers/stripe/premium_prices.get";
 import "./controllers/stripe/checkout_session.get";
 import "./controllers/stripe/create_checkout_session.post";
 import "./controllers/stripe/create_billing_portal_session.post";

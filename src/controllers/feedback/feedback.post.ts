@@ -1,5 +1,5 @@
 import { feedbackRouter } from "../../routers";
-import { conf } from "../../conf";
+import { ENV } from "../../env";
 import { FeedbackReceivedTempate } from "../../lib/mailTemplates/FeedbackReceivedTemplate";
 import { Schemas } from "../../lib/schemas/Schemas";
 import { prisma } from "../../server";
@@ -48,7 +48,7 @@ feedbackRouter.post("/", async (req, res, next) => {
       message: body.value.message ?? "(No message)",
     });
 
-    for (const developerEmail of conf.email.developerEmails) {
+    for (const developerEmail of ENV.email.developerEmails) {
       await mailer.sendTemplate(developerEmail, passwordChangedTemplate);
     }
   } catch (e) {

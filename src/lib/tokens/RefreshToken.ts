@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Request, Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
-import { conf } from "../../conf";
+import { ENV } from "../../env";
 import { AbstractToken } from "./AbstractToken";
 
 type IRefreshToken = z.TypeOf<typeof RefreshToken["schema"]>;
@@ -50,8 +50,8 @@ export class RefreshToken
       {
         schema: (_) => _.merge(RefreshToken.schema),
         tkt: "refresh",
-        secret: conf.token.refreshToken.secret,
-        expiresIn: conf.token.refreshToken.expiresIn,
+        secret: ENV.token.refreshToken.secret,
+        expiresIn: ENV.token.refreshToken.expiresIn,
         defaultUponError: { uid: "", vrs: -1 },
         verify: async (payload) => {
           const user = await prisma.user.findUnique({
@@ -70,9 +70,9 @@ export class RefreshToken
    * Sends refresh token as cookie in response
    */
   sendCookie(response: Response): Response {
-    const secure = !["development", "test"].includes(conf.env);
-    return response.cookie(conf.token.refreshToken.name, this.jwt, {
-      maxAge: conf.token.refreshToken.expiresInSeconds * 1000,
+    const secure = !["development", "test"].includes(ENV.env);
+    return response.cookie(ENV.token.refreshToken.name, this.jwt, {
+      maxAge: ENV.token.refreshToken.expiresInSeconds * 1000,
       httpOnly: true,
       secure,
       sameSite: secure ? "none" : "lax",
@@ -93,7 +93,7 @@ export class RefreshToken
    */
   static async fromRequest(request: Request, prisma: PrismaClient) {
     if (!request.cookies) return;
-    const token = request.cookies[conf.token.refreshToken.name];
+    const token = request.cookies[ENV.token.refreshToken.name];
     if (typeof token === "string") {
       try {
         const refreshToken = new RefreshToken(token, prisma);
@@ -109,6 +109,6 @@ export class RefreshToken
    * Clears the refresh token from a request
    */
   static clearCookie(response: Response) {
-    return response.clearCookie(conf.token.refreshToken.name);
+    return response.clearCookie(ENV.token.refreshToken.name);
   }
 }

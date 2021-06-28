@@ -7,11 +7,6 @@ datasource postgresql {
   url      = env("DATABASE_URL")
 }
 
-// Each user is connected to a user account, which contains their ID, login
-// details and other authentication details. The user account may also specify
-// the user's google account and stripe customer ID. All other user data is
-// linked back to the user object with a UID field. Each user is also connected
-// to a profile.
 model User {
   id               String   @id @default(uuid())
   email            String?  @unique
@@ -32,13 +27,11 @@ model User {
   Profile             Profile?
   Log                 Log[]
   TransactionSchedule TransactionSchedule[]
-  Subscription        UserSubscription?
+  Subscription        PremiumSubscription?
 
   @@map(name: "users")
 }
 
-// Profile contains public user data such as the user's id, name, photo,
-// optional google photo and settings.
 model Profile {
   uid            String   @id
   displayName    String?  @map("display_name")
@@ -54,9 +47,6 @@ model Profile {
   @@map(name: "profiles")
 }
 
-// Transactions contain all incomes and expenses and other details. All
-// transactions belong to a category and a user and may optionally specify
-// that they belong to a specific transaction schedule.
 model Transaction {
   id            String   @id @default(uuid())
   uid           String
@@ -75,10 +65,6 @@ model Transaction {
   @@map(name: "transactions")
 }
 
-// All transaction schedules specify template data for creating transactions
-// and the intervalType, intervalLength, firstOccurrence and occurrences
-// fields that model when transactions according to the template should be
-// created.
 model TransactionSchedule {
   id                      String       @id @default(uuid())
   uid                     String
@@ -100,7 +86,6 @@ model TransactionSchedule {
   @@map(name: "transaction_schedules")
 }
 
-// Possible interval types for transaction schedules
 enum IntervalType {
   DAY
   WEEK
@@ -108,9 +93,6 @@ enum IntervalType {
   YEAR
 }
 
-// All budgets are used to analyze transactions and measure if their sum
-// exceed the set limit in integerAmount. A budget only measures transactions
-// that belong to categories specified by the budget category inclusiosn field.
 model Budget {
   id            String   @id @default(uuid())
   uid           String
@@ -127,7 +109,6 @@ model Budget {
   @@map(name: "budgets")
 }
 
-// Intermediate table for manually connecting budgets to categories.
 model BudgetCategoryInclusion {
   budgetId   String @map("budget_id")
   categoryId String @map("category_id")
@@ -138,9 +119,6 @@ model BudgetCategoryInclusion {
   @@id([categoryId, budgetId])
 }
 
-// Categories contain their name in the value field, an optional icon and
-// metadata. All transactions belong to a category and categories are linked
-// to budgets with budget category inclusions.
 model Category {
   id        String   @id @default(uuid())
   uid       String
@@ -160,8 +138,6 @@ model Category {
   @@map(name: "categories")
 }
 
-// All simple feedback items include the user who left the message and the
-// feedback message itself.
 model Feedback {
   id      String  @id @default(uuid())
   uid     String
@@ -170,7 +146,6 @@ model Feedback {
   User User @relation(fields: [uid], references: [id])
 }
 
-// Shape of logs that are saved to the database.
 model Log {
   id         String   @id @default(uuid())
   uid        String?
@@ -187,59 +162,41 @@ model Log {
   User User? @relation(fields: [uid], references: [id])
 }
 
-// All configuration values are string key-value pairs that are further
-// processed on the server.
 model Config {
   key   String @id
   value String
 }
 
 // Subscriptions
-model UserSubscription {
-  id               String              @id @default(uuid())
-  uid              String              @unique
-  product          SubscribableProduct
-  currentPeriodEnd DateTime?           @map("current_period_end")
-  createdAt        DateTime            @default(now()) @map("created_at")
-  updatedAt        DateTime            @default(now()) @updatedAt @map("updated_at")
+model PremiumSubscription {
+  id               String    @id @default(uuid())
+  uid              String    @unique
+  currentPeriodEnd DateTime? @map("current_period_end")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
 
   User User @relation(fields: [uid], references: [id])
 
-  @@map(name: "subscriptions")
+  @@map(name: "premium_subscriptions")
 }
 
-// Possible subscription items
+model PremiumPrice {
+  id                     String   @id
+  unitAmount             Int?     @map("unit_amount")
+  productId              String   @map("product_id")
+  active                 Boolean
+  currency               String
+  nickname               String?
+  type                   String
+  recurringInterval      String?  @map("recurring_interval")
+  recurringIntervalCount Int?     @map("recurring_interval_count")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map(name: "premium_prices")
+}
+
+// @DEPRECATED
 enum SubscribableProduct {
   PREMIUM
-}
-
-// Copies of stripe products
-model StripeProduct {
-  id          String   @id
-  active      Boolean
-  description String
-  name        String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
-
-  ProductPrice StripePrice[]
-
-  @@map(name: "stripe_products")
-}
-
-// Copies of stripe prices
-model StripePrice {
-  id                String   @id
-  productId         String   @map("product_id")
-  active            Boolean
-  currency          String
-  nickname          String?
-  type              String
-  recurringInterval String?  @map("recurring_interval")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at")
-
-  Product StripeProduct @relation(fields: [productId], references: [id])
-
-  @@map(name: "stripe_prices")
 }

@@ -1,4 +1,4 @@
-import { conf } from "../../conf";
+import { ENV } from "../../env";
 
 /**
  * Utility function for removing a trailing slash.
@@ -42,7 +42,7 @@ export const getUrl = {
     query: { [key: string]: string | undefined } = {}
   ) {
     return [
-      removeTrailingSlash(conf.hosts.server),
+      removeTrailingSlash(ENV.hosts.server),
       removeLeadingSlash(path),
       constructQuery(query),
     ].join("/");
@@ -56,7 +56,7 @@ export const getUrl = {
     query: { [key: string]: string | undefined } = {}
   ) {
     return [
-      removeTrailingSlash(conf.hosts.client),
+      removeTrailingSlash(ENV.hosts.client),
       removeLeadingSlash(path),
       constructQuery(query),
     ].join("/");

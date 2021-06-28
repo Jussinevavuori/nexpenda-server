@@ -1,6 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import { z } from "zod";
-import { conf } from "../../conf";
+import { ENV } from "../../env";
 
 export type IAbstractToken = {
   iat: number;
@@ -120,8 +120,8 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
       this.jwt = token;
     } else {
       this.jwt = jwt.sign({ ...token, tkt: options.tkt }, options.secret, {
-        issuer: conf.token.issuer,
-        audience: conf.token.audience,
+        issuer: ENV.token.issuer,
+        audience: ENV.token.audience,
         expiresIn: options.expiresIn,
       });
     }
@@ -216,8 +216,8 @@ export class AbstractToken<T extends {}> implements IAbstractToken {
        * function automatically returns false
        */
       const decoded = jwt.verify(this.jwt, this.secret, {
-        audience: conf.token.audience,
-        issuer: conf.token.issuer,
+        audience: ENV.token.audience,
+        issuer: ENV.token.issuer,
       });
 
       /**

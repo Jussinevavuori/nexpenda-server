@@ -2,7 +2,7 @@ import * as faker from "faker";
 import * as jwt from "jsonwebtoken";
 import { TestClient } from "../../TestClient";
 import { v4 as uuid } from "uuid";
-import { conf } from "../../../conf";
+import { ENV } from "../../../env";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -71,8 +71,8 @@ describe("/api/auth/confirm_email/ [POST]", () => {
         uid: record!.id,
         tkt: "confirm_email",
       },
-      conf.token.confirmEmailToken.secret,
-      { issuer: conf.token.issuer, audience: conf.token.audience, expiresIn: 1 }
+      ENV.token.confirmEmailToken.secret,
+      { issuer: ENV.token.issuer, audience: ENV.token.audience, expiresIn: 1 }
     );
     await new Promise((res) => setTimeout(res, 1000));
     const response = await client.auth().confirmEmail(token);
@@ -95,9 +95,9 @@ describe("/api/auth/confirm_email/ [POST]", () => {
       },
       "invalid_secret",
       {
-        issuer: conf.token.issuer,
-        audience: conf.token.audience,
-        expiresIn: conf.token.confirmEmailToken.expiresIn,
+        issuer: ENV.token.issuer,
+        audience: ENV.token.audience,
+        expiresIn: ENV.token.confirmEmailToken.expiresIn,
       }
     );
     const response = await client.auth().confirmEmail(token);

@@ -1,6 +1,6 @@
 import * as passport from "passport";
 import { OAuth2Strategy as GoogleStrategy } from "passport-google-oauth";
-import { conf } from "./conf";
+import { ENV } from "./env";
 import { Schemas } from "./lib/schemas/Schemas";
 import { prisma } from "./server";
 
@@ -42,9 +42,9 @@ passport.deserializeUser(async (id, done) => {
 passport.use(
   new GoogleStrategy(
     {
-      clientID: conf.google.clientId,
-      clientSecret: conf.google.clientSecret,
-      callbackURL: `${conf.hosts.server}/api/auth/google/callback`,
+      clientID: ENV.google.clientId,
+      clientSecret: ENV.google.clientSecret,
+      callbackURL: `${ENV.hosts.server}/api/auth/google/callback`,
     },
     async (_accessToken, _refreshToken, googleProfile, done) => {
       try {

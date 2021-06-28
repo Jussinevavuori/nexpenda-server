@@ -1,5 +1,5 @@
 import { TestClient } from "../../TestClient";
-import { conf } from "../../../conf";
+import { ENV } from "../../../env";
 import { TestUtils } from "../../TestUtils";
 import { PrismaClient } from "@prisma/client";
 
@@ -14,7 +14,7 @@ describe("/api/auth/logout/ [POST]", () => {
     const response = await client.auth().logout();
     const refreshToken = TestUtils.parseCookieFromResponse(
       response,
-      conf.token.refreshToken.name
+      ENV.token.refreshToken.name
     );
     expect(response.status).toBe(200);
     expect(refreshToken).toBeDefined();

@@ -1,8 +1,8 @@
 import { stripe } from "../../server";
 import { stripeRouter } from "../../routers";
-import { StripeService } from "../../lib/stripe/StripeService";
 import { StripeFailure } from "../../lib/result/Failures";
 import { SimpleCache } from "../../lib/utils/SimpleCache";
+import { Stripe } from "stripe";
 
 /**
  * Cache the latest fetched products and refetch every ten minutes
@@ -28,7 +28,7 @@ stripeRouter.get("/products", async (req, res, next) => {
      */
     const productsResponse = await stripe.products.list();
     const pricesResponse = await stripe.prices.list();
-    const products = StripeService.combineProductsAndPrices(
+    const products = combineProductsAndPrices(
       productsResponse.data,
       pricesResponse.data
     );
@@ -46,3 +46,27 @@ stripeRouter.get("/products", async (req, res, next) => {
     return new StripeFailure(e);
   }
 });
+
+/**
+ * Combines products and prices into an easier-to-user format
+ * @param products 	List of products
+ * @param prices 	 	List of prices
+ * @returns        	List of products with each product containing
+ * 									a prices field which contains all prices for
+ * 									that product.
+ */
+function combineProductsAndPrices(
+  products: Stripe.Product[],
+  prices: Stripe.Price[]
+): StripeProductWithPrices[] {
+  return products.map((product) => {
+    return {
+      ...product,
+      prices: prices.filter((price) => {
+        return (
+          typeof price.product === "string" && price.product === product.id
+        );
+      }),
+    };
+  });
+}

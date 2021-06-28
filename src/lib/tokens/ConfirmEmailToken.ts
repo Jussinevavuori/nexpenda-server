@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { conf } from "../../conf";
+import { ENV } from "../../env";
 import { User } from "@prisma/client";
 import { AbstractToken } from "./AbstractToken";
 
@@ -26,8 +26,8 @@ export class ConfirmEmailToken
     super(typeof arg === "string" ? arg : { uid: arg.id }, {
       schema: (_) => _.merge(ConfirmEmailToken.schema),
       tkt: "confirm_email",
-      secret: conf.token.confirmEmailToken.secret,
-      expiresIn: conf.token.confirmEmailToken.expiresIn,
+      secret: ENV.token.confirmEmailToken.secret,
+      expiresIn: ENV.token.confirmEmailToken.expiresIn,
       defaultUponError: { uid: "" },
     });
     this.uid = this.payload.uid;
@@ -37,7 +37,7 @@ export class ConfirmEmailToken
    * Generate a URL for resetting the password
    */
   generateURL() {
-    return [conf.hosts.client, "confirmEmail", this.jwt].join("/");
+    return [ENV.hosts.client, "confirmEmail", this.jwt].join("/");
   }
 
   /**

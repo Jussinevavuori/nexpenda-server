@@ -24,3 +24,11 @@
 20210624120628-rename_stripe_models
 20210624121635-update_stripe_price
 20210624122137-update_subscription_model_name
+20210628093700-add_premium_prices
+20210628094325-add_recurring_interval_count
+20210628104145
+20210628104457-add_unit_amounts_to_premium_prices
+20210628105806-optional_unit_amout
+20210628110017-remove_unit_amount_decimal
+20210628111110-premium_subscription
+20210628115545-updates

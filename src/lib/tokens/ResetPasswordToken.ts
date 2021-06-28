@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { conf } from "../../conf";
+import { ENV } from "../../env";
 import { User } from "@prisma/client";
 import { AbstractToken } from "./AbstractToken";
 import { prisma } from "../../server";
@@ -37,8 +37,8 @@ export class ResetPasswordToken
       {
         schema: (_) => _.merge(ResetPasswordToken.schema),
         tkt: "reset_password",
-        secret: conf.token.resetPasswordToken.secret,
-        expiresIn: conf.token.resetPasswordToken.expiresIn,
+        secret: ENV.token.resetPasswordToken.secret,
+        expiresIn: ENV.token.resetPasswordToken.expiresIn,
         defaultUponError: { uid: "", vrs: -1 },
         verify: async (payload) => {
           const user = await prisma.user.findUnique({
@@ -59,7 +59,7 @@ export class ResetPasswordToken
    * Generate a URL for resetting the password
    */
   generateURL() {
-    return `${conf.hosts.client}/changePassword/${this.jwt}`;
+    return `${ENV.hosts.client}/changePassword/${this.jwt}`;
   }
 
   /**

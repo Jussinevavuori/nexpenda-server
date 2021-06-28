@@ -1,6 +1,6 @@
 import { stripe } from "../../server";
 import { stripeRouter } from "../../routers";
-import { StripeService } from "../../lib/stripe/StripeService";
+import { CustomerService } from "../../lib/stripe/CustomerService";
 import {
   StripeFailure,
   UnauthenticatedFailure,
@@ -20,7 +20,7 @@ stripeRouter.post("/create-billing-portal-session", async (req, res, next) => {
   /**
    * Create or update stripe customer for user
    */
-  const customer = await StripeService.createOrUpdateCustomer(user);
+  const customer = await CustomerService.createOrUpdateCustomer(user);
 
   try {
     /**
