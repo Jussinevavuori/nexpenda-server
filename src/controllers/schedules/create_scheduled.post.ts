@@ -14,6 +14,10 @@ import {
 } from "../../lib/result/Failures";
 import { groupByDateSerialToMap } from "../../lib/dates/groupByDateSerialToMap";
 
+/**
+ * Endpoint to create all scheduled transactions that are due until this date.
+ * Returns the created transactions in an array.
+ */
 schedulesRouter.post("/create_scheduled", async (req, res, next) => {
   try {
     /**
@@ -50,14 +54,17 @@ schedulesRouter.post("/create_scheduled", async (req, res, next) => {
     /**
      * Run through each schedule
      */
-    for (const schedule of schedules) {
+    for (const transactionSchedule of schedules) {
+      // Memorize new latest created occurrence if new occurrences are created
+      let newLatestCreatedOccurrence: Date | null = null;
+
       // Create schedule object for iterating over occurrences
-      const S = new Schedule({
-        firstOccurrence: schedule.firstOccurrence,
-        occurrences: schedule.occurrences ?? undefined,
+      const schedule = new Schedule({
+        firstOccurrence: transactionSchedule.firstOccurrence,
+        occurrences: transactionSchedule.occurrences ?? undefined,
         interval: {
-          type: schedule.intervalType,
-          every: schedule.intervalEvery,
+          type: transactionSchedule.intervalType,
+          every: transactionSchedule.intervalEvery,
         },
       });
 
@@ -65,20 +72,20 @@ schedulesRouter.post("/create_scheduled", async (req, res, next) => {
       // either the last created occurrence if one exists, else use the  first
       // occurrence.
       const firstDate = (() => {
-        const latest = schedule.latestCreatedOccurrence;
+        const latest = transactionSchedule.latestCreatedOccurrence;
         if (latest) {
-          const next = S.getNextOccurrence(latest);
+          const next = schedule.getNextOccurrence(latest);
           if (next) return next;
         }
 
         // Default
-        return schedule.firstOccurrence;
+        return transactionSchedule.firstOccurrence;
       })();
 
       // Get last date to loop to: if a last occurrence exists and is before
       // today, use it. By default use today.
       const lastDate = (() => {
-        const last = S.getLastOccurrence();
+        const last = schedule.getLastOccurrence();
         const today = new Date();
         if (last && compareDate(last, "<", today)) {
           return last;
@@ -96,41 +103,47 @@ schedulesRouter.post("/create_scheduled", async (req, res, next) => {
         const serial = DateSerializer.serializeDate(date);
         const transactionGroup = transactionsByDates[serial] ?? [];
         const existing = transactionGroup.find(
-          (t) => t.scheduleId === schedule.id && isSameDay(date, t.time)
+          (t) =>
+            t.scheduleId === transactionSchedule.id && isSameDay(date, t.time)
         );
 
         // If no existing occurrence found, create occurrence
         if (!existing) {
-          console.log(`>     Creating`);
           const occurrence = await prisma.transaction.create({
             data: {
               User: { connect: { id: req.data.auth.user.id } },
-              Category: { connect: { id: schedule.categoryId } },
-              integerAmount: schedule.integerAmount,
-              comment: schedule.comment,
+              Category: { connect: { id: transactionSchedule.categoryId } },
+              integerAmount: transactionSchedule.integerAmount,
+              comment: transactionSchedule.comment,
               time: date,
-              Schedule: { connect: { id: schedule.id } },
+              Schedule: { connect: { id: transactionSchedule.id } },
             },
             include: {
               Category: true,
               Schedule: true,
             },
           });
+
+          // Memorize new latest created occurrence
+          newLatestCreatedOccurrence = date;
+
           created.push(occurrence);
         }
 
         // Iterate to next occurrence
-        const next = S.getNextOccurrence(date);
+        const next = schedule.getNextOccurrence(date);
         if (!next || isSameDay(date, next)) break;
         date = next;
       }
 
       // Update latest created occurrence of scheule in order to not
       // create same schedules again, even if they are deleted.
-      await prisma.transactionSchedule.update({
-        where: { id: schedule.id },
-        data: { latestCreatedOccurrence: date },
-      });
+      if (newLatestCreatedOccurrence) {
+        await prisma.transactionSchedule.update({
+          where: { id: transactionSchedule.id },
+          data: { latestCreatedOccurrence: newLatestCreatedOccurrence },
+        });
+      }
     }
 
     // Respond with created transactions
